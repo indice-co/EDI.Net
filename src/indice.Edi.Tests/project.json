@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0-*",
+  "description": "indice.Edi.Tests Class Library",
+  "authors": [ "c.leftheris" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "dependencies": {
+    "System.Collections": "4.0.11-beta-23225",
+    "System.Linq": "4.0.1-beta-23225",
+    "System.Threading": "4.0.11-beta-23225",
+    "System.Runtime": "4.0.21-beta-23225",
+    "Microsoft.CSharp": "4.0.1-beta-23225",
+    "indice.Edi": "1.0.0-*",
+    "xunit": "2.1.0-*",
+    "xunit.runner.visualstudio": "2.1.0-*"
+  },
+
+  "frameworks": {
+    "dotnet": { }
+  }
+}
