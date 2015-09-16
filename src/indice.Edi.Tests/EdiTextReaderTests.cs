@@ -1,4 +1,5 @@
-﻿using System;
+﻿using indice.Edi.Tests.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,5 +38,14 @@ namespace indice.Edi.Tests
             Assert.Equal(4, msgCount);
         }
 
+        [Fact]
+        public void EdiSerializerDeserializeTest() {
+            var grammar = EdiGrammar.NewTradacoms();
+            var interchange = default(Interchange);
+            using (var stream = GetResourceStream("tradacoms.order9.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(670, interchange.Invoices.Count);
+        }
     }
 }

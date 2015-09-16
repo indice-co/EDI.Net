@@ -57,8 +57,8 @@ namespace indice.Edi.Serialization
         public EdiPropertyDescriptor(PropertyInfo info, IEnumerable<EdiAttribute> attributes) {
             _Info = info;
             if (attributes == null) {
-                attributes = info.GetCustomAttributes().OfType<EdiAttribute>()
-                                 .Concat(info.GetCustomAttributes<EdiAttribute>());
+                attributes = info.GetCustomAttributes<EdiAttribute>()
+                                 .Concat(info.PropertyType.GetTypeInfo().GetCustomAttributes<EdiAttribute>());
                 if (info.PropertyType.IsCollectionType()) {
                     var itemType = Info.PropertyType.GetGenericArguments().First();
                     attributes = attributes.Concat(itemType.GetTypeInfo().GetCustomAttributes<EdiAttribute>());
