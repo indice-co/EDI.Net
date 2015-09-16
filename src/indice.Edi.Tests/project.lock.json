@@ -1646,7 +1646,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "indice.Edi >= 1.0.1-*",
+      "indice.Edi >= 1.0.2-*",
       "xunit >= 2.1.0-*",
       "xunit.runner.visualstudio >= 2.1.0-*"
     ],

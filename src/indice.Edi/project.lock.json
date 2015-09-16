@@ -367,6 +367,7 @@
         }
       }
     },
+    ".NETFramework,Version=v4.5.1": {},
     "DNX,Version=v4.5.1": {}
   },
   "libraries": {
@@ -1323,6 +1324,9 @@
       "System.Data.Common >= 4.0.1-beta-23225",
       "System.Runtime.Numerics >= 4.0.1-beta-23225",
       "System.Runtime.Serialization.Primitives >= 4.0.11-beta-23225"
+    ],
+    ".NETFramework,Version=v4.5.1": [
+      "fx/System.Numerics >= 4.0.0.0"
     ],
     "DNX,Version=v4.5.1": [
       "fx/System.Numerics >= 4.0.0.0"

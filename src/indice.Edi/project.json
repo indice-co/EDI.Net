@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1-*",
+  "version": "1.0.2-*",
   "description": "Edi.Net Class Library",
   "copyright": "Copyright (c) 2015 Indice",
   "authors": [ "c.leftheris" ],
@@ -23,6 +23,13 @@
         "System.Data.Common": "4.0.1-beta-23225",
         "System.Runtime.Numerics": "4.0.1-beta-23225",
         "System.Runtime.Serialization.Primitives": "4.0.11-beta-23225"
+      }
+    },
+    "net451": {
+      "dependencies": {
+      },
+      "frameworkAssemblies": {
+        "System.Numerics": "4.0.0.0"
       }
     },
     "dnx451": {
