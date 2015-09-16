@@ -1,6 +1,7 @@
 {
   "version": "1.0.0-*",
   "description": "Edi.Net Class Library",
+  "copyright": "Copyright (c) 2015 Indice",
   "authors": [ "c.leftheris" ],
   "tags": [ "EDI", "EDIFact", "Tradacoms", "Serializer", "Parser" ],
   "projectUrl": "https://github.com/indice-co/EDI.Net",
