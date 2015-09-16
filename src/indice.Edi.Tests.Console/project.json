@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0-*",
+  "description": "indice.Edi.Tests.Console Console Application",
+  "authors": [ "c.leftheris" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "dependencies": {
+    "indice.Edi.Tests": "1.0.0-*"
+  },
+
+  "commands": {
+    "indice.Edi.Tests.Console": "indice.Edi.Tests.Console"
+  },
+
+  "frameworks": {
+    
+    "dnxcore50": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23225",
+        "System.Collections": "4.0.11-beta-23225",
+        "System.Console": "4.0.0-beta-23225",
+        "System.Linq": "4.0.1-beta-23225",
+        "System.Threading": "4.0.11-beta-23225"
+      }
+    }
+  }
+}

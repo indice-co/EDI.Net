@@ -1,9 +1,12 @@
 ﻿using indice.Edi.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace indice.Edi
 {
@@ -48,8 +51,8 @@ namespace indice.Edi
         /// Reads the next EDI token from the stream as a <see cref="Nullable{Decimal}"/>.
         /// </summary>
         /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override decimal? ReadAsDecimal() {
-            return ReadAsDecimalInternal();
+        public override decimal? ReadAsDecimal(Picture? picture = null) {
+            return ReadAsDecimalInternal(picture);
         }
 
         /// <summary>
@@ -494,6 +497,7 @@ namespace indice.Edi
                             }
                         }
                         break;
+                    // TODO: Make use of the release character.
                     case '\\':
                         _charPos = charPos;
                         if (!EnsureChars(0, true)) {

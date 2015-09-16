@@ -5,6 +5,7 @@
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
+  "resource": ["Samples/**/*.edi"],
 
   "dependencies": {
     "System.Collections": "4.0.11-beta-23225",

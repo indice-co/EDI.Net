@@ -104,7 +104,7 @@ namespace indice.Edi
         /// Gets the <see cref="IEdiGrammar"/> rules for use in the reader.
         /// </summary>
         /// <value>The current reader state.</value>
-        protected IEdiGrammar Grammar {
+        public IEdiGrammar Grammar {
             get { return _grammar; }
         }
 
@@ -169,12 +169,13 @@ namespace indice.Edi
         /// </summary>
         public virtual string Path {
             get {
+                // TODO: Make path a private member and update accordingly whenever needed. This is a performance bottleneck because most deserialization is based on inspecting the path.
                 if (_currentPosition.Type == EdiContainerType.None)
                     return string.Empty;
 
                 bool insideContainer = (_currentState != State.SegmentStart
                                         && _currentState != State.ElementStart
-                                        && _currentState != State.ComponentStart);
+                                        /*&& _currentState != State.ComponentStart*/);
 
                 IEnumerable<EdiPosition> positions = (!insideContainer)
                     ? _stack
@@ -330,8 +331,9 @@ namespace indice.Edi
         /// <summary>
         /// Reads the next EDI token from the stream as a <see cref="Nullable{Decimal}"/>.
         /// </summary>
+        /// <param name="picture">The <see cref="Nullable{Picture}"/> is the format information needed to parse this into a float</param>
         /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public abstract decimal? ReadAsDecimal();
+        public abstract decimal? ReadAsDecimal(Picture? picture);
 
         /// <summary>
         /// Reads the next EDI token from the stream as a <see cref="Nullable{DateTime}"/>.
@@ -345,7 +347,7 @@ namespace indice.Edi
             throw new NotImplementedException();
         }
         
-        internal decimal? ReadAsDecimalInternal() {
+        internal decimal? ReadAsDecimalInternal(Picture? picture) {
             EdiToken t;
             if (!ReadInternal()) {
                 SetToken(EdiToken.None);
@@ -362,7 +364,11 @@ namespace indice.Edi
                     return null;
                 }
                 decimal d;
-                if (decimal.TryParse(s, NumberStyles.Number, Culture, out d)) {
+                if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && decimal.TryParse(s, NumberStyles.Integer, Culture, out d)) {
+                    d = d * (decimal)Math.Pow(0.1, picture.Value.Precision);
+                    SetToken(EdiToken.Float, d, false);
+                    return d;
+                } else if (decimal.TryParse(s, NumberStyles.Number, Culture, out d)) {
                     SetToken(EdiToken.Float, d, false);
                     return d;
                 } else {
@@ -389,7 +395,6 @@ namespace indice.Edi
                     SetToken(EdiToken.Null);
                     return null;
                 }
-
                 if (int.TryParse(s, NumberStyles.Integer, Culture, out i)) {
                     SetToken(EdiToken.Integer, i, false);
                     return i;

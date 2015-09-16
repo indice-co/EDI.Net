@@ -1,4 +1,6 @@
-﻿namespace indice.Edi
+﻿using System;
+
+namespace indice.Edi
 {
     public interface IEdiGrammar
     {

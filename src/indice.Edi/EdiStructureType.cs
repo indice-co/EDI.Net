@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace indice.Edi
 {
-    internal enum EdiContainerType
+    public enum EdiStructureType
     {
         None = 0,
-        Segment = 1,
-        Element = 2,
-        Component = 3 
+        Interchange = 1,
+        Group = 2,
+        Message = 3,
+        Segment = 4,
+        Element = 5
     }
 }

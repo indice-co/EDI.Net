@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "indice.Edi Class Library",
   "authors": [ "c.leftheris" ],
@@ -11,7 +11,12 @@
     "System.Linq": "4.0.1-beta-23225",
     "System.Threading": "4.0.11-beta-23225",
     "System.Runtime": "4.0.21-beta-23225",
-    "Microsoft.CSharp": "4.0.1-beta-23225"
+    "Microsoft.CSharp": "4.0.1-beta-23225",
+    "System.ComponentModel.TypeConverter": "4.0.1-beta-23225",
+    "System.Text.RegularExpressions": "4.0.11-beta-23225",
+    "System.Data.Common": "4.0.1-beta-23225",
+    "System.Runtime.Numerics": "4.0.1-beta-23225",
+    "System.Runtime.Serialization.Primitives": "4.0.11-beta-23225"
   },
 
   "frameworks": {

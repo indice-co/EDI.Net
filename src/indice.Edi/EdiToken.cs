@@ -1,4 +1,10 @@
-﻿namespace indice.Edi
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace indice.Edi
 {
     /// <summary>
     /// Specifies the type of EDI token.
