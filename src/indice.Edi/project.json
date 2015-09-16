@@ -8,20 +8,29 @@
   "licenseUrl": "https://github.com/indice-co/EDI.Net/blob/master/LICENSE",
   "title": "Edi.Net",
   "summary": "Edi.Net Class Library for Reading Deserializing EDIFact and Tradacoms files into Clr Objects.",
-  "dependencies": {
-    "System.Collections": "4.0.11-beta-23225",
-    "System.Linq": "4.0.1-beta-23225",
-    "System.Threading": "4.0.11-beta-23225",
-    "System.Runtime": "4.0.21-beta-23225",
-    "Microsoft.CSharp": "4.0.1-beta-23225",
-    "System.ComponentModel.TypeConverter": "4.0.1-beta-23225",
-    "System.Text.RegularExpressions": "4.0.11-beta-23225",
-    "System.Data.Common": "4.0.1-beta-23225",
-    "System.Runtime.Numerics": "4.0.1-beta-23225",
-    "System.Runtime.Serialization.Primitives": "4.0.11-beta-23225"
-  },
-
+  
   "frameworks": {
-    "dotnet": { }
+    "dotnet": {
+      
+      "dependencies": {
+        "System.Collections": "4.0.11-beta-23225",
+        "System.Linq": "4.0.1-beta-23225",
+        "System.Threading": "4.0.11-beta-23225",
+        "System.Runtime": "4.0.21-beta-23225",
+        "Microsoft.CSharp": "4.0.1-beta-23225",
+        "System.ComponentModel.TypeConverter": "4.0.1-beta-23225",
+        "System.Text.RegularExpressions": "4.0.11-beta-23225",
+        "System.Data.Common": "4.0.1-beta-23225",
+        "System.Runtime.Numerics": "4.0.1-beta-23225",
+        "System.Runtime.Serialization.Primitives": "4.0.11-beta-23225"
+      }
+    },
+    "dnx451": {
+      "dependencies": {
+      },
+      "frameworkAssemblies": {
+        "System.Numerics": "4.0.0.0"
+      }
+    }
   }
 }

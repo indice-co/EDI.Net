@@ -5,20 +5,29 @@
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-  "resource": ["Samples/**/*.edi"],
-
+  "resource": [ "Samples/**/*.edi" ],
   "dependencies": {
-    "System.Collections": "4.0.11-beta-23225",
-    "System.Linq": "4.0.1-beta-23225",
-    "System.Threading": "4.0.11-beta-23225",
-    "System.Runtime": "4.0.21-beta-23225",
-    "Microsoft.CSharp": "4.0.1-beta-23225",
-    "indice.Edi": "1.0.0-*",
-    "xunit": "2.1.0-*",
-    "xunit.runner.visualstudio": "2.1.0-*"
+      "indice.Edi": "1.0.0-*",
+      "xunit": "2.1.0-*",
+      "xunit.runner.visualstudio": "2.1.0-*"
   },
-
   "frameworks": {
-    "dotnet": { }
+    "dotnet": {
+      "dependencies": {
+        "System.Collections": "4.0.11-beta-23225",
+        "System.Linq": "4.0.1-beta-23225",
+        "System.Threading": "4.0.11-beta-23225",
+        "System.Runtime": "4.0.21-beta-23225",
+        "Microsoft.CSharp": "4.0.1-beta-23225"
+      }
+    },
+    "dnx451": {
+      "dependencies": {
+       
+      },
+      "frameworkAssemblies": {
+          "System.Runtime": "4.0.10.0"
+      }
+    }
   }
 }

@@ -366,7 +366,8 @@
           "ref/dotnet/System.Threading.Tasks.dll": {}
         }
       }
-    }
+    },
+    "DNX,Version=v4.5.1": {}
   },
   "libraries": {
     "Microsoft.CSharp/4.0.1-beta-23225": {
@@ -1310,7 +1311,8 @@
     }
   },
   "projectFileDependencyGroups": {
-    "": [
+    "": [],
+    ".NETPlatform,Version=v5.0": [
       "System.Collections >= 4.0.11-beta-23225",
       "System.Linq >= 4.0.1-beta-23225",
       "System.Threading >= 4.0.11-beta-23225",
@@ -1322,6 +1324,8 @@
       "System.Runtime.Numerics >= 4.0.1-beta-23225",
       "System.Runtime.Serialization.Primitives >= 4.0.11-beta-23225"
     ],
-    ".NETPlatform,Version=v5.0": []
+    "DNX,Version=v4.5.1": [
+      "fx/System.Numerics >= 4.0.0.0"
+    ]
   }
 }
