@@ -21,6 +21,13 @@
         "Microsoft.CSharp": "4.0.1-beta-23225"
       }
     },
+    "net451": {
+      "dependencies": {
+      },
+      "frameworkAssemblies": {
+
+      }
+    },
     "dnx451": {
       "dependencies": {
        

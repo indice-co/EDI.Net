@@ -3,7 +3,7 @@
   "version": 1,
   "targets": {
     "DNXCore,Version=v5.0": {
-      "indice.Edi/1.0.1": {
+      "indice.Edi/1.0.2": {
         "type": "project",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1-beta-23225",
@@ -600,7 +600,7 @@
     }
   },
   "libraries": {
-    "indice.Edi/1.0.1": {
+    "indice.Edi/1.0.2": {
       "type": "project",
       "path": "../indice.Edi/project.json"
     },
