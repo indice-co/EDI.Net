@@ -91,6 +91,7 @@ namespace indice.Edi
         private readonly List<EdiPosition> _stack;
         private int? _maxDepth;
         private bool _hasExceededMaxDepth;
+        private string _Path;
 
         /// <summary>
         /// Gets the current reader state.
@@ -167,21 +168,9 @@ namespace indice.Edi
         /// <summary>
         /// Gets the path of the current EDI token. 
         /// </summary>
-        public virtual string Path {
+        public string Path {
             get {
-                // TODO: Make path a private member and update accordingly whenever needed. This is a performance bottleneck because most deserialization is based on inspecting the path.
-                if (_currentPosition.Type == EdiContainerType.None)
-                    return string.Empty;
-
-                bool insideContainer = (_currentState != State.SegmentStart
-                                        && _currentState != State.ElementStart
-                                        /*&& _currentState != State.ComponentStart*/);
-
-                IEnumerable<EdiPosition> positions = (!insideContainer)
-                    ? _stack
-                    : _stack.Concat(new[] { _currentPosition });
-
-                return EdiPosition.BuildPath(positions);
+                return _Path;
             }
         }
 
@@ -259,6 +248,20 @@ namespace indice.Edi
             _maxDepth = 5; // SEGMENT/ELEMENT/COMPONENT/VALUE
         }
 
+        private string GetCurrentPath() {
+            if (_currentPosition.Type == EdiContainerType.None)
+                return string.Empty;
+
+            bool insideContainer = (_currentState != State.SegmentStart
+                                    && _currentState != State.ElementStart);
+
+            IEnumerable<EdiPosition> positions = (!insideContainer)
+                ? _stack
+                : _stack.Concat(new[] { _currentPosition });
+
+            return EdiPosition.BuildPath(positions);
+        }
+
         private void Push(EdiContainerType value) {
             if (_currentPosition.Type == EdiContainerType.None) {
                 _currentPosition = new EdiPosition(value);
@@ -284,7 +287,6 @@ namespace indice.Edi
                 oldPosition = _currentPosition;
                 _currentPosition = new EdiPosition();
             }
-
             if (_maxDepth != null && Depth <= _maxDepth)
                 _hasExceededMaxDepth = false;
 
@@ -544,6 +546,9 @@ namespace indice.Edi
                     SetPostValueState();
                     break;
             }
+            if (newToken.IsStartToken()) { 
+                _Path = GetCurrentPath();
+            }
         } 
         #endregion
 
@@ -555,8 +560,9 @@ namespace indice.Edi
         }
 
         private void IncrementPosition() {
-            if (_currentPosition.HasIndex)
+            if (_currentPosition.HasIndex) { 
                 _currentPosition.Position++;
+            }
         }
 
         

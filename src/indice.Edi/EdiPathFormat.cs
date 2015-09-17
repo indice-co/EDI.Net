@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace indice.Edi.Serialization
+namespace indice.Edi
 {
     public class EdiPathFormat : IFormatProvider, ICustomFormatter
     {

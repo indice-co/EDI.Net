@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace indice.Edi.Serialization
+namespace indice.Edi
 {
     public struct EdiPath {
         private const string PARSE_PATTERN = @"^([A-Z]{3})([\[/]{1}(\d+?)\]?)?([\[/]{1}(\d+?)\]?)?$"; // supports both "STX/2/1 and STX[2][1]"

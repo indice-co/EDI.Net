@@ -3,7 +3,7 @@
   "version": 1,
   "targets": {
     ".NETFramework,Version=v4.5.1": {
-      "indice.Edi/1.0.4": {
+      "indice.Edi/1.0.5": {
         "type": "project",
         "frameworkAssemblies": [
           "System.Numerics"
@@ -12,14 +12,14 @@
     }
   },
   "libraries": {
-    "indice.Edi/1.0.4": {
+    "indice.Edi/1.0.5": {
       "type": "project",
       "path": "../indice.Edi/project.json"
     }
   },
   "projectFileDependencyGroups": {
     "": [
-      "indice.Edi >= 1.0.4-*"
+      "indice.Edi >= 1.0.5-*"
     ],
     ".NETFramework,Version=v4.5.1": []
   }

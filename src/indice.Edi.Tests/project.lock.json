@@ -3,7 +3,7 @@
   "version": 1,
   "targets": {
     ".NETPlatform,Version=v5.0": {
-      "indice.Edi/1.0.4": {
+      "indice.Edi/1.0.5": {
         "type": "project",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1-beta-23225",
@@ -481,7 +481,7 @@
       }
     },
     ".NETFramework,Version=v4.5.1": {
-      "indice.Edi/1.0.4": {
+      "indice.Edi/1.0.5": {
         "type": "project",
         "frameworkAssemblies": [
           "System.Numerics"
@@ -550,7 +550,7 @@
       }
     },
     "DNX,Version=v4.5.1": {
-      "indice.Edi/1.0.4": {
+      "indice.Edi/1.0.5": {
         "type": "project",
         "frameworkAssemblies": [
           "System.Numerics"
@@ -620,7 +620,7 @@
     }
   },
   "libraries": {
-    "indice.Edi/1.0.4": {
+    "indice.Edi/1.0.5": {
       "type": "project",
       "path": "../indice.Edi/project.json"
     },
@@ -1715,7 +1715,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "indice.Edi >= 1.0.4-*",
+      "indice.Edi >= 1.0.5-*",
       "xunit >= 2.1.0-*",
       "xunit.runner.visualstudio >= 2.1.0-*"
     ],
