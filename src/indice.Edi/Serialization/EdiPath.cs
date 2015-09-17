@@ -51,7 +51,18 @@ namespace indice.Edi.Serialization
         }
 
         public override string ToString() {
-            return string.Format("{0}[{1}][{2}]", Segment, ElementIndex, ComponentIndex);
+            return ToString("C", null); 
+        }
+
+        public string ToString(string format) {
+            return ToString(format, null);
+        }
+        public string ToString(IFormatProvider formatProvider) {
+            return ToString("C", formatProvider);
+        }
+        public string ToString(string format, IFormatProvider formatProvider) {
+            var formatter = new EdiPathFormat();
+            return formatter.Format(format, this, formatProvider);
         }
 
         public static EdiPath Parse(string text) {

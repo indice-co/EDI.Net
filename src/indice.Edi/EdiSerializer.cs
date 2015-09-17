@@ -96,6 +96,8 @@ namespace indice.Edi
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
                     } else if (reader.TokenType == EdiToken.SegmentName) {
                         TryCreateContainer(reader, stack, EdiStructureType.Segment);
+                    } else if (reader.TokenType == EdiToken.ElementStart) {
+                        TryCreateContainer(reader, stack, EdiStructureType.Element);
                     }
                     if (reader.TokenType == EdiToken.ComponentStart) {
                         PopulateValue(reader, stack);
@@ -262,6 +264,8 @@ namespace indice.Edi
             var property = default(EdiPropertyDescriptor);
             if (newContainer == EdiStructureType.Segment) {
                 property = FindForCurrentSegment(reader, candidates, current.Descriptor);
+            } else if (newContainer == EdiStructureType.Element) {
+                property = FindForCurrentElement(reader, candidates, current.Descriptor);
             } else {
                 property = FindForCurrentLogicalStructure(reader, candidates, current.Descriptor, newContainer);
             }    
@@ -291,9 +295,22 @@ namespace indice.Edi
 
 
         private EdiPropertyDescriptor FindForCurrentSegment(EdiReader reader, EdiPropertyDescriptor[] candidates, EdiTypeDescriptor current) {
+            if (candidates.Length == 0) {
+                return null;
+            }
             var property = default(EdiPropertyDescriptor);
             if (reader.TokenType == EdiToken.SegmentName) { 
                 property = candidates.SingleOrDefault(p => p.Segment.Equals(reader.Value));
+            }
+            return property;
+        }
+        private EdiPropertyDescriptor FindForCurrentElement(EdiReader reader, EdiPropertyDescriptor[] candidates, EdiTypeDescriptor current) {
+            if (candidates.Length == 0) {
+                return null;
+            }
+            var property = default(EdiPropertyDescriptor);
+            if (reader.TokenType == EdiToken.ElementStart) {
+                property = candidates.SingleOrDefault(p => p.PathInfo.PathInternal.ToString("S").Equals(reader.Path));
             }
             return property;
         }

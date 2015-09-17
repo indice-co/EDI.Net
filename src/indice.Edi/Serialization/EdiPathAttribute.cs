@@ -15,6 +15,11 @@ namespace indice.Edi.Serialization
             get { return _Path; }
             set { _Path = (EdiPath)value; }
         }
+
+        internal EdiPath PathInternal {
+            get { return _Path; }
+        }
+
         public string Segment {
             get {
                 return _Path.Segment;
