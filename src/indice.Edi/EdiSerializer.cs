@@ -68,7 +68,7 @@ namespace indice.Edi
         public object Deserialize(EdiReader reader, Type objectType) {
             return DeserializeInternal(reader, objectType);
         }
-
+        
         internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -76,14 +76,14 @@ namespace indice.Edi
             // set serialization options onto reader
             object value = null;
 
-            var stack = new Stack<EdiTypeDescriptor>();
+            var stack = new Stack<EdiStructure>();
 
             // If this is not a collection type asume this type is the interchange.
             if (!objectType.IsCollectionType()) {
 
                 while (reader.Read()) {
                     if (reader.IsStartInterchange) {
-                        stack.Push(new EdiTypeDescriptor(EdiStructureType.Interchange, Activator.CreateInstance(objectType)));
+                        stack.Push(new EdiStructure(EdiStructureType.Interchange, Activator.CreateInstance(objectType)));
                     }
                     if (reader.IsEndInterchange) {
                         while (stack.Peek().Container != EdiStructureType.Interchange) {
@@ -112,9 +112,10 @@ namespace indice.Edi
             return value;
         }
 
-        internal void PopulateValue(EdiReader reader, Stack<EdiTypeDescriptor> stack) {
+        internal void PopulateValue(EdiReader reader, Stack<EdiStructure> stack) {
             var current = stack.Peek();
-            var valueProps = current.Properties.Where(p => p.ValueInfo != null && reader.Path == p.Path).ToArray();
+            var typeDescriptor = current.Descriptor;
+            var valueProps = typeDescriptor.Properties.Where(p => p.ValueInfo != null && reader.Path == p.Path).ToArray();
             for (var i = 0; i < valueProps.Length; i++) {
                 var descriptor = valueProps[i];
                 var valueInfo = descriptor.ValueInfo;
@@ -246,7 +247,7 @@ namespace indice.Edi
             }
         }
 
-        internal bool TryCreateContainer(EdiReader reader, Stack<EdiTypeDescriptor> stack, EdiStructureType newContainer) {
+        internal bool TryCreateContainer(EdiReader reader, Stack<EdiStructure> stack, EdiStructureType newContainer) {
             var index = 0;
             if (stack.Count == 0)
                 return false;
@@ -257,12 +258,12 @@ namespace indice.Edi
                 }
             }
             var current = stack.Peek();
-            var candidates = current.Properties.Where(p => p.Attributes.OfType(newContainer).Any()).ToArray();
+            var candidates = current.Descriptor.Properties.Where(p => p.Attributes.OfType(newContainer).Any()).ToArray();
             var property = default(EdiPropertyDescriptor);
             if (newContainer == EdiStructureType.Segment) {
-                property = FindForCurrentSegment(reader, candidates, current);
+                property = FindForCurrentSegment(reader, candidates, current.Descriptor);
             } else {
-                property = FindForCurrentLogicalStructure(reader, candidates, current, newContainer);
+                property = FindForCurrentLogicalStructure(reader, candidates, current.Descriptor, newContainer);
             }    
             if (property == null) {
                 return false;
@@ -284,7 +285,7 @@ namespace indice.Edi
                 ((IList)propValue).Add(item);
                 propValue = item;
             }
-            stack.Push(new EdiTypeDescriptor(newContainer, propValue, index));
+            stack.Push(new EdiStructure(newContainer, propValue, index));
             return true;
         }
 

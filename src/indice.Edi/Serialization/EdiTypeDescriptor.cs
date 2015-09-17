@@ -9,22 +9,10 @@ namespace indice.Edi.Serialization
 {
     class EdiTypeDescriptor
     {
-        private readonly EdiStructureType _Container;
-        private readonly int _Index;
-        private readonly object _Instance;
         private readonly List<EdiAttribute> _Attributes;
         private readonly List<EdiPropertyDescriptor> _Properties;
+        private readonly Type _ClrType;
 
-        public EdiStructureType Container {
-            get { return _Container; }
-        }
-
-        public int Index {
-            get { return _Index; }
-        }
-        public object Instance {
-            get { return _Instance; }
-        }
 
         public List<EdiAttribute> Attributes {
             get { return _Attributes; }
@@ -35,17 +23,11 @@ namespace indice.Edi.Serialization
         }
 
         public Type ClrType {
-            get { return Instance == null ? null : Instance.GetType(); }
+            get { return _ClrType; }
         }
-
-        public EdiTypeDescriptor(EdiStructureType container, object instance)
-            : this(container, instance, 0) {
-        }
-
-        public EdiTypeDescriptor(EdiStructureType container, object instance, int index) {
-            _Container = container;
-            _Instance = instance;
-            _Index = index;
+        
+        public EdiTypeDescriptor(Type clrType) {
+            _ClrType = clrType;
             _Properties = new List<EdiPropertyDescriptor>();
             var props = ClrType.GetProperties().Select(pi => new EdiPropertyDescriptor(pi)).Where(pi => pi.Attributes.Any());
             // support for multiple value attributes on the same property. Bit hacky.
