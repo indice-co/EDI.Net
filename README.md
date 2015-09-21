@@ -88,7 +88,7 @@ public class UtilityBill
 }
 
 [EdiSegment, EdiPath("CCD")]
-public class ConsumptionChargeCharge
+public class UtilityBillCharge
 {
     [EdiValue("9(10)", Path = "CCD/0")]
     public int SequenceNumber { get; set; }

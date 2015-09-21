@@ -310,7 +310,7 @@ namespace indice.Edi
             }
             var property = default(EdiPropertyDescriptor);
             if (reader.TokenType == EdiToken.ElementStart) {
-                property = candidates.SingleOrDefault(p => p.PathInfo.PathInternal.ToString("S").Equals(reader.Path));
+                property = candidates.SingleOrDefault(p => p.PathInfo.PathInternal.ToString("E").Equals(reader.Path));
             }
             return property;
         }

@@ -84,15 +84,31 @@ namespace indice.Edi.Tests.Models
 
         public UtilityBillTrailer Totals { get; set; }
         public UtilityBillValueAddedTax Vat { get; set; }
-        public List<ConsumptionChargeCharge> Charges { get; set; }
+        public List<Charge> Charges { get; set; }
 
         public override string ToString() {
             return string.Format("{0} TD:{1:d} F:{2:d} T:{3:d} Type:{4}", InvoiceNumber, IssueDate, StartDate, EndDate, BillTypeCode);
         }
     }
 
+    [EdiElement]
+    public class TariffCodeModifier
+    {
+        [EdiValue("X(6)", Path = "CCD/3/0", Description = "TMOD")]
+        public string Modifier1 { get; set; }
+
+        [EdiValue("X(6)", Path = "CCD/3/1", Description = "TMOD")]
+        public string Modifier2 { get; set; }
+
+        [EdiValue("X(6)", Path = "CCD/3/2", Description = "TMOD")]
+        public string Modifier3 { get; set; }
+
+        [EdiValue("X(6)", Path = "CCD/3/3", Description = "TMOD")]
+        public string Modifier4 { get; set; }
+    }
+
     [EdiSegment, EdiPath("CCD")]
-    public class ConsumptionChargeCharge
+    public class Charge
     {
         
         [EdiValue("9(10)", Path = "CCD/0")]
@@ -114,18 +130,8 @@ namespace indice.Edi.Tests.Models
         [EdiValue("X(40)", Path = "CCD/2/1", Description = "TCOD")]
         public string TariffDescription { get; set; }
 
-
-        [EdiValue("X(6)", Path = "CCD/3/0", Description = "TMOD")]
-        public string TariffCodeModifier1 { get; set; }
-
-        [EdiValue("X(6)", Path = "CCD/3/1", Description = "TMOD")]
-        public string TariffCodeModifier2 { get; set; }
-
-        [EdiValue("X(6)", Path = "CCD/3/2", Description = "TMOD")]
-        public string TariffCodeModifier3 { get; set; }
-
-        [EdiValue("X(6)", Path = "CCD/3/3", Description = "TMOD")]
-        public string TariffCodeModifier4 { get; set; }
+        [EdiPath("CCD/3")]
+        public TariffCodeModifier TariffCodeModifier { get; set; }
 
 
         [EdiValue("X(35)", Path = "CCD/4", Description = "MTNR")]

@@ -252,10 +252,9 @@ namespace indice.Edi
             if (_currentPosition.Type == EdiContainerType.None)
                 return string.Empty;
 
-            bool insideContainer = (_currentState != State.SegmentStart
-                                    && _currentState != State.ElementStart);
+            bool startingSegment = _currentState != State.SegmentStart;
 
-            IEnumerable<EdiPosition> positions = (!insideContainer)
+            IEnumerable<EdiPosition> positions = (!startingSegment)
                 ? _stack
                 : _stack.Concat(new[] { _currentPosition });
 

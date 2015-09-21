@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace indice.Edi
 {
     public struct EdiPath {
-        private const string PARSE_PATTERN = @"^([A-Z]{3})([\[/]{1}(\d+?)\]?)?([\[/]{1}(\d+?)\]?)?$"; // supports both "STX/2/1 and STX[2][1]"
+        private const string PARSE_PATTERN = @"^([A-Z]{3})?([\[/]{1}(\d+?)\]?)?([\[/]{1}(\d+?)\]?)?$"; // supports both "STX/2/1 and STX[2][1]"
         private readonly string _Segment;
         private readonly int _ElementIndex;
         private readonly int _ComponentIndex;
@@ -79,7 +79,7 @@ namespace indice.Edi
             }
         }
 
-        public static implicit operator String(EdiPath value) {
+        public static implicit operator string (EdiPath value) {
             return value.ToString();
         }
 

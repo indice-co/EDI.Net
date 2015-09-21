@@ -7,34 +7,17 @@
   "licenseUrl": "",
   "resource": [ "Samples/**/*.edi" ],
   "dependencies": {
-      "indice.Edi": "1.0.5-*",
-      "xunit": "2.1.0-*",
-      "xunit.runner.visualstudio": "2.1.0-*"
+    "indice.Edi": "1.0.5-*",
+    "xunit": "2.1.0-rc2-build3176",
+    "xunit.runner.visualstudio": "2.1.0-rc2-build1126"
   },
   "frameworks": {
-    "dotnet": {
-      "dependencies": {
-        "System.Collections": "4.0.11-beta-23225",
-        "System.Linq": "4.0.1-beta-23225",
-        "System.Threading": "4.0.11-beta-23225",
-        "System.Runtime": "4.0.21-beta-23225",
-        "Microsoft.CSharp": "4.0.1-beta-23225"
-      }
-    },
-    "net451": {
-      "dependencies": {
-          "xunit":  "2.1.0-rc1-build3168"
-      },
-      "frameworkAssemblies": {
-          "System.Runtime": "4.0.10.0"
-      }
-    },
     "dnx451": {
       "dependencies": {
-        "xunit" :  "2.1.0-rc1-build3168"
+
       },
       "frameworkAssemblies": {
-          "System.Runtime": "4.0.10.0"
+        "System.Runtime": "4.0.10.0"
       }
     }
   }
