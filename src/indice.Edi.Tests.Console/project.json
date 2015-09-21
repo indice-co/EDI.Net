@@ -7,7 +7,7 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "indice.Edi": "1.0.5-*"
+    "indice.Edi": "1.0.6-*"
   },
 
   "commands": {

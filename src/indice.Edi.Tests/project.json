@@ -7,7 +7,7 @@
   "licenseUrl": "",
   "resource": [ "Samples/**/*.edi" ],
   "dependencies": {
-    "indice.Edi": "1.0.5-*",
+    "indice.Edi": "1.0.6-*",
     "xunit": "2.1.0-rc2-build3176",
     "xunit.runner.visualstudio": "2.1.0-rc2-build1126"
   },

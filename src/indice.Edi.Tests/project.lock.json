@@ -3,7 +3,7 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "indice.Edi/1.0.5": {
+      "indice.Edi/1.0.6": {
         "type": "project",
         "frameworkAssemblies": [
           "System.Numerics"
@@ -73,7 +73,7 @@
     }
   },
   "libraries": {
-    "indice.Edi/1.0.5": {
+    "indice.Edi/1.0.6": {
       "type": "project",
       "path": "../indice.Edi/project.json"
     },
@@ -229,7 +229,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "indice.Edi >= 1.0.5-*",
+      "indice.Edi >= 1.0.6-*",
       "xunit >= 2.1.0-rc2-build3176",
       "xunit.runner.visualstudio >= 2.1.0-rc2-build1126"
     ],
