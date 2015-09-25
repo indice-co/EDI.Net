@@ -6,6 +6,13 @@ At the moment working for Tradacoms/EDI Fact formats.
 Using attributes you can express all EDI rules like Mandatory/Conditional Segments,Elements & Components 
 as well as describe component values with the picture syntax (e.g `9(3)`, `9(10)V9(2)` and `X(3)`).
 
+#### Installation
+
+To install Edi.Net, run the following command in the Package Manager Console. Or download it [here](https://www.nuget.org/packages/indice.Edi/)
+
+    PM> Install-Package "indice.Edi"
+
+
 #### Example Usage:
 ```csharp
 var grammar = EdiGrammar.NewTradacoms();
