@@ -68,7 +68,7 @@ namespace indice.Edi.Utilities
 
         public string Add(string key) {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             int length = key.Length;
             if (length == 0)

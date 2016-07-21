@@ -27,7 +27,7 @@ namespace indice.Edi
         public EdiTextReader(TextReader reader, IEdiGrammar grammar)
             : base(grammar) {
             if (null == reader)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
             _reader = reader;
             _lineNumber = 1;
             _chars = new char[1025];

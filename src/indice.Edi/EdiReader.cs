@@ -124,7 +124,7 @@ namespace indice.Edi
             get { return _maxDepth; }
             set {
                 if (value <= 0)
-                    throw new ArgumentException("Value must be positive.", "value");
+                    throw new ArgumentException("Value must be positive.", nameof(value));
 
                 _maxDepth = value;
             }
@@ -227,10 +227,10 @@ namespace indice.Edi
 
         public virtual bool CheckInsideSegment(string segmentName) {
             if (string.IsNullOrEmpty(segmentName)) {
-                throw new ArgumentNullException("segmentName");
+                throw new ArgumentNullException(nameof(segmentName));
             }
             if (segmentName.Length != 3) {
-                throw new ArgumentOutOfRangeException("segmentName", segmentName, "Unexpected value '{1}' for parameter {0}");
+                throw new ArgumentOutOfRangeException(nameof(segmentName), segmentName, "Unexpected value '{1}' for parameter {0}");
             }
             return Path.StartsWith(segmentName.ToUpperInvariant(), StringComparison.Ordinal);
         }
@@ -241,7 +241,7 @@ namespace indice.Edi
         /// </summary>
         protected EdiReader(IEdiGrammar grammar) {
             if (null == grammar)
-                throw new ArgumentNullException("grammar");
+                throw new ArgumentNullException(nameof(grammar));
             _currentState = State.Start;
             _grammar = grammar;
             _stack = new List<EdiPosition>(4);

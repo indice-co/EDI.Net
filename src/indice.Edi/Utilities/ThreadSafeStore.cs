@@ -38,7 +38,7 @@ namespace indice.Edi.Utilities
         public ThreadSafeStore(Func<TKey, TValue> creator)
         {
             if (creator == null)
-                throw new ArgumentNullException("creator");
+                throw new ArgumentNullException(nameof(creator));
 
             _creator = creator;
             _store = new Dictionary<TKey, TValue>();

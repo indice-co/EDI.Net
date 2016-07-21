@@ -60,7 +60,7 @@ namespace indice.Edi.Utilities
             // leave this a private to force code to use an explicit overload
             // avoids stack memory being reserved for the object array
             if (string.IsNullOrEmpty(format)) {
-                throw new ArgumentNullException("format");
+                throw new ArgumentNullException(nameof(format));
             }
             return string.Format(provider, format, args);
         }
@@ -74,7 +74,7 @@ namespace indice.Edi.Utilities
         /// </returns>
         public static bool IsWhiteSpace(string s) {
             if (s == null)
-                throw new ArgumentNullException("s");
+                throw new ArgumentNullException(nameof(s));
 
             if (s.Length == 0)
                 return false;
@@ -121,9 +121,9 @@ namespace indice.Edi.Utilities
 
         public static TSource ForgivingCaseSensitiveFind<TSource>(this IEnumerable<TSource> source, Func<TSource, string> valueSelector, string testValue) {
             if (source == null)
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             if (valueSelector == null)
-                throw new ArgumentNullException("valueSelector");
+                throw new ArgumentNullException(nameof(valueSelector));
 
             var caseInsensitiveResults = source.Where(s => string.Equals(valueSelector(s), testValue, StringComparison.OrdinalIgnoreCase));
             if (caseInsensitiveResults.Count() <= 1) {

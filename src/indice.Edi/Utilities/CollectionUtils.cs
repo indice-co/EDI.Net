@@ -60,7 +60,7 @@ namespace indice.Edi.Utilities
         public static void AddRange<T>(this IList<T> initial, IEnumerable<T> collection)
         {
             if (initial == null)
-                throw new ArgumentNullException("initial");
+                throw new ArgumentNullException(nameof(initial));
 
             if (collection == null)
                 return;
@@ -163,7 +163,7 @@ namespace indice.Edi.Utilities
                 comparer = EqualityComparer<TSource>.Default;
 
             if (source == null)
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
 
             foreach (TSource local in source)
             {
