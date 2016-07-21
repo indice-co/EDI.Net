@@ -24,7 +24,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
-        public void EdiTextReaderTest() {
+        public void ReaderTest() {
             var msgCount = 0;
             var grammar = EdiGrammar.NewTradacoms();
 
@@ -39,13 +39,23 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
-        public void EdiSerializerDeserializeTest() {
+        public void DeserializeTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
             using (var stream = GetResourceStream("tradacoms.utilitybill.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
             }
             Assert.Equal(1, interchange.Invoices.Count);
+        }
+
+        [Fact]
+        public void EscapeCharactersTest() {
+            var grammar = EdiGrammar.NewTradacoms();
+            var interchange = default(Interchange);
+            using (var stream = GetResourceStream("tradacoms.utilitybill.escape.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal("GEORGE'S FRIED CHIKEN + SONS", interchange.Head.ClientName);
         }
     }
 }

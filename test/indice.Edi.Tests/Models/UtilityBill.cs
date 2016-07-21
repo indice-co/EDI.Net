@@ -36,6 +36,9 @@ namespace indice.Edi.Tests.Models
 
         [EdiValue("9(1)", Path = "MHD/1/1")]
         public int Version { get; set; }
+
+        [EdiValue("X(40)", Path = "CDT/1")]
+        public string ClientName { get; set; }
     }
 
     [EdiMessage, EdiCondition("UTLTLR", Path = "MHD/1")]
