@@ -484,149 +484,73 @@ namespace indice.Edi
             int initialPosition = _charPos;
             int lastWritePosition = _charPos;
             StringBuffer buffer = null;
-
             while (true) {
-                switch (_chars[charPos++]) {
-                    case '\0':
-                        if (_charsUsed == charPos - 1) {
-                            charPos--;
+                var charAt = _chars[charPos++];
+                if ('\0' == charAt) {
+                    if (_charsUsed == charPos - 1) {
+                        charPos--;
 
-                            if (ReadData(true) == 0) {
-                                _charPos = charPos;
-                                throw EdiReaderException.Create(this, "Unterminated string. Expected delimiter.");
-                            }
-                        }
-                        break;
-                    // TODO: Make use of the release character.
-                    case '\\':
-                        _charPos = charPos;
-                        if (!EnsureChars(0, true)) {
+                        if (ReadData(true) == 0) {
                             _charPos = charPos;
                             throw EdiReaderException.Create(this, "Unterminated string. Expected delimiter.");
                         }
+                    }
+                }
+                // Make use of the release character. Identify escape sequence
+                else if (Grammar.ReleaseCharacter == charAt) {
+                    _charPos = charPos;
+                    if (!EnsureChars(0, true)) {
+                        _charPos = charPos;
+                        throw EdiReaderException.Create(this, "Unterminated string. Expected delimiter.");
+                    }
 
-                        // start of escape sequence
-                        int escapeStartPos = charPos - 1;
+                    // start of escape sequence
+                    int escapeStartPos = charPos - 1;
 
-                        char currentChar = _chars[charPos];
+                    char currentChar = _chars[charPos];
 
-                        char writeChar;
+                    char writeChar;
 
-                        switch (currentChar) {
-                            case 'b':
-                                charPos++;
-                                writeChar = '\b';
-                                break;
-                            case 't':
-                                charPos++;
-                                writeChar = '\t';
-                                break;
-                            case 'n':
-                                charPos++;
-                                writeChar = '\n';
-                                break;
-                            case 'f':
-                                charPos++;
-                                writeChar = '\f';
-                                break;
-                            case 'r':
-                                charPos++;
-                                writeChar = '\r';
-                                break;
-                            case '\\':
-                                charPos++;
-                                writeChar = '\\';
-                                break;
-                            case 'u':
-                                charPos++;
-                                _charPos = charPos;
-                                writeChar = ParseUnicode();
+                    if (Grammar.IsSpecial(currentChar) || Grammar.ReleaseCharacter == currentChar) {
+                        charPos++;
+                        writeChar = currentChar;
+                    } else {
+                        charPos++;
+                        _charPos = charPos;
+                        throw EdiReaderException.Create(this, "Bad EDI escape sequence: {0}.".FormatWith(CultureInfo.InvariantCulture, Grammar.ReleaseCharacter + currentChar));
+                    }
+                    
+                    if (buffer == null)
+                        buffer = GetBuffer();
 
-                                if (StringUtils.IsLowSurrogate(writeChar)) {
-                                    // low surrogate with no preceding high surrogate; this char is replaced
-                                    writeChar = UnicodeReplacementChar;
-                                } else if (StringUtils.IsHighSurrogate(writeChar)) {
-                                    bool anotherHighSurrogate;
+                    WriteCharToBuffer(buffer, writeChar, lastWritePosition, escapeStartPos);
 
-                                    // loop for handling situations where there are multiple consecutive high surrogates
-                                    do {
-                                        anotherHighSurrogate = false;
-
-                                        // potential start of a surrogate pair
-                                        if (EnsureChars(2, true) && _chars[_charPos] == '\\' && _chars[_charPos + 1] == 'u') {
-                                            char highSurrogate = writeChar;
-
-                                            _charPos += 2;
-                                            writeChar = ParseUnicode();
-
-                                            if (StringUtils.IsLowSurrogate(writeChar)) {
-                                                // a valid surrogate pair!
-                                            } else if (StringUtils.IsHighSurrogate(writeChar)) {
-                                                // another high surrogate; replace current and start check over
-                                                highSurrogate = UnicodeReplacementChar;
-                                                anotherHighSurrogate = true;
-                                            } else {
-                                                // high surrogate not followed by low surrogate; original char is replaced
-                                                highSurrogate = UnicodeReplacementChar;
-                                            }
-
-                                            if (buffer == null)
-                                                buffer = GetBuffer();
-
-                                            WriteCharToBuffer(buffer, highSurrogate, lastWritePosition, escapeStartPos);
-                                            lastWritePosition = _charPos;
-                                        } else {
-                                            // there are not enough remaining chars for the low surrogate or is not follow by unicode sequence
-                                            // replace high surrogate and continue on as usual
-                                            writeChar = UnicodeReplacementChar;
-                                        }
-                                    } while (anotherHighSurrogate);
-                                }
-
-                                charPos = _charPos;
-                                break;
-                            default:
-                                charPos++;
-                                _charPos = charPos;
-                                throw EdiReaderException.Create(this, "Bad EDI escape sequence: {0}.".FormatWith(CultureInfo.InvariantCulture, @"\" + currentChar));
-                        }
-
+                    lastWritePosition = charPos;
+                } else if (StringUtils.CarriageReturn == charAt) {
+                    _charPos = charPos - 1;
+                    ProcessCarriageReturn(true);
+                    charPos = _charPos;
+                } else if (StringUtils.LineFeed == charAt) {
+                    _charPos = charPos - 1;
+                    ProcessLineFeed();
+                    charPos = _charPos;
+                } else if (Grammar.IsSpecial(_chars[charPos - 1])) {
+                    charPos--;
+                    if (initialPosition == lastWritePosition) {
+                        _stringReference = new StringReference(_chars, initialPosition, charPos - initialPosition);
+                    } else {
                         if (buffer == null)
                             buffer = GetBuffer();
 
-                        WriteCharToBuffer(buffer, writeChar, lastWritePosition, escapeStartPos);
+                        if (charPos > lastWritePosition)
+                            buffer.Append(_chars, lastWritePosition, charPos - lastWritePosition);
 
-                        lastWritePosition = charPos;
-                        break;
-                    case StringUtils.CarriageReturn:
-                        _charPos = charPos - 1;
-                        ProcessCarriageReturn(true);
-                        charPos = _charPos;
-                        break;
-                    case StringUtils.LineFeed:
-                        _charPos = charPos - 1;
-                        ProcessLineFeed();
-                        charPos = _charPos;
-                        break;
-                    default:
-                        if (Grammar.IsSpecial(_chars[charPos - 1])) {
-                            charPos--;
-                            if (initialPosition == lastWritePosition) {
-                                _stringReference = new StringReference(_chars, initialPosition, charPos - initialPosition);
-                            } else {
-                                if (buffer == null)
-                                    buffer = GetBuffer();
-
-                                if (charPos > lastWritePosition)
-                                    buffer.Append(_chars, lastWritePosition, charPos - lastWritePosition);
-
-                                _stringReference = new StringReference(buffer.GetInternalBuffer(), 0, buffer.Position);
-                            }
-                            _charPos = charPos;
-                            return;
-                        }
-                        break;
+                        _stringReference = new StringReference(buffer.GetInternalBuffer(), 0, buffer.Position);
+                    }
+                    _charPos = charPos;
+                    return;
                 }
+
             }
         }
 

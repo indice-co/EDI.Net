@@ -55,7 +55,7 @@ namespace indice.Edi.Tests
             using (var stream = GetResourceStream("tradacoms.utilitybill.escape.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
             }
-            Assert.Equal("GEORGE'S FRIED CHIKEN + SONS", interchange.Head.ClientName);
+            Assert.Equal("GEORGE'S FRIED CHIKEN + SONS. Could be the best chicken yet?", interchange.Head.ClientName);
         }
     }
 }
