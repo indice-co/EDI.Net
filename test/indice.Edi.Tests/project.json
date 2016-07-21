@@ -2,6 +2,7 @@
   "version": "1.0.0-*",
   "description": "indice.Edi.Tests Class Library",
   "authors": [ "c.leftheris" ],
+  "testRunner": "xunit",
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
