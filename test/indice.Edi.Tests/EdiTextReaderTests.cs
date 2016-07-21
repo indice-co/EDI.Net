@@ -42,10 +42,10 @@ namespace indice.Edi.Tests
         public void EdiSerializerDeserializeTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
-            using (var stream = GetResourceStream("tradacoms.order9.edi")) {
+            using (var stream = GetResourceStream("tradacoms.utilitybill.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
             }
-            Assert.Equal(670, interchange.Invoices.Count);
+            Assert.Equal(1, interchange.Invoices.Count);
         }
     }
 }
