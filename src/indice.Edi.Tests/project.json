@@ -2,23 +2,28 @@
   "version": "1.0.0-*",
   "description": "indice.Edi.Tests Class Library",
   "authors": [ "c.leftheris" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-  "resource": [ "Samples/**/*.edi" ],
   "dependencies": {
-    "indice.Edi": "1.0.6-*",
-    "xunit": "2.1.0-rc2-build3176",
-    "xunit.runner.visualstudio": "2.1.0-rc2-build1126"
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0"
+    },
+    "xunit": "2.1.0",
+    "dotnet-test-xunit": "1.0.0-rc2-build10025",
+    "indice.Edi": "1.0.7"
+  },
+  "buildOptions": {
+    "embed": [ "Samples/**/*.edi" ],
+    "copyToOutput": {
+      "include": [ "xunit.runner.json" ]
+    }
   },
   "frameworks": {
-    "dnx451": {
-      "dependencies": {
-
-      },
-      "frameworkAssemblies": {
-        "System.Runtime": "4.0.10.0"
-      }
+    "netcoreapp1.0": {
+      "imports": [
+        "dotnet5.6",
+        "dnxcore50",
+        "portable-net45+win8"
+      ]
     }
   }
 }

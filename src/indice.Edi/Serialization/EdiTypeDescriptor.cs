@@ -1,4 +1,5 @@
-﻿using System;
+﻿using indice.Edi.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -29,7 +30,7 @@ namespace indice.Edi.Serialization
         public EdiTypeDescriptor(Type clrType) {
             _ClrType = clrType;
             _Properties = new List<EdiPropertyDescriptor>();
-            var props = ClrType.GetProperties().Select(pi => new EdiPropertyDescriptor(pi)).Where(pi => pi.Attributes.Any());
+            var props = ClrType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(pi => new EdiPropertyDescriptor(pi)).Where(pi => pi.Attributes.Any());
             // support for multiple value attributes on the same property. Bit hacky.
             foreach (var p in props) {
                 var valueAttributes = p.Attributes.OfType<EdiValueAttribute>().ToArray();

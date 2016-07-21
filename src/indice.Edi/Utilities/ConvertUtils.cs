@@ -27,10 +27,16 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.ComponentModel;
+#if !PORTABLE
+using System.Numerics;
+#endif
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Reflection;
-using System.Linq.Expressions;
+#if !(DOTNET || PORTABLE)
+using System.Data.SqlTypes;
+
+#endif
 
 namespace indice.Edi.Utilities
 {
@@ -133,12 +139,19 @@ namespace indice.Edi.Utilities
                 { typeof(Guid?), PrimitiveTypeCode.GuidNullable },
                 { typeof(TimeSpan), PrimitiveTypeCode.TimeSpan },
                 { typeof(TimeSpan?), PrimitiveTypeCode.TimeSpanNullable },
+#if !PORTABLE
+                { typeof(BigInteger), PrimitiveTypeCode.BigInteger },
+                { typeof(BigInteger?), PrimitiveTypeCode.BigIntegerNullable },
+#endif
                 { typeof(Uri), PrimitiveTypeCode.Uri },
                 { typeof(string), PrimitiveTypeCode.String },
                 { typeof(byte[]), PrimitiveTypeCode.Bytes },
+#if !(PORTABLE || DOTNET)
                 { typeof(DBNull), PrimitiveTypeCode.DBNull }
+#endif
             };
 
+#if !PORTABLE
         private static readonly TypeInformation[] PrimitiveTypeCodes =
         {
             // need all of these. lookup against the index with TypeCode value
@@ -162,35 +175,29 @@ namespace indice.Edi.Utilities
             new TypeInformation { Type = typeof(object), TypeCode = PrimitiveTypeCode.Empty }, // no 17 in TypeCode for some reason
             new TypeInformation { Type = typeof(string), TypeCode = PrimitiveTypeCode.String }
         };
+#endif
 
-
-        public static PrimitiveTypeCode GetTypeCode(Type t)
-        {
+        public static PrimitiveTypeCode GetTypeCode(Type t) {
             bool isEnum;
             return GetTypeCode(t, out isEnum);
         }
 
-        public static PrimitiveTypeCode GetTypeCode(Type t, out bool isEnum)
-        {
+        public static PrimitiveTypeCode GetTypeCode(Type t, out bool isEnum) {
             PrimitiveTypeCode typeCode;
-            if (TypeCodeMap.TryGetValue(t, out typeCode))
-            {
+            if (TypeCodeMap.TryGetValue(t, out typeCode)) {
                 isEnum = false;
                 return typeCode;
             }
 
-            if (t.IsEnum())
-            {
+            if (t.IsEnum()) {
                 isEnum = true;
                 return GetTypeCode(Enum.GetUnderlyingType(t));
             }
 
             // performance?
-            if (ReflectionUtils.IsNullableType(t))
-            {
+            if (ReflectionUtils.IsNullableType(t)) {
                 Type nonNullable = Nullable.GetUnderlyingType(t);
-                if (nonNullable.IsEnum())
-                {
+                if (nonNullable.IsEnum()) {
                     Type nullableUnderlyingType = typeof(Nullable<>).MakeGenericType(Enum.GetUnderlyingType(nonNullable));
                     isEnum = true;
                     return GetTypeCode(nullableUnderlyingType);
@@ -200,20 +207,26 @@ namespace indice.Edi.Utilities
             isEnum = false;
             return PrimitiveTypeCode.Object;
         }
-        
+
+#if !PORTABLE
         public static TypeInformation GetTypeInformation(IConvertible convertable)
         {
             TypeInformation typeInformation = PrimitiveTypeCodes[(int)convertable.GetTypeCode()];
             return typeInformation;
         }
+#endif
 
-        public static bool IsConvertible(Type t)
-        {
+        public static bool IsConvertible(Type t) {
+#if !PORTABLE
             return typeof(IConvertible).IsAssignableFrom(t);
+#else
+            return (
+                t == typeof(bool) || t == typeof(byte) || t == typeof(char) || t == typeof(DateTime) || t == typeof(decimal) || t == typeof(double) || t == typeof(short) || t == typeof(int) ||
+                t == typeof(long) || t == typeof(sbyte) || t == typeof(float) || t == typeof(string) || t == typeof(ushort) || t == typeof(uint) || t == typeof(ulong) || t.IsEnum());
+#endif
         }
 
-        public static TimeSpan ParseTimeSpan(string input)
-        {
+        public static TimeSpan ParseTimeSpan(string input) {
             return TimeSpan.Parse(input, CultureInfo.InvariantCulture);
         }
 
@@ -222,37 +235,32 @@ namespace indice.Edi.Utilities
             private readonly Type _initialType;
             private readonly Type _targetType;
 
-            public Type InitialType
-            {
+            public Type InitialType {
                 get { return _initialType; }
             }
 
-            public Type TargetType
-            {
+            public Type TargetType {
                 get { return _targetType; }
             }
 
-            public TypeConvertKey(Type initialType, Type targetType)
-            {
+            public TypeConvertKey(Type initialType, Type targetType) {
                 _initialType = initialType;
                 _targetType = targetType;
             }
 
-            public override int GetHashCode()
-            {
+            public override int GetHashCode() {
                 return _initialType.GetHashCode() ^ _targetType.GetHashCode();
             }
 
-            public override bool Equals(object obj)
-            {
-                if (!(obj is TypeConvertKey))
+            public override bool Equals(object obj) {
+                if (!(obj is TypeConvertKey)) {
                     return false;
+                }
 
                 return Equals((TypeConvertKey)obj);
             }
 
-            public bool Equals(TypeConvertKey other)
-            {
+            public bool Equals(TypeConvertKey other) {
                 return (_initialType == other._initialType && _targetType == other._targetType);
             }
         }
@@ -260,20 +268,104 @@ namespace indice.Edi.Utilities
         private static readonly ThreadSafeStore<TypeConvertKey, Func<object, object>> CastConverters =
             new ThreadSafeStore<TypeConvertKey, Func<object, object>>(CreateCastConverter);
 
-        private static Func<object, object> CreateCastConverter(TypeConvertKey t)
-        {
+        private static Func<object, object> CreateCastConverter(TypeConvertKey t) {
             MethodInfo castMethodInfo = t.TargetType.GetMethod("op_Implicit", new[] { t.InitialType });
-            if (castMethodInfo == null)
+            if (castMethodInfo == null) {
                 castMethodInfo = t.TargetType.GetMethod("op_Explicit", new[] { t.InitialType });
+            }
 
-            if (castMethodInfo == null)
+            if (castMethodInfo == null) {
                 return null;
+            }
+
 
             MethodCall<object, object> call = (o, a) => castMethodInfo.Invoke(o, a);
 
             return o => call(null, o);
         }
 
+#if !PORTABLE
+        internal static BigInteger ToBigInteger(object value)
+        {
+            if (value is BigInteger)
+            {
+                return (BigInteger)value;
+            }
+            if (value is string)
+            {
+                return BigInteger.Parse((string)value, CultureInfo.InvariantCulture);
+            }
+            if (value is float)
+            {
+                return new BigInteger((float)value);
+            }
+            if (value is double)
+            {
+                return new BigInteger((double)value);
+            }
+            if (value is decimal)
+            {
+                return new BigInteger((decimal)value);
+            }
+            if (value is int)
+            {
+                return new BigInteger((int)value);
+            }
+            if (value is long)
+            {
+                return new BigInteger((long)value);
+            }
+            if (value is uint)
+            {
+                return new BigInteger((uint)value);
+            }
+            if (value is ulong)
+            {
+                return new BigInteger((ulong)value);
+            }
+            if (value is byte[])
+            {
+                return new BigInteger((byte[])value);
+            }
+
+            throw new InvalidCastException("Cannot convert {0} to BigInteger.".FormatWith(CultureInfo.InvariantCulture, value.GetType()));
+        }
+
+        public static object FromBigInteger(BigInteger i, Type targetType)
+        {
+            if (targetType == typeof(decimal))
+            {
+                return (decimal)i;
+            }
+            if (targetType == typeof(double))
+            {
+                return (double)i;
+            }
+            if (targetType == typeof(float))
+            {
+                return (float)i;
+            }
+            if (targetType == typeof(ulong))
+            {
+                return (ulong)i;
+            }
+            if (targetType == typeof(bool))
+            {
+                return i != 0;
+            }
+
+            try
+            {
+                return System.Convert.ChangeType((long)i, targetType, CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Can not convert from BigInteger to {0}.".FormatWith(CultureInfo.InvariantCulture, targetType), ex);
+            }
+        }
+#endif
+
+        #region TryConvert
         internal enum ConvertResult
         {
             Success = 0,
@@ -282,17 +374,15 @@ namespace indice.Edi.Utilities
             NoValidConversion = 3
         }
 
-        public static object Convert(object initialValue, CultureInfo culture, Type targetType)
-        {
+        public static object Convert(object initialValue, CultureInfo culture, Type targetType) {
             object value;
-            switch (TryConvertInternal(initialValue, culture, targetType, out value))
-            {
+            switch (TryConvertInternal(initialValue, culture, targetType, out value)) {
                 case ConvertResult.Success:
                     return value;
                 case ConvertResult.CannotConvertNull:
                     throw new Exception("Can not convert null {0} into non-nullable {1}.".FormatWith(CultureInfo.InvariantCulture, initialValue.GetType(), targetType));
                 case ConvertResult.NotInstantiableType:
-                    throw new ArgumentException("Target type {0} is not a value type or a non-abstract class.".FormatWith(CultureInfo.InvariantCulture, targetType), "targetType");
+                    throw new ArgumentException("Target type {0} is not a value type or a non-abstract class.".FormatWith(CultureInfo.InvariantCulture, targetType), nameof(targetType));
                 case ConvertResult.NoValidConversion:
                     throw new InvalidOperationException("Can not convert from {0} to {1}.".FormatWith(CultureInfo.InvariantCulture, initialValue.GetType(), targetType));
                 default:
@@ -300,51 +390,43 @@ namespace indice.Edi.Utilities
             }
         }
 
-        private static bool TryConvert(object initialValue, CultureInfo culture, Type targetType, out object value)
-        {
-            try
-            {
-                if (TryConvertInternal(initialValue, culture, targetType, out value) == ConvertResult.Success)
+        private static bool TryConvert(object initialValue, CultureInfo culture, Type targetType, out object value) {
+            try {
+                if (TryConvertInternal(initialValue, culture, targetType, out value) == ConvertResult.Success) {
                     return true;
+                }
 
                 value = null;
                 return false;
-            }
-            catch
-            {
+            } catch {
                 value = null;
                 return false;
             }
         }
 
-        private static ConvertResult TryConvertInternal(object initialValue, CultureInfo culture, Type targetType, out object value)
-        {
-            if (initialValue == null)
-                throw new ArgumentNullException("initialValue");
+        private static ConvertResult TryConvertInternal(object initialValue, CultureInfo culture, Type targetType, out object value) {
+            if (initialValue == null) {
+                throw new ArgumentNullException(nameof(initialValue));
+            }
 
-            if (ReflectionUtils.IsNullableType(targetType))
+            if (ReflectionUtils.IsNullableType(targetType)) {
                 targetType = Nullable.GetUnderlyingType(targetType);
+            }
 
             Type initialType = initialValue.GetType();
 
-            if (targetType == initialType)
-            {
+            if (targetType == initialType) {
                 value = initialValue;
                 return ConvertResult.Success;
             }
 
             // use Convert.ChangeType if both types are IConvertible
-            if (ConvertUtils.IsConvertible(initialValue.GetType()) && ConvertUtils.IsConvertible(targetType))
-            {
-                if (targetType.IsEnum())
-                {
-                    if (initialValue is string)
-                    {
+            if (ConvertUtils.IsConvertible(initialValue.GetType()) && ConvertUtils.IsConvertible(targetType)) {
+                if (targetType.IsEnum()) {
+                    if (initialValue is string) {
                         value = Enum.Parse(targetType, initialValue.ToString(), true);
                         return ConvertResult.Success;
-                    }
-                    else if (IsInteger(initialValue))
-                    {
+                    } else if (IsInteger(initialValue)) {
                         value = Enum.ToObject(targetType, initialValue);
                         return ConvertResult.Success;
                     }
@@ -354,55 +436,70 @@ namespace indice.Edi.Utilities
                 return ConvertResult.Success;
             }
 
-            if (initialValue is DateTime && targetType == typeof(DateTimeOffset))
-            {
+            if (initialValue is DateTime && targetType == typeof(DateTimeOffset)) {
                 value = new DateTimeOffset((DateTime)initialValue);
                 return ConvertResult.Success;
             }
 
-            if (initialValue is byte[] && targetType == typeof(Guid))
-            {
+            if (initialValue is byte[] && targetType == typeof(Guid)) {
                 value = new Guid((byte[])initialValue);
                 return ConvertResult.Success;
             }
 
-            if (initialValue is Guid && targetType == typeof(byte[]))
-            {
+            if (initialValue is Guid && targetType == typeof(byte[])) {
                 value = ((Guid)initialValue).ToByteArray();
                 return ConvertResult.Success;
             }
 
-            if (initialValue is string)
-            {
-                if (targetType == typeof(Guid))
-                {
-                    value = new Guid((string)initialValue);
+            string s = initialValue as string;
+            if (s != null) {
+                if (targetType == typeof(Guid)) {
+                    value = new Guid(s);
                     return ConvertResult.Success;
                 }
-                if (targetType == typeof(Uri))
-                {
-                    value = new Uri((string)initialValue, UriKind.RelativeOrAbsolute);
+                if (targetType == typeof(Uri)) {
+                    value = new Uri(s, UriKind.RelativeOrAbsolute);
                     return ConvertResult.Success;
                 }
-                if (targetType == typeof(TimeSpan))
-                {
-                    value = ParseTimeSpan((string)initialValue);
+                if (targetType == typeof(TimeSpan)) {
+                    value = ParseTimeSpan(s);
                     return ConvertResult.Success;
                 }
-                if (targetType == typeof(byte[]))
-                {
-                    value = System.Convert.FromBase64String((string)initialValue);
+                if (targetType == typeof(byte[])) {
+                    value = System.Convert.FromBase64String(s);
                     return ConvertResult.Success;
                 }
-                if (typeof(Type).IsAssignableFrom(targetType))
-                {
-                    value = Type.GetType((string)initialValue, true);
+                if (targetType == typeof(Version)) {
+                    Version result;
+                    if (VersionTryParse(s, out result)) {
+                        value = result;
+                        return ConvertResult.Success;
+                    }
+                    value = null;
+                    return ConvertResult.NoValidConversion;
+                }
+                if (typeof(Type).IsAssignableFrom(targetType)) {
+                    value = Type.GetType(s, true);
                     return ConvertResult.Success;
                 }
             }
 
+#if !PORTABLE
+            if (targetType == typeof(BigInteger))
+            {
+                value = ToBigInteger(initialValue);
+                return ConvertResult.Success;
+            }
+            if (initialValue is BigInteger)
+            {
+                value = FromBigInteger((BigInteger)initialValue, targetType);
+                return ConvertResult.Success;
+            }
+#endif
+
+#if !PORTABLE
             // see if source or target types have a TypeConverter that converts between the two
-            TypeConverter toConverter = TypeDescriptor.GetConverter(initialType);
+            TypeConverter toConverter = GetConverter(initialType);
 
             if (toConverter != null && toConverter.CanConvertTo(targetType))
             {
@@ -410,14 +507,15 @@ namespace indice.Edi.Utilities
                 return ConvertResult.Success;
             }
 
-            TypeConverter fromConverter = TypeDescriptor.GetConverter(targetType);
+            TypeConverter fromConverter = GetConverter(targetType);
 
             if (fromConverter != null && fromConverter.CanConvertFrom(initialType))
             {
                 value = fromConverter.ConvertFrom(null, culture, initialValue);
                 return ConvertResult.Success;
             }
-
+#endif
+#if !(DOTNET || PORTABLE)
             // handle DBNull and INullable
             if (initialValue == DBNull.Value)
             {
@@ -431,9 +529,16 @@ namespace indice.Edi.Utilities
                 value = null;
                 return ConvertResult.CannotConvertNull;
             }
-            
-            if (targetType.IsInterface() || targetType.IsGenericTypeDefinition() || targetType.IsAbstract())
+#endif
+#if !(DOTNET || PORTABLE)
+            if (initialValue is INullable)
             {
+                value = EnsureTypeAssignable(ToValue((INullable)initialValue), initialType, targetType);
+                return ConvertResult.Success;
+            }
+#endif
+
+            if (targetType.IsInterface() || targetType.IsGenericTypeDefinition() || targetType.IsAbstract()) {
                 value = null;
                 return ConvertResult.NotInstantiableType;
             }
@@ -441,8 +546,9 @@ namespace indice.Edi.Utilities
             value = null;
             return ConvertResult.NoValidConversion;
         }
+        #endregion
 
-#region ConvertOrCast
+        #region ConvertOrCast
         /// <summary>
         /// Converts the value to the specified type. If the value is unable to be converted, the
         /// value is checked whether it assignable to the specified type.
@@ -454,49 +560,103 @@ namespace indice.Edi.Utilities
         /// The converted type. If conversion was unsuccessful, the initial value
         /// is returned if assignable to the target type.
         /// </returns>
-        public static object ConvertOrCast(object initialValue, CultureInfo culture, Type targetType)
-        {
+        public static object ConvertOrCast(object initialValue, CultureInfo culture, Type targetType) {
             object convertedValue;
 
-            if (targetType == typeof(object))
+            if (targetType == typeof(object)) {
                 return initialValue;
+            }
 
-            if (initialValue == null && ReflectionUtils.IsNullable(targetType))
+            if (initialValue == null && ReflectionUtils.IsNullable(targetType)) {
                 return null;
+            }
 
-            if (TryConvert(initialValue, culture, targetType, out convertedValue))
+            if (TryConvert(initialValue, culture, targetType, out convertedValue)) {
                 return convertedValue;
+            }
 
             return EnsureTypeAssignable(initialValue, ReflectionUtils.GetObjectType(initialValue), targetType);
         }
-#endregion
+        #endregion
 
-        private static object EnsureTypeAssignable(object value, Type initialType, Type targetType)
-        {
+        private static object EnsureTypeAssignable(object value, Type initialType, Type targetType) {
             Type valueType = (value != null) ? value.GetType() : null;
 
-            if (value != null)
-            {
-                if (targetType.IsAssignableFrom(valueType))
+            if (value != null) {
+                if (targetType.IsAssignableFrom(valueType)) {
                     return value;
+                }
 
                 Func<object, object> castConverter = CastConverters.Get(new TypeConvertKey(valueType, targetType));
-                if (castConverter != null)
+                if (castConverter != null) {
                     return castConverter(value);
-            }
-            else
-            {
-                if (ReflectionUtils.IsNullable(targetType))
+                }
+            } else {
+                if (ReflectionUtils.IsNullable(targetType)) {
                     return null;
+                }
             }
 
             throw new ArgumentException("Could not cast or convert from {0} to {1}.".FormatWith(CultureInfo.InvariantCulture, (initialType != null) ? initialType.ToString() : "{null}", targetType));
         }
-        
-        public static bool IsInteger(object value)
+
+#if !(DOTNET || PORTABLE)
+        public static object ToValue(INullable nullableValue)
         {
-            switch (GetTypeCode(value.GetType()))
+            if (nullableValue == null)
             {
+                return null;
+            }
+            else if (nullableValue is SqlInt32)
+            {
+                return ToValue((SqlInt32)nullableValue);
+            }
+            else if (nullableValue is SqlInt64)
+            {
+                return ToValue((SqlInt64)nullableValue);
+            }
+            else if (nullableValue is SqlBoolean)
+            {
+                return ToValue((SqlBoolean)nullableValue);
+            }
+            else if (nullableValue is SqlString)
+            {
+                return ToValue((SqlString)nullableValue);
+            }
+            else if (nullableValue is SqlDateTime)
+            {
+                return ToValue((SqlDateTime)nullableValue);
+            }
+
+            throw new ArgumentException("Unsupported INullable type: {0}".FormatWith(CultureInfo.InvariantCulture, nullableValue.GetType()));
+        }
+#endif
+
+#if !PORTABLE
+        internal static TypeConverter GetConverter(Type t)
+        {
+            return TypeDescriptor.GetConverter(t);
+        }
+#endif
+
+        public static bool VersionTryParse(string input, out Version result) {
+            return Version.TryParse(input, out result);
+
+            // improve failure performance with regex?
+            try
+            {
+                result = new Version(input);
+                return true;
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
+        }
+
+        public static bool IsInteger(object value) {
+            switch (GetTypeCode(value.GetType())) {
                 case PrimitiveTypeCode.SByte:
                 case PrimitiveTypeCode.Byte:
                 case PrimitiveTypeCode.Int16:
@@ -511,20 +671,20 @@ namespace indice.Edi.Utilities
             }
         }
 
-        public static ParseResult Int32TryParse(char[] chars, int start, int length, out int value)
-        {
+        public static ParseResult Int32TryParse(char[] chars, int start, int length, out int value) {
             value = 0;
 
-            if (length == 0)
+            if (length == 0) {
                 return ParseResult.Invalid;
+            }
 
             bool isNegative = (chars[start] == '-');
 
-            if (isNegative)
-            {
+            if (isNegative) {
                 // text just a negative sign
-                if (length == 1)
+                if (length == 1) {
                     return ParseResult.Invalid;
+                }
 
                 start++;
                 length--;
@@ -532,28 +692,43 @@ namespace indice.Edi.Utilities
 
             int end = start + length;
 
-            for (int i = start; i < end; i++)
-            {
+            // Int32.MaxValue and MinValue are 10 chars
+            // Or is 10 chars and start is greater than two
+            // Need to improve this!
+            if (length > 10 || (length == 10 && chars[start] - '0' > 2)) {
+                // invalid result takes precedence over overflow
+                for (int i = start; i < end; i++) {
+                    int c = chars[i] - '0';
+
+                    if (c < 0 || c > 9) {
+                        return ParseResult.Invalid;
+                    }
+                }
+
+                return ParseResult.Overflow;
+            }
+
+            for (int i = start; i < end; i++) {
                 int c = chars[i] - '0';
 
-                if (c < 0 || c > 9)
+                if (c < 0 || c > 9) {
                     return ParseResult.Invalid;
+                }
 
                 int newValue = (10 * value) - c;
 
                 // overflow has caused the number to loop around
-                if (newValue > value)
-                {
+                if (newValue > value) {
                     i++;
 
                     // double check the rest of the string that there wasn't anything invalid
                     // invalid result takes precedence over overflow result
-                    for (; i < end; i++)
-                    {
+                    for (; i < end; i++) {
                         c = chars[i] - '0';
 
-                        if (c < 0 || c > 9)
+                        if (c < 0 || c > 9) {
                             return ParseResult.Invalid;
+                        }
                     }
 
                     return ParseResult.Overflow;
@@ -564,11 +739,11 @@ namespace indice.Edi.Utilities
 
             // go from negative to positive to avoids overflow
             // negative can be slightly bigger than positive
-            if (!isNegative)
-            {
+            if (!isNegative) {
                 // negative integer can be one bigger than positive
-                if (value == int.MinValue)
+                if (value == int.MinValue) {
                     return ParseResult.Overflow;
+                }
 
                 value = -value;
             }
@@ -576,20 +751,20 @@ namespace indice.Edi.Utilities
             return ParseResult.Success;
         }
 
-        public static ParseResult Int64TryParse(char[] chars, int start, int length, out long value)
-        {
+        public static ParseResult Int64TryParse(char[] chars, int start, int length, out long value) {
             value = 0;
 
-            if (length == 0)
+            if (length == 0) {
                 return ParseResult.Invalid;
+            }
 
             bool isNegative = (chars[start] == '-');
 
-            if (isNegative)
-            {
+            if (isNegative) {
                 // text just a negative sign
-                if (length == 1)
+                if (length == 1) {
                     return ParseResult.Invalid;
+                }
 
                 start++;
                 length--;
@@ -597,28 +772,41 @@ namespace indice.Edi.Utilities
 
             int end = start + length;
 
-            for (int i = start; i < end; i++)
-            {
+            // Int64.MaxValue and MinValue are 19 chars
+            if (length > 19) {
+                // invalid result takes precedence over overflow
+                for (int i = start; i < end; i++) {
+                    int c = chars[i] - '0';
+
+                    if (c < 0 || c > 9) {
+                        return ParseResult.Invalid;
+                    }
+                }
+
+                return ParseResult.Overflow;
+            }
+
+            for (int i = start; i < end; i++) {
                 int c = chars[i] - '0';
 
-                if (c < 0 || c > 9)
+                if (c < 0 || c > 9) {
                     return ParseResult.Invalid;
+                }
 
                 long newValue = (10 * value) - c;
 
                 // overflow has caused the number to loop around
-                if (newValue > value)
-                {
+                if (newValue > value) {
                     i++;
 
                     // double check the rest of the string that there wasn't anything invalid
                     // invalid result takes precedence over overflow result
-                    for (; i < end; i++)
-                    {
+                    for (; i < end; i++) {
                         c = chars[i] - '0';
 
-                        if (c < 0 || c > 9)
+                        if (c < 0 || c > 9) {
                             return ParseResult.Invalid;
+                        }
                     }
 
                     return ParseResult.Overflow;
@@ -629,11 +817,11 @@ namespace indice.Edi.Utilities
 
             // go from negative to positive to avoids overflow
             // negative can be slightly bigger than positive
-            if (!isNegative)
-            {
+            if (!isNegative) {
                 // negative integer can be one bigger than positive
-                if (value == long.MinValue)
+                if (value == long.MinValue) {
                     return ParseResult.Overflow;
+                }
 
                 value = -value;
             }
@@ -641,12 +829,13 @@ namespace indice.Edi.Utilities
             return ParseResult.Success;
         }
 
-        public static bool TryConvertGuid(string s, out Guid g)
-        {
+        public static bool TryConvertGuid(string s, out Guid g) {
             // GUID has to have format 00000000-0000-0000-0000-000000000000
 #if NET20 || NET35
             if (s == null)
+            {
                 throw new ArgumentNullException("s");
+            }
 
             Regex format = new Regex("^[A-Fa-f0-9]{8}-([A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}$");
             Match match = format.Match(s);
@@ -661,6 +850,30 @@ namespace indice.Edi.Utilities
 #else
             return Guid.TryParseExact(s, "D", out g);
 #endif
+        }
+
+        public static int HexTextToInt(char[] text, int start, int end) {
+            int value = 0;
+            for (int i = start; i < end; i++) {
+                value += HexCharToInt(text[i]) << ((end - 1 - i) * 4);
+            }
+            return value;
+        }
+
+        private static int HexCharToInt(char ch) {
+            if (ch <= 57 && ch >= 48) {
+                return ch - 48;
+            }
+
+            if (ch <= 70 && ch >= 65) {
+                return ch - 55;
+            }
+
+            if (ch <= 102 && ch >= 97) {
+                return ch - 87;
+            }
+
+            throw new FormatException("Invalid hex character: " + ch);
         }
     }
 }
