@@ -30,37 +30,37 @@ namespace indice.Edi
             Closed,
 
             /// <summary>
-            /// Reader is at the start of a <see cref="Edi.Segment" />.
+            /// Reader is at the start of a Segment.
             /// </summary>
             SegmentStart,
 
             /// <summary>
-            /// Reader is inside a <see cref="Edi.Segment" />.
+            /// Reader is inside a Segment.
             /// </summary>
             Segment,
 
             /// <summary>
-            /// Reader is at the name of a <see cref="Edi.Segment" />.
+            /// Reader is at the name of a Segment.
             /// </summary>
             SegmentName,
 
             /// <summary>
-            /// Reader is at the start of an <see cref="Edi.Element" />.
+            /// Reader is at the start of an Element.
             /// </summary>
             ElementStart,
 
             /// <summary>
-            /// Reader is inside an <see cref="Edi.Element" />.
+            /// Reader is inside an Element.
             /// </summary>
             Element,
 
             /// <summary>
-            /// Reader is at the start of a <see cref="Edi.Component" />.
+            /// Reader is at the start of a Component.
             /// </summary>
             ComponentStart,
 
             /// <summary>
-            /// Reader is inside a <see cref="Edi.Component" />.
+            /// Reader is inside a Component.
             /// </summary>
             Component,
 

@@ -641,18 +641,6 @@ namespace indice.Edi.Utilities
 
         public static bool VersionTryParse(string input, out Version result) {
             return Version.TryParse(input, out result);
-
-            // improve failure performance with regex?
-            try
-            {
-                result = new Version(input);
-                return true;
-            }
-            catch
-            {
-                result = null;
-                return false;
-            }
         }
 
         public static bool IsInteger(object value) {

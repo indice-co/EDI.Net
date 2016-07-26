@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace indice.Edi
 {
@@ -34,7 +35,22 @@ namespace indice.Edi
             : base(message, innerException)
         {
         }
-        
+
+
+#if !(DOTNET || PORTABLE)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EdiWriterException"/> class.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
+        /// <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
+        public EdiException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
+
         internal static EdiException Create(IEdiLineInfo lineInfo, string path, string message) {
             message = EdiPosition.FormatMessage(lineInfo, path, message);
 

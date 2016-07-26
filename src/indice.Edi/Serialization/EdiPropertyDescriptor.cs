@@ -60,7 +60,12 @@ namespace indice.Edi.Serialization
                 attributes = info.GetCustomAttributes<EdiAttribute>()
                                  .Concat(info.PropertyType.GetTypeInfo().GetCustomAttributes<EdiAttribute>());
                 if (info.PropertyType.IsCollectionType()) {
-                    var itemType = Info.PropertyType.GetGenericArguments().First();
+                    var itemType = default(Type);
+                    if (info.PropertyType.HasElementType) {
+                        itemType = info.PropertyType.GetElementType();
+                    } else {
+                        itemType = Info.PropertyType.GetGenericArguments().First();
+                    }
                     attributes = attributes.Concat(itemType.GetTypeInfo().GetCustomAttributes<EdiAttribute>());
                 }
             }

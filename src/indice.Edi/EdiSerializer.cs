@@ -275,25 +275,40 @@ namespace indice.Edi
             object propValue = property.Info.GetValue(current.Instance, null);
             if (propValue == null) {
                 if (property.Info.PropertyType.IsCollectionType()) {
-                    var baseType = typeof(List<>);
-                    var genericType = baseType.MakeGenericType(property.Info.PropertyType.GetGenericArguments().First());
-                    propValue = Activator.CreateInstance(genericType);
+                    if (property.Info.PropertyType.IsArray) {
+                        var initalLength = 0;
+                        propValue = Activator.CreateInstance(property.Info.PropertyType, initalLength);
+                    } else {
+                        var baseType = typeof(List<>);
+                        var genericType = baseType.MakeGenericType(property.Info.PropertyType.GetGenericArguments().First());
+                        propValue = Activator.CreateInstance(genericType);
+                    }
                 } else {
                     propValue = Activator.CreateInstance(property.Info.PropertyType);
                 }
                 property.Info.SetValue(current.Instance, propValue);
             }
             if (propValue is IList) {
-                var itemType = property.Info.PropertyType.GetGenericArguments().First();
-                var item = Activator.CreateInstance(itemType);
-                ((IList)propValue).Add(item);
+                var itemType = default(Type);
+                var item = default(object);
+                if (property.Info.PropertyType.IsArray) {
+                    itemType = property.Info.PropertyType.GetElementType();
+                    item = Activator.CreateInstance(itemType);
+                    var newArray = Array.CreateInstance(itemType, ((IList)propValue).Count + 1);
+                    var oldArray = ((Array)propValue);
+                    Array.Copy(oldArray, newArray, oldArray.Length);
+                    newArray.SetValue(item, newArray.Length - 1);
+                    property.Info.SetValue(current.Instance, newArray);
+                } else {
+                    itemType = property.Info.PropertyType.GetGenericArguments().First();
+                    item = Activator.CreateInstance(itemType);
+                    ((IList)propValue).Add(item);
+                }
                 propValue = item;
             }
             stack.Push(new EdiStructure(newContainer, propValue, index));
             return true;
         }
-
-
         private EdiPropertyDescriptor FindForCurrentSegment(EdiReader reader, EdiPropertyDescriptor[] candidates, EdiTypeDescriptor current) {
             if (candidates.Length == 0) {
                 return null;

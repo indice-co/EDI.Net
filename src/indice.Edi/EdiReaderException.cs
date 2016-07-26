@@ -5,6 +5,9 @@ namespace indice.Edi
     /// <summary>
     /// The exception thrown when an error occurs while reading JSON text.
     /// </summary>
+#if !(DOTNET || PORTABLE)
+    [Serializable]
+#endif
     public class EdiReaderException : EdiException
     {
         /// <summary>

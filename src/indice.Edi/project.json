@@ -1,5 +1,5 @@
 {
-  "version": "1.0.7-*",
+  "version": "1.0.8-*",
   "description": "Edi.Net Class Library",
   "copyright": "Copyright (c) 2015 Indice",
   "authors": [ "c.leftheris" ],
@@ -16,9 +16,9 @@
     "summary": "Edi.Net Class Library for Reading Deserializing EDIFact and Tradacoms files into Clr Objects."
   },
   "scripts": {
-    //"postcompile": [
-    //  "dotnet pack --no-build --configuration %compile:Configuration%"
-    //]
+    "postcompile": [
+      "dotnet pack --no-build --configuration %compile:Configuration%"
+    ]
   },
   "title": "Edi.Net",
   "frameworks": {

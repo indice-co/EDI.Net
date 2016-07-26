@@ -57,5 +57,36 @@ namespace indice.Edi.Tests
             }
             Assert.Equal("GEORGE'S FRIED CHIKEN + SONS. Could be the best chicken yet?", interchange.Head.ClientName);
         }
+
+        [Fact]
+        public void EdiFactTest() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var messages = default(Test);
+            using (var stream = GetResourceStream("edifact.edi")) {
+                messages = new EdiSerializer().Deserialize<Test>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(messages);
+        }
+
+        [Serialization.EdiSegment, Serialization.EdiPath("DTM")]
+        public class MessageCreationInfo
+        {
+            [Serialization.EdiValue("X(3)", Path = "DTM/0")]
+            public string Code { get; set; }
+            [Serialization.EdiValue("X(12)", Path = "DTM/0/1")]
+            public string Date { get; set; }
+        }
+
+        public class Test
+        {
+            public List<MessageTest> Messages { get; set; }
+        }
+
+        [Serialization.EdiMessage]
+        public class MessageTest
+        {
+
+            public List<MessageCreationInfo> CreationInfos { get; set; }
+        }
     }
 }
