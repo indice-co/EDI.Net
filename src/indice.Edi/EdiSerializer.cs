@@ -106,7 +106,7 @@ namespace indice.Edi
             }
             // else if this is indeed a collection type this must be a collection of messages.
             else {
-                throw new NotImplementedException("Collection types are not supported as the root Type. Try to wrap List of Messages inside an \"Interchage\" type.");
+                throw new NotImplementedException("Collection types are not supported as the root Type. Try to wrap List of Messages inside a container type.");
             }
 
             return value;
