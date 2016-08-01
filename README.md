@@ -1,17 +1,20 @@
 # EDI.Net
-EDI Parser/Deserializer. A ground up implementation and does not make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong whe way of getting the desired Clr object.
+EDI Parser/Deserializer. 
 
-At the moment working for Tradacoms/EDI Fact formats. 
+This is a ground up implementation and does not make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong whe way of getting the desired Clr object.
+
+At the moment working for __[Tradacoms](https://en.wikipedia.org/wiki/TRADACOMS)__/__[EDIFact](https://en.wikipedia.org/wiki/EDIFACT)__ formats. 
 
 Using attributes you can express all EDI rules like Mandatory/Conditional Segments,Elements & Components 
-as well as describe component values with the picture syntax (e.g `9(3)`, `9(10)V9(2)` and `X(3)`).
+as well as describe component values size length and precision with the picture syntax (e.g `9(3)`, `9(10)V9(2)` and `X(3)`). 
 
 #### Installation
 
 To install Edi.Net, run the following command in the Package Manager Console. Or download it [here](https://www.nuget.org/packages/indice.Edi/)
 
-    PM> Install-Package "indice.Edi"
-
+```powershell
+PM> Install-Package "indice.Edi"
+```
 
 #### Example Usage:
 ```csharp
@@ -114,12 +117,22 @@ public class UtilityBillCharge
 }
 ```
 
+#### The Picture clause
+The _Picture Clause_ is taken from COBOL laguage and the way it handles expressing numeric and alphanumric data types. It is used throug out tradacoms.
+
+|Symbol | Description      | Example Picture  | Component           | c# result
+|:-----:|------------------|:----------------:|---------------------|------------------|
+|   9   | Numeric          | `9(3)`          | `013`               | `int v = 13;`
+|   A   | Alphabetic       | not used         | -                   | -
+|   X   | Alphanumeric     | `X(20)`         | `This is alphanumeric`| `string v = "This is alphanumeric";`
+|   V   | Implicit Decimal | `9(5)V(2)`      | `01342`            | `decimal v = 13.42M;`
+|   S   | Sign             | not used         | - | - |
+|   P   | Assumed Decimal  | not used         | - | - |
 
 #### Roadmap (TODO)
 
-1. Update samples with Order9 and UtilityBill for tradacoms.
-2. Showcase more cases using the EDIFact format.
-4. Implement serializer `Serialize` to write Clr classes to edi format (Using attributes).  
-5. Consider adding support for X12 format.
+1. Implement serializer `Serialize` to write Clr classes to edi format (Using attributes). (planned for v1.1)
+1. Start github wiki page and begin documentation.
+1. Consider adding support for X12 format.
 
 _Disclaimer. The project was inspired and influenced by the work done in the excellent library [JSON.Net](https://github.com/JamesNK/Newtonsoft.Json) by James Newton King. Some utility parts for reflection string parsing etc. are used as is_
