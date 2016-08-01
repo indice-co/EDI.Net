@@ -59,34 +59,15 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
-        public void EdiFactTest() {
+        public void EdiFact_01_Test() {
             var grammar = EdiGrammar.NewEdiFact();
-            var messages = default(Test);
-            using (var stream = GetResourceStream("edifact.edi")) {
-                messages = new EdiSerializer().Deserialize<Test>(new StreamReader(stream), grammar);
+            var interchange = default(Models.EdiFact01.Interchange);
+            using (var stream = GetResourceStream("edifact.01.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.EdiFact01.Interchange>(new StreamReader(stream), grammar);
             }
-            Assert.NotNull(messages);
-        }
-
-        [Serialization.EdiSegment, Serialization.EdiPath("DTM")]
-        public class MessageCreationInfo
-        {
-            [Serialization.EdiValue("X(3)", Path = "DTM/0")]
-            public string Code { get; set; }
-            [Serialization.EdiValue("X(12)", Path = "DTM/0/1")]
-            public string Date { get; set; }
-        }
-
-        public class Test
-        {
-            public List<MessageTest> Messages { get; set; }
-        }
-
-        [Serialization.EdiMessage]
-        public class MessageTest
-        {
-
-            public List<MessageCreationInfo> CreationInfos { get; set; }
+            Assert.NotNull(interchange.Messages[0].CreationDate.Code);
+            Assert.Equal(new DateTime(2010, 10,19, 11, 04, 00), interchange.Messages[0].CreationDate.Date);
+            Assert.NotNull(interchange.Messages[0].CreationZone.Code);
         }
     }
 }

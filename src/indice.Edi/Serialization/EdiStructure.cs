@@ -13,6 +13,8 @@ namespace indice.Edi.Serialization
         private readonly int _Index;
         private readonly object _Instance;
         private readonly EdiTypeDescriptor _Descriptor;
+        private readonly Queue<EdiEntry> _CachedReads;
+
         public EdiStructureType Container {
             get { return _Container; }
         }
@@ -24,24 +26,34 @@ namespace indice.Edi.Serialization
         public int Index {
             get { return _Index; }
         }
+
         public object Instance {
             get { return _Instance; }
         }
 
-        public EdiStructure(EdiStructureType container, object instance)
-            : this(container, instance, 0) {
+        public Queue<EdiEntry> CachedReads {
+            get { return _CachedReads; }
         }
 
-        public EdiStructure(EdiStructureType container, object instance, int index) {
+        public EdiStructure(EdiStructureType container, object instance)
+            : this(container, instance, 0, new Queue<EdiEntry>()) {
+        }
+
+        public EdiStructure(EdiStructureType container, object instance, int index, Queue<EdiEntry> cache) {
             ValidationUtils.ArgumentNotNull(instance, "instance");
             _Container = container;
             _Instance = instance;
             _Index = index;
             _Descriptor = typeStore.Get(instance.GetType());
+            _CachedReads = cache;
         }
 
         private static EdiTypeDescriptor GetTypeDescriptor(Type type) {
             return new EdiTypeDescriptor(type);
+        }
+
+        public EdiPropertyDescriptor[] GetMatchingProperties(EdiStructureType sructureType) {
+            return Descriptor.Properties.Where(p => p.Attributes.OfType(sructureType).Any()).ToArray();
         }
     }
 }

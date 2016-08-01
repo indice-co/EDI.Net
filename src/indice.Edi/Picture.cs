@@ -13,6 +13,11 @@ namespace indice.Edi
         Numeric
     }
 
+    /// <summary>
+    /// Indicates the number of numeric (9) digits or alphanumeric (X) characters allowed in the data field.  
+    /// If the field is numeric, this excludes any minus sign or the decimal point.  
+    /// The decimal point is implied and its position within the data field is indicate by V.
+    /// </summary>
     public struct Picture
     {
         private const string PARSE_PATTERN = @"([9X]{1})\s?\((\d+?)\)\s?(V9\((\d+?)\))?";

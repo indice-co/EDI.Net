@@ -353,9 +353,9 @@ namespace indice.Edi
             if (!ReadInternal()) {
                 SetToken(EdiToken.None);
                 return null;
-            } else {
-                t = TokenType;
             }
+
+            t = TokenType;
             if (t == EdiToken.Null)
                 return null;
             if (t == EdiToken.String) {
@@ -365,16 +365,11 @@ namespace indice.Edi
                     return null;
                 }
                 decimal d;
-                if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && decimal.TryParse(s, NumberStyles.Integer, Culture, out d)) {
-                    d = d * (decimal)Math.Pow(0.1, picture.Value.Precision);
+                if (s.TryParse(picture, Culture, out d)) {
                     SetToken(EdiToken.Float, d, false);
                     return d;
-                } else if (decimal.TryParse(s, NumberStyles.Number, Culture, out d)) {
-                    SetToken(EdiToken.Float, d, false);
-                    return d;
-                } else {
-                    throw EdiReaderException.Create(this, "Could not convert string to decimal: {0}.".FormatWith(CultureInfo.InvariantCulture, Value));
                 }
+                throw EdiReaderException.Create(this, "Could not convert string to decimal: {0}.".FormatWith(CultureInfo.InvariantCulture, Value));
             }
             throw EdiReaderException.Create(this, "Error reading decimal. Unexpected token: {0}.".FormatWith(CultureInfo.InvariantCulture, t));
         }
@@ -399,9 +394,8 @@ namespace indice.Edi
                 if (int.TryParse(s, NumberStyles.Integer, Culture, out i)) {
                     SetToken(EdiToken.Integer, i, false);
                     return i;
-                } else {
-                    throw EdiReaderException.Create(this, "Could not convert string to integer: {0}.".FormatWith(CultureInfo.InvariantCulture, Value));
                 }
+                throw EdiReaderException.Create(this, "Could not convert string to integer: {0}.".FormatWith(CultureInfo.InvariantCulture, Value));
             }
             throw EdiReaderException.Create(this, "Error reading integer. Unexpected token: {0}.".FormatWith(CultureInfo.InvariantCulture, TokenType));
         }

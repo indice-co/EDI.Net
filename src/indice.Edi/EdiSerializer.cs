@@ -68,7 +68,7 @@ namespace indice.Edi
         public object Deserialize(EdiReader reader, Type objectType) {
             return DeserializeInternal(reader, objectType);
         }
-        
+
         internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -106,9 +106,7 @@ namespace indice.Edi
             }
             // else if this is indeed a collection type this must be a collection of messages.
             else {
-                // 1. reflect for any EdiAttributes foreach property.
-                // 2. populate the values 
-                // 3. go deeper in the elements.
+                throw new NotImplementedException("Collection types are not supported as the root Type. Try to wrap List of Messages inside an \"Interchage\" type.");
             }
 
             return value;
@@ -116,136 +114,144 @@ namespace indice.Edi
 
         internal void PopulateValue(EdiReader reader, Stack<EdiStructure> stack) {
             var current = stack.Peek();
-            var typeDescriptor = current.Descriptor;
-            var valueProps = typeDescriptor.Properties.Where(p => p.ValueInfo != null && reader.Path == p.Path).ToArray();
-            for (var i = 0; i < valueProps.Length; i++) {
-                var descriptor = valueProps[i];
-                var valueInfo = descriptor.ValueInfo;
-                var read = i == 0;
-                switch (ConvertUtils.GetTypeCode(descriptor.Info.PropertyType)) {
-                    case PrimitiveTypeCode.Empty:
-                        break;
-                    case PrimitiveTypeCode.Object:
-                        break;
-                    case PrimitiveTypeCode.Char:
-                        break;
-                    case PrimitiveTypeCode.CharNullable:
-                        break;
-                    case PrimitiveTypeCode.Boolean:
-                        break;
-                    case PrimitiveTypeCode.BooleanNullable:
-                        break;
-                    case PrimitiveTypeCode.SByte:
-                        break;
-                    case PrimitiveTypeCode.SByteNullable:
-                        break;
-                    case PrimitiveTypeCode.Int16:
-                        break;
-                    case PrimitiveTypeCode.Int16Nullable:
-                        break;
-                    case PrimitiveTypeCode.UInt16:
-                        break;
-                    case PrimitiveTypeCode.UInt16Nullable:
-                        break;
-                    case PrimitiveTypeCode.Int32:
-                    case PrimitiveTypeCode.Int32Nullable:
-                        if (!descriptor.Info.PropertyType.IsEnum()) {
-                            var integer = read ? reader.ReadAsInt32() : (int?)reader.Value;
-                            if (integer.HasValue) {
-                                descriptor.Info.SetValue(current.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
-                            }
-                        } else {
-                            var enumValueString = read ? reader.ReadAsString() : (string)reader.Value;
-                            if (!string.IsNullOrEmpty(enumValueString)) {
-                                descriptor.Info.SetValue(current.Instance, ConvertUtils.ConvertOrCast(enumValueString, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
-                            }
-                        }
-                        break;
-                    case PrimitiveTypeCode.Byte:
-                        break;
-                    case PrimitiveTypeCode.ByteNullable:
-                        break;
-                    case PrimitiveTypeCode.UInt32:
-                        break;
-                    case PrimitiveTypeCode.UInt32Nullable:
-                        break;
-                    case PrimitiveTypeCode.Int64:
-                        break;
-                    case PrimitiveTypeCode.Int64Nullable:
-                        break;
-                    case PrimitiveTypeCode.UInt64:
-                        break;
-                    case PrimitiveTypeCode.UInt64Nullable:
-                        break;
-                    case PrimitiveTypeCode.Single:
-                        break;
-                    case PrimitiveTypeCode.SingleNullable:
-                        break;
-                    case PrimitiveTypeCode.Double:
-                    case PrimitiveTypeCode.DoubleNullable:
-                    case PrimitiveTypeCode.Decimal:
-                    case PrimitiveTypeCode.DecimalNullable:
-                        var numberFloat = read ? reader.ReadAsDecimal(descriptor.ValueInfo.Picture) : (decimal?)reader.Value;
-                        if (numberFloat != null) {
-                            descriptor.Info.SetValue(current.Instance, numberFloat);
-                        }
-                        break;
-                    case PrimitiveTypeCode.DateTime:
-                    case PrimitiveTypeCode.DateTimeNullable:
-                        var dateString = read ? reader.ReadAsString() : (string)reader.Value;
-                        if (dateString != null) {
-                            dateString = dateString.Substring(0, valueInfo.Picture.Scale);
-                            var date = default(DateTime);
-                            if (DateTime.TryParseExact(dateString, valueInfo.Format, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out date)) {
-                                var existingDateObject = descriptor.Info.GetValue(current.Instance);
-                                var existingDate = default(DateTime);
-                                if (existingDateObject != null && !existingDateObject.Equals(default(DateTime))) {
-                                    if (existingDateObject is DateTime?) {
-                                        existingDate = ((DateTime?)existingDateObject).Value;
-                                    } else {
-                                        existingDate = ((DateTime)existingDateObject);
-                                    }
-                                    if (date - date.Date == default(TimeSpan)) {
-                                        date = date.Date.Add(existingDate - existingDate.Date);
-                                    } else {
-                                        date = existingDate.Add(date - date.Date);
-                                    }
-                                }
-                                descriptor.Info.SetValue(current.Instance, date);
-                            }
-                        }
-                        break;
-                    case PrimitiveTypeCode.DateTimeOffset:
-                        break;
-                    case PrimitiveTypeCode.DateTimeOffsetNullable:
-                        break;
-                    case PrimitiveTypeCode.Guid:
-                        break;
-                    case PrimitiveTypeCode.GuidNullable:
-                        break;
-                    case PrimitiveTypeCode.TimeSpan:
-                        break;
-                    case PrimitiveTypeCode.TimeSpanNullable:
-                        break;
-                    case PrimitiveTypeCode.BigInteger:
-                        break;
-                    case PrimitiveTypeCode.BigIntegerNullable:
-                        break;
-                    case PrimitiveTypeCode.Uri:
-                        break;
-                    case PrimitiveTypeCode.String:
-                        var text = read ? reader.ReadAsString() : (string)reader.Value;
-                        descriptor.Info.SetValue(current.Instance, text);
-                        break;
-                    case PrimitiveTypeCode.Bytes:
-                        break;
-                    case PrimitiveTypeCode.DBNull:
-                        break;
-                    default:
-                        break;
+            var maxLevelsUp = 0;
+            var level = 0;
+            // stack always enumerates backwards so this is a search upwards :-)
+            // we search only if we need to have more than one property populated with the value from the reader.
+            // maxLevelsUp = zero means only the current level (quicker).
+            foreach (var structure in stack) { 
+                if (level++ > maxLevelsUp)
+                    break;
+                var typeDescriptor = structure.Descriptor;
+                var valueProps = typeDescriptor.Properties
+                                               .Where(p => p.ValueInfo != null && 
+                                                            (reader.Path == p.Path  || structure.CachedReads.ContainsPath(p.Path))
+                                                           ).OrderByDescending(p => reader.Path == p.Path).ToArray();
+
+                for (var i = 0; i < valueProps.Length; i++) {
+                    var descriptor = valueProps[i];
+                    // should I use the text reader? 
+                    // Values must be read only once on first pass! 
+                    // Otherwise the reader position moves forward 
+                    // and the serializer gets out of sync.
+                    var read = current == structure && reader.Path == descriptor.Path && i == 0; 
+                    switch (ConvertUtils.GetTypeCode(descriptor.Info.PropertyType)) {
+                        case PrimitiveTypeCode.Empty: break;
+                        case PrimitiveTypeCode.Object: break;
+                        case PrimitiveTypeCode.Char: break;
+                        case PrimitiveTypeCode.CharNullable: break;
+                        case PrimitiveTypeCode.Boolean: break;
+                        case PrimitiveTypeCode.BooleanNullable: break;
+                        case PrimitiveTypeCode.SByte: break;
+                        case PrimitiveTypeCode.SByteNullable: break;
+                        case PrimitiveTypeCode.Int16: break;
+                        case PrimitiveTypeCode.Int16Nullable: break;
+                        case PrimitiveTypeCode.UInt16: break;
+                        case PrimitiveTypeCode.UInt16Nullable: break;
+                        case PrimitiveTypeCode.Int32:
+                        case PrimitiveTypeCode.Int32Nullable:
+                            PopulateInt32Value(reader, structure, descriptor, read);
+                            break;
+                        case PrimitiveTypeCode.Byte: break;
+                        case PrimitiveTypeCode.ByteNullable: break;
+                        case PrimitiveTypeCode.UInt32: break;
+                        case PrimitiveTypeCode.UInt32Nullable: break;
+                        case PrimitiveTypeCode.Int64: break;
+                        case PrimitiveTypeCode.Int64Nullable: break;
+                        case PrimitiveTypeCode.UInt64: break;
+                        case PrimitiveTypeCode.UInt64Nullable: break;
+                        case PrimitiveTypeCode.Single: break;
+                        case PrimitiveTypeCode.SingleNullable: break;
+                        case PrimitiveTypeCode.Double:
+                        case PrimitiveTypeCode.DoubleNullable:
+                        case PrimitiveTypeCode.Decimal:
+                        case PrimitiveTypeCode.DecimalNullable:
+                            PopulateDecimalValue(reader, structure, descriptor, read);
+                            break;
+                        case PrimitiveTypeCode.DateTime:
+                        case PrimitiveTypeCode.DateTimeNullable:
+                            PopulateDateTimeValue(reader, structure, descriptor, read);
+                            break;
+                        case PrimitiveTypeCode.DateTimeOffset: break;
+                        case PrimitiveTypeCode.DateTimeOffsetNullable: break;
+                        case PrimitiveTypeCode.Guid: break;
+                        case PrimitiveTypeCode.GuidNullable: break;
+                        case PrimitiveTypeCode.TimeSpan: break;
+                        case PrimitiveTypeCode.TimeSpanNullable: break;
+                        case PrimitiveTypeCode.BigInteger: break;
+                        case PrimitiveTypeCode.BigIntegerNullable: break;
+                        case PrimitiveTypeCode.Uri: break;
+                        case PrimitiveTypeCode.String:
+                            PopulateStringValue(reader, structure, descriptor, read);
+                            break;
+                        case PrimitiveTypeCode.Bytes: break;
+                        case PrimitiveTypeCode.DBNull: break;
+                    }
                 }
+            }
+        }
 
+        private static void PopulateStringValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            var text = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) : 
+                                                     read ? reader.ReadAsString() : (string)reader.Value;
+            descriptor.Info.SetValue(structure.Instance, text);
+        }
 
+        internal static void PopulateDateTimeValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            var dateString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
+                                                           read ? reader.ReadAsString() : (string)reader.Value;
+            if (dateString != null) {
+                dateString = dateString.Substring(0, valueInfo.Picture.Scale);
+                var date = default(DateTime);
+                if (DateTime.TryParseExact(dateString, valueInfo.Format, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out date)) {
+                    var existingDateObject = descriptor.Info.GetValue(structure.Instance);
+                    var existingDate = default(DateTime);
+                    if (existingDateObject != null && !existingDateObject.Equals(default(DateTime))) {
+                        if (existingDateObject is DateTime?) {
+                            existingDate = ((DateTime?)existingDateObject).Value;
+                        } else {
+                            existingDate = ((DateTime)existingDateObject);
+                        }
+                        if (date - date.Date == default(TimeSpan)) {
+                            date = date.Date.Add(existingDate - existingDate.Date);
+                        } else {
+                            date = existingDate.Add(date - date.Date);
+                        }
+                    }
+                    descriptor.Info.SetValue(structure.Instance, date);
+                }
+            }
+        }
+
+        internal static void PopulateDecimalValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            var numberFloat = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsDecimal(valueInfo.Path, descriptor.ValueInfo.Picture, reader.Culture) :
+                                                            read ? reader.ReadAsDecimal(descriptor.ValueInfo.Picture) : (decimal?)reader.Value;
+            if (numberFloat != null) {
+                descriptor.Info.SetValue(structure.Instance, numberFloat);
+            }
+        }
+
+        internal static void PopulateInt32Value(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            if (!descriptor.Info.PropertyType.IsEnum()) {
+                var integer = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsInt32(valueInfo.Path, reader.Culture) :
+                                                            read ? reader.ReadAsInt32() : (int?)reader.Value;
+                if (integer.HasValue) {
+                    descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
+                }
+            } else {
+                var enumValueString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
+                                                                    read ? reader.ReadAsString() : (string)reader.Value;
+                if (!string.IsNullOrEmpty(enumValueString)) {
+                    descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(enumValueString, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
+                }
             }
         }
 
@@ -260,15 +266,15 @@ namespace indice.Edi
                 }
             }
             var current = stack.Peek();
-            var candidates = current.Descriptor.Properties.Where(p => p.Attributes.OfType(newContainer).Any()).ToArray();
+            var candidates = current.GetMatchingProperties(newContainer);
             var property = default(EdiPropertyDescriptor);
             if (newContainer == EdiStructureType.Segment) {
-                property = FindForCurrentSegment(reader, candidates, current.Descriptor);
+                property = FindForCurrentSegment(reader, current, newContainer);
             } else if (newContainer == EdiStructureType.Element) {
-                property = FindForCurrentElement(reader, candidates, current.Descriptor);
+                property = FindForCurrentElement(reader, current, newContainer);
             } else {
-                property = FindForCurrentLogicalStructure(reader, candidates, current.Descriptor, newContainer);
-            }    
+                property = FindForCurrentLogicalStructure(reader, current, newContainer);
+            }
             if (property == null) {
                 return false;
             }
@@ -306,52 +312,85 @@ namespace indice.Edi
                 }
                 propValue = item;
             }
-            stack.Push(new EdiStructure(newContainer, propValue, index));
+            stack.Push(new EdiStructure(newContainer, propValue, index, current.CachedReads));
             return true;
         }
-        private EdiPropertyDescriptor FindForCurrentSegment(EdiReader reader, EdiPropertyDescriptor[] candidates, EdiTypeDescriptor current) {
+        private EdiPropertyDescriptor FindForCurrentSegment(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
+            currentStructure.CachedReads.Clear();
+            var candidates = currentStructure.GetMatchingProperties(newContainerType);
             if (candidates.Length == 0) {
                 return null;
             }
             var property = default(EdiPropertyDescriptor);
-            if (reader.TokenType == EdiToken.SegmentName) { 
-                property = candidates.SingleOrDefault(p => p.Segment.Equals(reader.Value));
+            if (reader.TokenType == EdiToken.SegmentName) {
+                var matches = candidates.Where(p => p.Segment.Equals(reader.Value)).ToArray();
+                if (matches.Length == 0) {
+                    property = null;
+                } else if (matches.Length == 1 && matches[0].ConditionInfo == null) {
+                    property = matches[0];
+                } else {
+                    property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
+                }
             }
             return property;
         }
-        private EdiPropertyDescriptor FindForCurrentElement(EdiReader reader, EdiPropertyDescriptor[] candidates, EdiTypeDescriptor current) {
+        private EdiPropertyDescriptor FindForCurrentElement(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
+            var candidates = currentStructure.GetMatchingProperties(newContainerType);
             if (candidates.Length == 0) {
                 return null;
             }
             var property = default(EdiPropertyDescriptor);
             if (reader.TokenType == EdiToken.ElementStart) {
-                property = candidates.SingleOrDefault(p => p.PathInfo.PathInternal.ToString("E").Equals(reader.Path));
+                var matches = candidates.Where(p => p.PathInfo.PathInternal.ToString("E").Equals(reader.Path)).ToArray();
+                if (matches.Length == 0) {
+                    property = null;
+                } 
+                else if (matches.Length == 1 && matches[0].ConditionInfo == null) {
+                    property = matches[0];
+                } else {
+                    property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
+                }
+            }
+            return property;
+        }
+        
+        private EdiPropertyDescriptor FindForCurrentLogicalStructure(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
+            var candidates = currentStructure.GetMatchingProperties(newContainerType);
+            var property = default(EdiPropertyDescriptor);
+            if (candidates.Length == 0) {
+                return null;
+            }
+            if (candidates.Length == 1 && candidates[0].ConditionInfo == null) {
+                property = candidates[0];
+            } else {
+                property = ConditionalMatch(reader, currentStructure, newContainerType, candidates);
             }
             return property;
         }
 
-        private EdiPropertyDescriptor FindForCurrentLogicalStructure(EdiReader reader, EdiPropertyDescriptor[] candidates, EdiTypeDescriptor current, EdiStructureType newContainer) {
-            var property = default(EdiPropertyDescriptor);
-            if (candidates.Length == 0) {
-                return null;
-            } else if (candidates.Length == 1 && candidates[0].ConditionInfo == null) {
-                property = candidates[0];
-            } else {
-                if (!candidates.All(p => p.ConditionInfo != null)) {
-                    "More than one properties on type '{0}' have a '{1}' attribute. Please add a 'Condition' attribute to all properties in order to discriminate where each message will go.".FormatWith(CultureInfo.InvariantCulture, current.ClrType.Name, newContainer);
-                }
-                if (candidates.Select(p => p.Path).Distinct().Count() != 1) {
-                    "More than one properties on type '{0}' have a '{1}' attribute but the 'Condition' attribute has a different search path declared.".FormatWith(CultureInfo.InvariantCulture, current.ClrType.Name, newContainer);
-                }
-                var path = string.Empty;
-                do {
-                    reader.Read();
-                    path = reader.Path;
-                } while (reader.TokenType != EdiToken.SegmentStart && candidates[0].Path != path);
 
-                var discriminator = reader.ReadAsString();
-                property = candidates.SingleOrDefault(p => p.ConditionInfo.MatchValue == discriminator);
+        private static EdiPropertyDescriptor ConditionalMatch(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType, EdiPropertyDescriptor[] matches) {
+            if (!matches.All(p => p.ConditionInfo != null)) {
+                throw new EdiException(
+                "More than one properties on type '{0}' have the '{1}' attribute. Please add a 'Condition' attribute to all properties in order to discriminate where each {2} will go."
+                    .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType, newContainerType));
             }
+            if (matches.Select(p => p.Path).Distinct().Count() != 1) {
+                throw new EdiException("More than one properties on type '{0}' have the '{1}' attribute but the 'Condition' attribute has a different search path declared."
+                    .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType));
+            }
+
+            var readCache = currentStructure.CachedReads;
+            var path = string.Empty;
+            do {
+                reader.Read();
+                path = reader.Path;
+                readCache.Enqueue(new EdiEntry(path, reader.TokenType, reader.Value as string));
+            } while (reader.TokenType != EdiToken.SegmentStart && matches[0].Path != path);
+
+            var discriminator = reader.ReadAsString();
+            var property = matches.SingleOrDefault(p => p.ConditionInfo.MatchValue == discriminator);
+            readCache.Enqueue(new EdiEntry(path, reader.TokenType, discriminator));
             return property;
         }
     }

@@ -43,8 +43,12 @@ namespace indice.Edi
         }
 
         public override bool Equals(object obj) {
-            if (obj != null && obj is EdiPath) {
-                var other = ((EdiPath)obj);
+            if (obj != null && (obj is EdiPath || obj is string)) {
+                var other = default(EdiPath);
+                if (obj is EdiPath)
+                    other = (EdiPath)obj;
+                else
+                    other = (EdiPath)(string)obj;
                 return other.Segment == Segment && other.ElementIndex == ElementIndex && other.ComponentIndex == ComponentIndex;
             }
             return base.Equals(obj);
