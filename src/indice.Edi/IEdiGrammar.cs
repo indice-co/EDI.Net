@@ -26,7 +26,7 @@ namespace indice.Edi
         /// is used as a prefix to remove special meaning from the separator, segment termination, 
         /// and release characters when they are used as plain text. Default value is <value>'?'</value>
         /// </summary>
-        char ReleaseCharacter { get; }
+        char? ReleaseCharacter { get; }
 
         /// <summary>
         /// <para>

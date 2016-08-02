@@ -69,5 +69,17 @@ namespace indice.Edi.Tests
             Assert.Equal(new DateTime(2010, 10,19, 11, 04, 00), interchange.Messages[0].CreationDate.Date);
             Assert.NotNull(interchange.Messages[0].CreationZone.Code);
         }
+
+        [Fact]
+        public void X12_Grammar_Test() {
+            var grammar = EdiGrammar.NewX12();
+            var interchange = default(Models.EdiFact01.Interchange);
+            using (var stream = GetResourceStream("edifact.01.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.EdiFact01.Interchange>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(interchange.Messages[0].CreationDate.Code);
+            Assert.Equal(new DateTime(2010, 10, 19, 11, 04, 00), interchange.Messages[0].CreationDate.Date);
+            Assert.NotNull(interchange.Messages[0].CreationZone.Code);
+        }
     }
 }

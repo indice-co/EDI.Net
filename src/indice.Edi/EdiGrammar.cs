@@ -11,7 +11,7 @@ namespace indice.Edi
         protected char[] _ComponentDataElementSeparator;
         protected char[] _DataElementSeparator;
         protected char? _DecimalMark;
-        protected char _ReleaseCharacter;
+        protected char? _ReleaseCharacter;
         protected char[] _Reserved;
         protected char _SegmentTerminator;
 
@@ -65,7 +65,7 @@ namespace indice.Edi
         public char? DecimalMark {
             get { return _DecimalMark; }
         }
-        public char ReleaseCharacter {
+        public char? ReleaseCharacter {
             get { return _ReleaseCharacter; }
         }
 
@@ -123,6 +123,24 @@ namespace indice.Edi
                 _MessageTrailerTag = "MTR",
                 _FunctionalGroupTrailerTag = "EOB",
                 _InterchangeTrailerTag = "END",
+            };
+        }
+        
+        public static IEdiGrammar NewX12() {
+            return new EdiGrammar() {
+                _ComponentDataElementSeparator = new[] { '>' },
+                _DataElementSeparator = new[] { '*' },
+                _DecimalMark = null,
+                _ReleaseCharacter = null,
+                _Reserved = new char[0],
+                _SegmentTerminator = '~',
+                _ServiceStringAdviceTag = null,
+                _InterchangeHeaderTag = "ISA",
+                _FunctionalGroupHeaderTag = "GS",
+                _MessageHeaderTag = "ST",
+                _MessageTrailerTag = "SE",
+                _FunctionalGroupTrailerTag = "GE",
+                _InterchangeTrailerTag = "IEA",
             };
         }
     }
