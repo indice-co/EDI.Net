@@ -138,10 +138,14 @@ namespace indice.Edi
                     switch (ConvertUtils.GetTypeCode(descriptor.Info.PropertyType)) {
                         case PrimitiveTypeCode.Empty: break;
                         case PrimitiveTypeCode.Object: break;
-                        case PrimitiveTypeCode.Char: break;
-                        case PrimitiveTypeCode.CharNullable: break;
-                        case PrimitiveTypeCode.Boolean: break;
-                        case PrimitiveTypeCode.BooleanNullable: break;
+                        case PrimitiveTypeCode.Char:
+                        case PrimitiveTypeCode.CharNullable:
+                            PopulateCharValue(reader, structure, descriptor, read);
+                            break;
+                        case PrimitiveTypeCode.Boolean:
+                        case PrimitiveTypeCode.BooleanNullable: 
+                            PopulateBooleanValue(reader, structure, descriptor, read);
+                            break;
                         case PrimitiveTypeCode.SByte: break;
                         case PrimitiveTypeCode.SByteNullable: break;
                         case PrimitiveTypeCode.Int16: break;
@@ -255,6 +259,39 @@ namespace indice.Edi
             }
         }
 
+        internal static void PopulateCharValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            var text = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
+                                                     read ? reader.ReadAsString() : (string)reader.Value;
+
+            if (!string.IsNullOrEmpty(text)) {
+                if (text.Length > 1)
+                    throw new EdiException("Unable to convert string '{0}' to char. It is more than 1 character long.".FormatWith(reader.Culture, text));
+                descriptor.Info.SetValue(structure.Instance, text[0]);
+            }
+        }
+
+        internal static void PopulateBooleanValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            var text = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
+                                                     read ? reader.ReadAsString() : (string)reader.Value;
+
+            if (!string.IsNullOrEmpty(text)) {
+                int integerValue = default(int);
+                bool booleanValue = default(bool);
+                if (int.TryParse(text, NumberStyles.Integer, reader.Culture, out integerValue)) {
+                    booleanValue = integerValue == 1;
+                } else if (bool.TryParse(text, out booleanValue)) {
+                } 
+                else { 
+                    throw new EdiException("Unable to convert string '{0}' to char. It is more than 1 character long.".FormatWith(reader.Culture, text));
+                }
+                descriptor.Info.SetValue(structure.Instance, booleanValue);
+            }
+        }
+
         internal bool TryCreateContainer(EdiReader reader, Stack<EdiStructure> stack, EdiStructureType newContainer) {
             var index = 0;
             if (stack.Count == 0)
@@ -315,6 +352,7 @@ namespace indice.Edi
             stack.Push(new EdiStructure(newContainer, propValue, index, current.CachedReads));
             return true;
         }
+
         private EdiPropertyDescriptor FindForCurrentSegment(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
             currentStructure.CachedReads.Clear();
             var candidates = currentStructure.GetMatchingProperties(newContainerType);
@@ -367,7 +405,6 @@ namespace indice.Edi
             }
             return property;
         }
-
 
         private static EdiPropertyDescriptor ConditionalMatch(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType, EdiPropertyDescriptor[] matches) {
             if (!matches.All(p => p.ConditionInfo != null)) {
