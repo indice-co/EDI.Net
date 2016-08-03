@@ -3,7 +3,7 @@ EDI Parser/Deserializer.
 
 This is a ground up implementation and does not make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong whe way of getting the desired Clr object.
 
-Tested with __[Tradacoms](https://en.wikipedia.org/wiki/TRADACOMS)__, __[EDIFact](https://en.wikipedia.org/wiki/EDIFACT)__ and __[ASCII ASC X12](https://en.wikipedia.org/wiki/ASC_X12) (X12)__ formats. 
+Tested with __[Tradacoms](https://en.wikipedia.org/wiki/TRADACOMS)__, __[EDIFact](https://en.wikipedia.org/wiki/EDIFACT)__ and __[ANSI ASC X12](https://en.wikipedia.org/wiki/ASC_X12) (X12)__ formats. 
 
 Using attributes you can express all EDI rules like Mandatory/Conditional Segments, Elements & Components 
 as well as describe component values size length and precision with the [picture syntax](#the-picture-clause) (e.g `9(3)`, `9(10)V9(2)` and `X(3)`). 
