@@ -34,7 +34,11 @@ namespace indice.Edi.Serialization
         public Picture Picture {
             get { return _picture; }
         }
-        
+
+        public EdiValueAttribute()
+           : this(default(Picture)) {
+        }
+
         public EdiValueAttribute(string picture)
             : this((Picture)picture) {
         }

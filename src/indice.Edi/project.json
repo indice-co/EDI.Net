@@ -4,7 +4,7 @@
   "copyright": "Copyright (c) 2015 Indice",
   "authors": [ "c.leftheris" ],
   "packOptions": {
-    "tags": [ "EDI", "EDIFact", "Tradacoms", "Serializer", "Parser" ],
+    "tags": [ "EDI", "EDIFact", "Tradacoms", "X12", "Serializer", "Parser" ],
     "projectUrl": "https://github.com/indice-co/EDI.Net",
     "licenseUrl": "https://github.com/indice-co/EDI.Net/blob/master/LICENSE",
     "owners": [ "indice" ],

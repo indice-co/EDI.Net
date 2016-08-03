@@ -13,10 +13,20 @@ namespace indice.Edi.Tests
         [InlineData("DTM/0")]
         [InlineData("DTM")]
         [Theory]
-        public void ParseMustHandleUriAndIndexFormats(string text)
+        public void ParseHandlesUriAndIndexFormats(string text)
         {
             var path = EdiPath.Parse(text);
             Assert.True(path.Equals("DTM[0][0]"));  
+        }
+
+        [InlineData("GS[0][0]")]
+        [InlineData("GS/0/0")]
+        [InlineData("GS/0")]
+        [InlineData("GS")]
+        [Theory]
+        public void ParseHandlesTwoLetterSegmentNames(string text) {
+            var path = EdiPath.Parse(text);
+            Assert.Equal("GS[0][0]", path.ToString());
         }
     }
 }

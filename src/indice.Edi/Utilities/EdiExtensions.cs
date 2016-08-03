@@ -62,10 +62,10 @@ namespace indice.Edi.Utilities
             return null == typeToSearch ? Enumerable.Empty<EdiAttribute>() : attributes.Where(a => a.GetType().Equals(typeToSearch));
         }
         
-        public static bool TryParse(this string value, Picture? picture, CultureInfo culture, out decimal number) {
+        public static bool TryParse(this string value, Picture? picture, char? decimalMark, out decimal number) {
             number = 0.0M;
             try {
-                var result = Parse(value, picture, culture);
+                var result = Parse(value, picture, decimalMark);
                 if (result.HasValue)
                     number = result.Value;
                 return true;
@@ -74,19 +74,24 @@ namespace indice.Edi.Utilities
             }
         }
 
-        public static decimal? Parse(this string value, Picture? picture, CultureInfo culture = null) {
+        public static decimal? Parse(this string value, Picture? picture, char? decimalMark) {
             if (string.IsNullOrEmpty(value))
                 return null;
-            culture = culture ?? CultureInfo.InvariantCulture;
             decimal d;
-            if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && decimal.TryParse(value, NumberStyles.Integer, culture, out d)) {
+            var provider = NumberFormatInfo.InvariantInfo;
+            if (decimalMark.HasValue) {
+                if (provider.NumberDecimalSeparator != decimalMark.ToString()) {
+                    provider = provider.Clone() as NumberFormatInfo;
+                    provider.NumberDecimalSeparator = decimalMark.Value.ToString();
+                }
+                if (decimal.TryParse(value, NumberStyles.Number, provider, out d)) {
+                    return d;
+                }
+            }
+            else if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && decimal.TryParse(value, NumberStyles.Integer, provider, out d)) {
                 d = d * (decimal)Math.Pow(0.1, picture.Value.Precision);
                 return d;
             }
-            if (decimal.TryParse(value, NumberStyles.Number, culture, out d)) {
-                return d;
-            }
-
             throw new EdiException("Could not convert string to decimal: {0}.".FormatWith(CultureInfo.InvariantCulture, value));
         }
     }

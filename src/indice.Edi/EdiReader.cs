@@ -365,7 +365,7 @@ namespace indice.Edi
                     return null;
                 }
                 decimal d;
-                if (s.TryParse(picture, Culture, out d)) {
+                if (s.TryParse(picture, Grammar.DecimalMark, out d)) {
                     SetToken(EdiToken.Float, d, false);
                     return d;
                 }

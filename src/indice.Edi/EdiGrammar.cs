@@ -41,7 +41,24 @@ namespace indice.Edi
             _FunctionalGroupTrailerTag = "UNE";
             _InterchangeTrailerTag = "UNZ";
         }
-        
+
+        public EdiGrammar(IEdiGrammar grammar) {
+            _ComponentDataElementSeparator = grammar.ComponentDataElementSeparator.Clone() as char[];
+            _DataElementSeparator = grammar.DataElementSeparator.Clone() as char[];
+            _DecimalMark = grammar.DecimalMark;
+            _ReleaseCharacter = grammar.ReleaseCharacter;
+            _Reserved = grammar.Reserved.Clone() as char[];
+            _SegmentTerminator = grammar.SegmentTerminator;
+
+            _ServiceStringAdviceTag = grammar.ServiceStringAdviceTag;
+            _InterchangeHeaderTag = grammar.InterchangeHeaderTag;
+            _FunctionalGroupHeaderTag = grammar.FunctionalGroupHeaderTag;
+            _MessageHeaderTag = grammar.MessageHeaderTag;
+            _MessageTrailerTag = grammar.MessageTrailerTag;
+            _FunctionalGroupTrailerTag = grammar.FunctionalGroupTrailerTag;
+            _InterchangeTrailerTag = grammar.InterchangeTrailerTag;
+        }
+
         public char[] Separators {
             get {
                 if (_separators == null) {
@@ -130,7 +147,7 @@ namespace indice.Edi
             return new EdiGrammar() {
                 _ComponentDataElementSeparator = new[] { '>' },
                 _DataElementSeparator = new[] { '*' },
-                _DecimalMark = null,
+                _DecimalMark = '.',
                 _ReleaseCharacter = null,
                 _Reserved = new char[0],
                 _SegmentTerminator = '~',
@@ -142,6 +159,10 @@ namespace indice.Edi
                 _FunctionalGroupTrailerTag = "GE",
                 _InterchangeTrailerTag = "IEA",
             };
+        }
+
+        public EdiGrammar Clone() {
+            return new EdiGrammar(this);
         }
     }
 }

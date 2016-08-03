@@ -1,11 +1,9 @@
 ﻿using indice.Edi.Tests.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace indice.Edi.Tests
@@ -127,11 +125,17 @@ namespace indice.Edi.Tests
 
         }
 
-        [Fact(Skip = "work in progress")]
+        [Fact]
         public void X12_Grammar_Test() {
             var grammar = EdiGrammar.NewX12();
-
-            Assert.True(false);
+            var interchange = default(Models.X12_01.PurchaseOrder_850);
+            using (var stream = GetResourceStream("x12.850.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.X12_01.PurchaseOrder_850>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(new DateTime(2009, 8, 27, 9, 36, 00), interchange.Date);
+            Assert.Equal(new DateTime(2009, 8, 27, 10, 41, 00), interchange.Groups[0].Date);
+            Assert.Equal(19.95M, interchange.Groups[0].Orders[0].UnitPrice);
+            Assert.Equal("126 Any St", interchange.Groups[0].Orders[0].StreetAddress);
         }
     }
 }

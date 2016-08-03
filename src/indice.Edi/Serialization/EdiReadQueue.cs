@@ -40,11 +40,12 @@ namespace indice.Edi.Serialization
             return integer;
         }
 
-        public static decimal? ReadAsDecimal(this Queue<EdiEntry> queue, string path, Picture? picture, CultureInfo culture = null) {
+        public static decimal? ReadAsDecimal(this Queue<EdiEntry> queue, string path, Picture? picture, char? decimalMark) {
             var text = ReadAsString(queue, path);
             if (string.IsNullOrEmpty(text))
                 return null;
-            return text.Parse(picture, culture);
+            
+            return text.Parse(picture, decimalMark);
         }
     }
 

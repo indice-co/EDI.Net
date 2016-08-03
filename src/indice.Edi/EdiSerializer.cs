@@ -234,7 +234,7 @@ namespace indice.Edi
         internal static void PopulateDecimalValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
             var cache = structure.CachedReads;
             var valueInfo = descriptor.ValueInfo;
-            var numberFloat = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsDecimal(valueInfo.Path, descriptor.ValueInfo.Picture, reader.Culture) :
+            var numberFloat = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsDecimal(valueInfo.Path, descriptor.ValueInfo.Picture, reader.Grammar.DecimalMark) :
                                                             read ? reader.ReadAsDecimal(descriptor.ValueInfo.Picture) : (decimal?)reader.Value;
             if (numberFloat != null) {
                 descriptor.Info.SetValue(structure.Instance, numberFloat);
@@ -286,7 +286,7 @@ namespace indice.Edi
                 } else if (bool.TryParse(text, out booleanValue)) {
                 } 
                 else { 
-                    throw new EdiException("Unable to convert string '{0}' to char. It is more than 1 character long.".FormatWith(reader.Culture, text));
+                    throw new EdiException("Unable to convert string '{0}' to boolean.".FormatWith(reader.Culture, text));
                 }
                 descriptor.Info.SetValue(structure.Instance, booleanValue);
             }
