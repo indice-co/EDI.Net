@@ -3,12 +3,20 @@ EDI Parser/Deserializer.
 
 This is a ground up implementation and does not make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong whe way of getting the desired Clr object.
 
-At the moment working for __[Tradacoms](https://en.wikipedia.org/wiki/TRADACOMS)__/__[EDIFact](https://en.wikipedia.org/wiki/EDIFACT)__ formats. 
+Tested with __[Tradacoms](https://en.wikipedia.org/wiki/TRADACOMS)__, __[EDIFact](https://en.wikipedia.org/wiki/EDIFACT)__ and __[ASCII ASC X12](https://en.wikipedia.org/wiki/ASC_X12) (X12)__ formats. 
 
-Using attributes you can express all EDI rules like Mandatory/Conditional Segments,Elements & Components 
-as well as describe component values size length and precision with the picture syntax (e.g `9(3)`, `9(10)V9(2)` and `X(3)`). 
+Using attributes you can express all EDI rules like Mandatory/Conditional Segments, Elements & Components 
+as well as describe component values size length and precision with the [picture syntax](#the-picture-clause) (e.g `9(3)`, `9(10)V9(2)` and `X(3)`). 
 
-#### Installation
+## Quick links
+
+- [Installation](#installation)
+- [Example usage](#example-usage)
+- [Contributions](#contributions)
+- [The Picture clause](#roadmap-todo)
+- [Roadmap](#roadmap-todo)
+
+## Installation
 
 To install Edi.Net, run the following command in the Package Manager Console. Or download it [here](https://www.nuget.org/packages/indice.Edi/)
 
@@ -16,7 +24,8 @@ To install Edi.Net, run the following command in the Package Manager Console. Or
 PM> Install-Package "indice.Edi"
 ```
 
-#### Example Usage:
+## Example usage:
+
 ```csharp
 var grammar = EdiGrammar.NewTradacoms();
 var interchange = default(Interchange);
@@ -116,8 +125,31 @@ public class UtilityBillCharge
     public decimal? UnitsConsumedBilling { get; set; }
 }
 ```
+    
+## Contributions
 
-#### The Picture clause
+The following is a set of guidelines for contributing to EDI.Net.
+
+##### Did you find a bug?
+
+- Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/indice-co/EDI.Net/issues).
+- If you're unable to find an open issue addressing the problem, open a [new one](https://github.com/indice-co/EDI.Net/issues/new). Be sure to include a title and clear description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
+
+##### Did you write a patch that fixes a bug?
+Open a new GitHub pull request with the patch.
+Ensure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.
+
+##### Build the sourcecode
+As of v1.0.7 the solution was adapted to support the dotnet core project system. 
+In order to build and test the source code you will need either one of the following.
+
+- Visual studio 2015 Update 3 & .NET Core 1.0.0 - VS 2015 Tooling
+- [VS Code + .NET Core SDK](https://code.visualstudio.com/docs/runtimes/dotnet) 
+
+for more information check .Net Core [official page](https://www.microsoft.com/net/core).
+
+
+## The Picture clause
 The _Picture Clause_ is taken from COBOL laguage and the way it handles expressing numeric and alphanumric data types. It is used throug out tradacoms.
 
 |Symbol | Description      | Example Picture  | Component           | c# result
@@ -129,10 +161,10 @@ The _Picture Clause_ is taken from COBOL laguage and the way it handles expressi
 |   S   | Sign             | not used         | - | - |
 |   P   | Assumed Decimal  | not used         | - | - |
 
-#### Roadmap (TODO)
+## Roadmap (TODO)
 
 1. Implement serializer `Serialize` to write Clr classes to edi format (Using attributes). (planned for v1.1)
 1. Start github wiki page and begin documentation.
-1. Consider adding support for X12 format.
+1. Create a seperate package (or packages per EDI Format) to host well known interchange transmitions (ie Tradacoms Utitlity Bill). Then anyone can fork and contribute his own set of POCO classes.
 
 _Disclaimer. The project was inspired and influenced by the work done in the excellent library [JSON.Net](https://github.com/JamesNK/Newtonsoft.Json) by James Newton King. Some utility parts for reflection string parsing etc. are used as is_
