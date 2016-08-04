@@ -1,5 +1,5 @@
 {
-  "version": "1.0.8-*",
+  "version": "1.0.9-*",
   "description": "Edi.Net Class Library",
   "copyright": "Copyright (c) 2015 Indice",
   "authors": [ "c.leftheris" ],
@@ -12,8 +12,8 @@
       "type": "git",
       "url": "https://github.com/indice-co/EDI.Net"
     },
-    "releaseNotes": "Updated to dotnet core 1.0",
-    "summary": "Edi.Net Class Library for Reading Deserializing EDIFact and Tradacoms files into Clr Objects."
+    "releaseNotes": "Support for EDI X12. Plus bug fixes",
+    "summary": "Edi.Net Class Library for Reading Deserializing EDIFact, Tradacoms and X12 files into Clr Objects."
   },
   "scripts": {
     "postcompile": [

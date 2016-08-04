@@ -26,6 +26,17 @@ PM> Install-Package "indice.Edi"
 
 ## Example usage:
 
+There are available configurations (`EdiGrammar`) for `EDIFact`, `Tradacoms` and `X12`. Working examples for all supported EDI formats can be found in the source code under [tests](https://github.com/indice-co/EDI.Net/tree/master/test/indice.Edi.Tests).
+
+- EdiFact [sample POCO classes](https://github.com/indice-co/EDI.Net/blob/master/test/indice.Edi.Tests/Models/EdiFact01.cs)
+- TRADACOMS [sample classes](https://github.com/indice-co/EDI.Net/blob/master/test/indice.Edi.Tests/Models/UtilityBill.cs) (UtilityBill)
+- X12 [sample classes](https://github.com/indice-co/EDI.Net/blob/master/test/indice.Edi.Tests/Models/X12_850.cs) (850 Purchase Order)
+
+_Note that all examples may be partialy implemented transmissions for demonstration purposes although they are a good starting point. If someone has complete poco classes for any transmition please feel free to contribute a complete test._
+
+The following example makes use of the `Tradacoms` grammar. 
+
+
 ```csharp
 var grammar = EdiGrammar.NewTradacoms();
 var interchange = default(Interchange);

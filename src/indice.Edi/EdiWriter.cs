@@ -274,23 +274,18 @@ namespace indice.Edi
                 case EdiToken.None:
                     // read to next
                     break;
-                //case EdiToken.SegmentStart:
-                //    WriteStartObject();
-                //    break;
-                //case EdiToken.StartArray:
-                //    WriteStartArray();
-                //    break;
-                //case EdiToken.StartConstructor:
-                //    ValidationUtils.ArgumentNotNull(value, nameof(value));
-                //    WriteStartConstructor(value.ToString());
-                //    break;
-                //case EdiToken.PropertyName:
-                //    ValidationUtils.ArgumentNotNull(value, nameof(value));
-                //    WritePropertyName(value.ToString());
-                //    break;
-                //case EdiToken.Comment:
-                //    WriteComment((value != null) ? value.ToString() : null);
-                //    break;
+                case EdiToken.SegmentStart:
+                    // read to next
+                    break;
+                case EdiToken.SegmentName:
+                    // read to next
+                    break;
+                case EdiToken.ElementStart:
+                    // read to next
+                    break;
+                case EdiToken.ComponentStart:
+                    // read to next
+                    break;
                 case EdiToken.Integer:
                     ValidationUtils.ArgumentNotNull(value, nameof(value));
 #if !PORTABLE
