@@ -11,6 +11,7 @@ as well as describe component values size length and precision with the [picture
 ## Quick links
 
 - [Installation](#installation)
+- [Attributes](#attributes)
 - [Example usage](#example-usage)
 - [Contributions](#contributions)
 - [The Picture clause](#roadmap-todo)
@@ -23,6 +24,21 @@ To install Edi.Net, run the following command in the Package Manager Console. Or
 ```powershell
 PM> Install-Package "indice.Edi"
 ```
+## Attributes. 
+The general rules of thumb are :
+
+| Attribute        | Description      | 
+|------------------|------------------|
+| __EdiValue__     | Any value inside a segment. (ie the component value _500_ in bold) | 
+|                  | UCI+001342651817+9907137000005:500+9912022000002:__500__+7         |
+| __EdiElement__   | Elements are considered to be groups of values otherwise known as groups of components. One can use this attribute to deserialize into a complex class that resides inside a segment. For example this can usually be used to deserialize more than one value between `+` into a ComplexType (ie the whole element into a new class _9912022000002:500_ in bold) |
+|                  | UCI+001342651817+9907137000005:500+__9912022000002:500__+7 |
+| __EdiPath__      | To specify the path |
+| __EdiSegment__   | Marks a class to be deserialized for a given segment. Used in conjunction with EdiPath  |
+| __EdiMessage__   | Marks a class to be deserialized for any message found.  |
+| __EdiGroup__     | Marks a class to be deserialized for any group found. |
+| __EdiCondition__ | In case multiple MessageTypes or Segment types with the same name. Used to discriminate the classes based on a component value |
+
 
 ## Example usage:
 
