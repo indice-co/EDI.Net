@@ -1,7 +1,7 @@
 # EDI.Net
 EDI Parser/Deserializer. 
 
-This is a ground up implementation and does not make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong whe way of getting the desired Clr object.
+This is a ground up implementation and does not make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong the way of getting the desired Clr object.
 
 Tested with __[Tradacoms](https://en.wikipedia.org/wiki/TRADACOMS)__, __[EDIFact](https://en.wikipedia.org/wiki/EDIFACT)__ and __[ANSI ASC X12](https://en.wikipedia.org/wiki/ASC_X12) (X12)__ formats. 
 
@@ -27,17 +27,18 @@ PM> Install-Package "indice.Edi"
 ## Attributes. 
 The general rules of thumb are :
 
-| Attribute        | Description      | 
-|------------------|------------------|
-| __EdiValue__     | Any value inside a segment. (ie the component value _500_ in bold) | 
-|                  | UCI+001342651817+9907137000005:500+9912022000002:__500__+7         |
-| __EdiElement__   | Elements are considered to be groups of values otherwise known as groups of components. One can use this attribute to deserialize into a complex class that resides inside a segment. For example this can usually be used to deserialize more than one value between `+` into a ComplexType (ie the whole element into a new class _9912022000002:500_ in bold) |
-|                  | UCI+001342651817+9907137000005:500+__9912022000002:500__+7 |
-| __EdiPath__      | To specify the path |
-| __EdiSegment__   | Marks a class to be deserialized for a given segment. Used in conjunction with EdiPath  |
-| __EdiMessage__   | Marks a class to be deserialized for any message found.  |
-| __EdiGroup__     | Marks a class to be deserialized for any group found. |
-| __EdiCondition__ | In case multiple MessageTypes or Segment types with the same name. Used to discriminate the classes based on a component value |
+| Attribute             | Description      | 
+|-----------------------|------------------|
+| __EdiValue__          | Any value inside a segment. (ie the component value _500_ in bold) | 
+|                       | UCI+001342651817+9907137000005:500+9912022000002:__500__+7         |
+| __EdiElement__        | Elements are considered to be groups of values otherwise known as groups of components. One can use this attribute to deserialize into a complex class that resides inside a segment. For example this can usually be used to deserialize more than one value between `+` into a ComplexType (ie the whole element into a new class _9912022000002:500_ in bold) |
+|                       | UCI+001342651817+9907137000005:500+__9912022000002:500__+7 |
+| __EdiPath__           | To specify the path |
+| __EdiSegment__        | Marks a propery/class to be deserialized for a given segment. Used in conjunction with EdiPath  |
+| __EdiSegmentGroup__   | Marks a propery/class as a logical container of segments. This allows a user to decorate a class whith information regarding the starting and ending segments that define a virtual group other than the standard ones (Functional Group etc). Can be applied on Lists the same way that `[Message]` or `[Segment]` attributes work |
+| __EdiMessage__        | Marks a propery/class to be deserialized for any message found.  |
+| __EdiGroup__          | Marks a propery/class to be deserialized for any group found. |
+| __EdiCondition__      | In case multiple MessageTypes or Segment types with the same name. Used to discriminate the classes based on a component value |
 
 
 ## Example usage:
