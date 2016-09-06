@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace indice.Edi.Serialization
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
-    public class EdiConditionAttribute : EdiPathAttribute
+    public sealed class EdiConditionAttribute : EdiPathAttribute
     {
         private readonly string _MatchValue;
 

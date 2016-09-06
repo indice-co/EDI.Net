@@ -34,7 +34,7 @@ namespace indice.Edi.Serialization
         public Queue<EdiEntry> CachedReads {
             get { return _CachedReads; }
         }
-
+        
         public EdiStructure(EdiStructureType container, object instance)
             : this(container, instance, 0, new Queue<EdiEntry>()) {
         }
@@ -54,6 +54,13 @@ namespace indice.Edi.Serialization
 
         public EdiPropertyDescriptor[] GetMatchingProperties(EdiStructureType sructureType) {
             return Descriptor.Properties.Where(p => p.Attributes.OfType(sructureType).Any()).ToArray();
+        }
+
+        public override string ToString() {
+            if (Index > 0)
+                return $"{Container} [{Index + 1}]";
+
+            return $"{Container}";
         }
     }
 }

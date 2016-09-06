@@ -13,6 +13,7 @@ namespace indice.Edi.Serialization
         private readonly List<EdiAttribute> _Attributes;
         private readonly List<EdiPropertyDescriptor> _Properties;
         private readonly Type _ClrType;
+        private readonly EdiSegmentGroupAttribute _SegmentGroupInfo;
 
 
         public List<EdiAttribute> Attributes {
@@ -26,7 +27,19 @@ namespace indice.Edi.Serialization
         public Type ClrType {
             get { return _ClrType; }
         }
-        
+
+        public EdiSegmentGroupAttribute SegmentGroupInfo {
+            get {
+                return _SegmentGroupInfo;
+            }
+        }
+
+        public bool IsSegmentGroup {
+            get {
+                return SegmentGroupInfo != null;
+            }
+        }
+
         public EdiTypeDescriptor(Type clrType) {
             _ClrType = clrType;
             _Properties = new List<EdiPropertyDescriptor>();
@@ -45,6 +58,7 @@ namespace indice.Edi.Serialization
             
             _Attributes = new List<EdiAttribute>();
             Attributes.AddRange(ClrType.GetTypeInfo().GetCustomAttributes<EdiAttribute>());
+            _SegmentGroupInfo = Attributes.OfType<EdiSegmentGroupAttribute>().SingleOrDefault();
         }
     }
 }

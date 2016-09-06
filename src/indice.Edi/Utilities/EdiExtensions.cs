@@ -37,29 +37,31 @@ namespace indice.Edi.Utilities
 
 
         public static IEnumerable<EdiAttribute> OfType(this IEnumerable<EdiAttribute> attributes, EdiStructureType container) {
-            var typeToSearch = default(Type);
+            var typesToSearch = new Type[0];
             switch (container) {
                 case EdiStructureType.None:
-                    break;
                 case EdiStructureType.Interchange:
                     break;
                 case EdiStructureType.Group:
-                    typeToSearch = typeof(EdiGroupAttribute);
+                    typesToSearch = new [] { typeof(EdiGroupAttribute) };
                     break;
                 case EdiStructureType.Message:
-                    typeToSearch = typeof(EdiMessageAttribute);
+                    typesToSearch = new [] { typeof(EdiMessageAttribute) };
+                    break;
+                case EdiStructureType.SegmentGroup:
+                    typesToSearch = new [] { typeof(EdiSegmentGroupAttribute) };
                     break;
                 case EdiStructureType.Segment:
-                    typeToSearch = typeof(EdiSegmentAttribute);
+                    typesToSearch = new [] { typeof(EdiSegmentAttribute), typeof(EdiSegmentGroupAttribute) };
                     break;
                 case EdiStructureType.Element:
-                    typeToSearch = typeof(EdiElementAttribute);
+                    typesToSearch = new [] { typeof(EdiElementAttribute) };
                     break;
                 default:
                     break;
             }
 
-            return null == typeToSearch ? Enumerable.Empty<EdiAttribute>() : attributes.Where(a => a.GetType().Equals(typeToSearch));
+            return null == typesToSearch ? Enumerable.Empty<EdiAttribute>() : attributes.Where(a => typesToSearch.Contains(a.GetType()));
         }
         
         public static bool TryParse(this string value, Picture? picture, char? decimalMark, out decimal number) {

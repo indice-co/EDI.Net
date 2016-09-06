@@ -12,7 +12,8 @@ namespace indice.Edi
         Interchange = 1,
         Group = 2,
         Message = 3,
-        Segment = 4,
-        Element = 5
+        SegmentGroup = 4,
+        Segment = 5,
+        Element = 6
     }
 }

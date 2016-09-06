@@ -15,6 +15,7 @@ namespace indice.Edi.Serialization
         private readonly EdiPathAttribute _PathInfo;
         private readonly EdiConditionAttribute _ConditionInfo;
         private readonly EdiValueAttribute _ValueInfo;
+        private readonly EdiSegmentGroupAttribute _SegmentGroupInfo;
 
         public List<EdiAttribute> Attributes {
             get { return _Attributes; }
@@ -49,6 +50,17 @@ namespace indice.Edi.Serialization
                 return _ValueInfo;
             }
         }
+        public EdiSegmentGroupAttribute SegmentGroupInfo {
+            get {
+                return _SegmentGroupInfo;
+            }
+        }
+
+        public bool MarksSegmentGroup {
+            get {
+                return _SegmentGroupInfo != null;
+            }
+        }
 
         public EdiPropertyDescriptor(PropertyInfo info) 
             : this(info, null) {
@@ -73,8 +85,12 @@ namespace indice.Edi.Serialization
             _PathInfo = Attributes.OfType<EdiPathAttribute>().FirstOrDefault();
             _ConditionInfo = Attributes.OfType<EdiConditionAttribute>().FirstOrDefault();
             _ValueInfo = Attributes.OfType<EdiValueAttribute>().FirstOrDefault();
+            _SegmentGroupInfo = Attributes.OfType<EdiSegmentGroupAttribute>().FirstOrDefault();
             if (_ValueInfo != null && _ValueInfo.Path != null && _PathInfo == null) {
                 _PathInfo = new EdiPathAttribute(_ValueInfo.Path);
+            }
+            if (_SegmentGroupInfo != null && _SegmentGroupInfo.StartInternal.Segment != null && _PathInfo == null) {
+                _PathInfo = new EdiPathAttribute(_SegmentGroupInfo.StartInternal.Segment);
             }
         }
     }

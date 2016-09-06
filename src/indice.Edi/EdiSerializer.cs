@@ -94,7 +94,7 @@ namespace indice.Edi
                         TryCreateContainer(reader, stack, EdiStructureType.Group);
                     } else if (reader.IsStartMessage) {
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
-                    } else if (reader.TokenType == EdiToken.SegmentName) {
+                    }  else if (reader.TokenType == EdiToken.SegmentName) {
                         TryCreateContainer(reader, stack, EdiStructureType.Segment);
                     } else if (reader.TokenType == EdiToken.ElementStart) {
                         TryCreateContainer(reader, stack, EdiStructureType.Element);
@@ -302,11 +302,27 @@ namespace indice.Edi
                     index = previous.Index + 1;
                 }
             }
+            
             var current = stack.Peek();
-            var candidates = current.GetMatchingProperties(newContainer);
             var property = default(EdiPropertyDescriptor);
             if (newContainer == EdiStructureType.Segment) {
+                // for custom segment group structures that live side by side with other segments
+                // we must inspect the stack in order to findout if we reached the end of the container. 
+                // This is indicated by the end segment on the segment group attribute.
+                if (stack.Count > 0 && current.Container == EdiStructureType.SegmentGroup) {
+                    var groupMark = current.Descriptor.SegmentGroupInfo;
+                    if (groupMark.SequenceEndInternal.Segment.Equals(reader.Value) ||
+                        groupMark.StartInternal.Segment.Equals(reader.Value)) { 
+                        stack.Pop();
+                        current = stack.Peek();
+                    }
+                }
                 property = FindForCurrentSegment(reader, current, newContainer);
+                // for segment group start we must inspect the descriptor
+                if (property != null && property.MarksSegmentGroup && 
+                                        property.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
+                    return TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup);
+                }
             } else if (newContainer == EdiStructureType.Element) {
                 property = FindForCurrentElement(reader, current, newContainer);
             } else {
@@ -400,9 +416,12 @@ namespace indice.Edi
             }
             if (candidates.Length == 1 && candidates[0].ConditionInfo == null) {
                 property = candidates[0];
-            } else {
+            }else {
                 property = ConditionalMatch(reader, currentStructure, newContainerType, candidates);
             }
+            //if (property.MarksSegmentGroupStart && !property.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
+            //    return null;
+            //}
             return property;
         }
 

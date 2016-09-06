@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace indice.Edi.Tests.Models.EdiFact01
 {
+    [EdiElement, EdiPath("DTM/0")]
     public class DTM
     {
         [EdiValue("9(3)", Path = "DTM/0/0")]
@@ -13,17 +14,7 @@ namespace indice.Edi.Tests.Models.EdiFact01
         [EdiValue("X(12)", Path = "DTM/0/1", Format = "yyyyMMddHHmm")]
         public DateTime Date { get; set; }
     }
-
-    [EdiElement, EdiPath("DTM/0"), EdiCondition("137", Path = "DTM/0/0")]
-    public class MessageDate : DTM { }
-
-
-    [EdiElement, EdiPath("DTM/0"), EdiCondition("163", Path = "DTM/0/0")]
-    public class ProcessingStartDate : DTM { }
-
-    [EdiElement, EdiPath("DTM/0"), EdiCondition("164", Path = "DTM/0/0")]
-    public class ProcessingEndDate : DTM { }
-
+    
     [EdiElement, EdiPath("DTM/0"), EdiCondition("ZZZ", Path = "DTM/0/0")]
     public class UTCOffset
     {
@@ -121,9 +112,14 @@ namespace indice.Edi.Tests.Models.EdiFact01
         [EdiValue("X(3)", Path = "BGM/3/0")]
         public string ResponseType { get; set; }
 
-        public MessageDate MessageDate { get; set; }
-        public ProcessingStartDate ProcessingStartDate { get; set; }
-        public ProcessingEndDate ProcessingEndDate { get; set; }
+        [EdiCondition("137", Path = "DTM/0/0")]
+        public DTM MessageDate { get; set; }
+
+        [EdiCondition("163", Path = "DTM/0/0")]
+        public DTM ProcessingStartDate { get; set; }
+
+        [EdiCondition("164", Path = "DTM/0/0")]
+        public DTM ProcessingEndDate { get; set; }
 
         public UTCOffset UTCOffset { get; set; }
 
@@ -144,5 +140,29 @@ namespace indice.Edi.Tests.Models.EdiFact01
         [EdiValue("X(3)", Path = "LOC/1/2")]
         public string LocationResponsibleAgency { get; set; }
 
+        public List<LinItem> ItemsOfLin { get; set; }
+
+        [EdiValue("X(1)", Path = "UNS/0/0")]
+        public char? UNS { get; set; }
+    }
+
+    [EdiSegment, EdiSegmentGroup("LIN", SequenceEnd = "UNS")]
+    public class LinItem
+    {
+        [EdiCondition("324", Path = "DTM/0/0")]
+        public DTM SomeOtherDate { get; set; }
+
+        public List<PRI> PREList { get; set; }
+    }
+
+    [EdiSegment, EdiPath("PRI")]
+    public class PRI
+    {
+
+        [EdiValue("X(3)", Path = "PRI/0/0")]
+        public string PRI_Text { get; set; }
+
+        [EdiValue("9(3)", Path = "PRI/0/1")]
+        public int PRI_Value { get; set; }
     }
 }

@@ -122,9 +122,20 @@ namespace indice.Edi.Tests
             Assert.Equal("SE1", quote.LocationId);
             Assert.Equal("SM", quote.LocationResponsibleAgency);
 
-
+            Assert.Equal("SE1", quote.LocationId);
+            Assert.Equal("SM", quote.LocationResponsibleAgency);
+            
+            var linArray = quote.ItemsOfLin;
+            Assert.All(linArray, lin => {
+                Assert.Equal(2, lin.PREList.Count);
+                Assert.Equal(-2100, lin.PREList[0].PRI_Value);
+                Assert.Equal(324, linArray[2].SomeOtherDate.Code);
+            });
+            Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), linArray[0].SomeOtherDate.Date);
+            Assert.Equal(new DateTime(2010, 10, 20, 00, 00, 00), linArray[1].SomeOtherDate.Date);
+            Assert.Equal(new DateTime(2010, 10, 20, 01, 00, 00), linArray[2].SomeOtherDate.Date);
         }
-
+        
         [Fact]
         public void X12_Grammar_Test() {
             var grammar = EdiGrammar.NewX12();
