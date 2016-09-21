@@ -11,758 +11,445 @@ using indice.Edi.Utilities;
 
 namespace indice.Edi
 {
-//    /// <summary>
-//    /// Represents a writer that provides a fast, non-cached, forward-only way of generating EDI data.
-//    /// </summary>
-//    public class EdiTextWriter : EdiWriter
-//    {
-//        private readonly TextWriter _writer;
-//        private char _indentChar;
-//        private int _indentation;
-//        private char _quoteChar;
-//        private bool _quoteName;
-//        private bool[] _charEscapeFlags;
-//        private char[] _writeBuffer;
-//        private IArrayPool<char> _arrayPool;
-//        private char[] _indentChars;
+    /// <summary>
+    /// Represents a writer that provides a fast, non-cached, forward-only way of generating EDI data.
+    /// </summary>
+    public class EdiTextWriter : EdiWriter
+    {
+        private readonly TextWriter _writer;
+        private readonly bool[] _charEscapeFlags;
+        private char[] _writeBuffer;
+        private IArrayPool<char> _arrayPool;
+
+        /// <summary>
+        /// Gets or sets the writer's character array pool.
+        /// </summary>
+        public IArrayPool<char> ArrayPool {
+            get { return _arrayPool; }
+            set {
+                if (value == null) {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                _arrayPool = value;
+            }
+        }
+
+
+        /// <summary>
+        /// Creates an instance of the <c>EdiWriter</c> class using the specified <see cref="TextWriter"/>. 
+        /// </summary>
+        /// <param name="textWriter">The <c>TextWriter</c> to write to.</param>
+        public EdiTextWriter(TextWriter textWriter, IEdiGrammar grammar)
+            : base(grammar) {
+            if (textWriter == null) {
+                throw new ArgumentNullException(nameof(textWriter));
+            }
+
+            _writer = textWriter;
+            _charEscapeFlags = new bool[128];
+            if (Grammar.ReleaseCharacter.HasValue) { 
+                _charEscapeFlags[Grammar.DataElementSeparator] =
+                _charEscapeFlags[Grammar.ComponentDataElementSeparator] =
+                _charEscapeFlags[Grammar.SegmentNameDelimiter] =
+                _charEscapeFlags[Grammar.SegmentTerminator] =
+                _charEscapeFlags[Grammar.ReleaseCharacter.Value] = true;
+            }
+        }
+
+        /// <summary>
+        /// Flushes whatever is in the buffer to the underlying streams and also flushes the underlying stream.
+        /// </summary>
+        public override void Flush() {
+            _writer.Flush();
+        }
+
+        /// <summary>
+        /// Closes this stream and the underlying stream.
+        /// </summary>
+        public override void Close() {
+            base.Close();
+
+            if (_writeBuffer != null) {
+                BufferUtils.ReturnBuffer(_arrayPool, _writeBuffer);
+                _writeBuffer = null;
+            }
+
+            if (CloseOutput && _writer != null) {
+#if !(DOTNET || PORTABLE)
+                _writer.Close();
+#else
+                _writer.Dispose();
+#endif
+            }
+        }
         
-//        /// <summary>
-//        /// Gets or sets the writer's character array pool.
-//        /// </summary>
-//        public IArrayPool<char> ArrayPool
-//        {
-//            get { return _arrayPool; }
-//            set
-//            {
-//                if (value == null)
-//                {
-//                    throw new ArgumentNullException(nameof(value));
-//                }
-
-//                _arrayPool = value;
-//            }
-//        }
-
-//        /// <summary>
-//        /// Gets or sets how many IndentChars to write for each level in the hierarchy when <see cref="Formatting"/> is set to <c>Formatting.Indented</c>.
-//        /// </summary>
-//        public int Indentation
-//        {
-//            get { return _indentation; }
-//            set
-//            {
-//                if (value < 0)
-//                {
-//                    throw new ArgumentException("Indentation value must be greater than 0.");
-//                }
-
-//                _indentation = value;
-//            }
-//        }
-
-//        /// <summary>
-//        /// Gets or sets which character to use to quote attribute values.
-//        /// </summary>
-//        public char QuoteChar
-//        {
-//            get { return _quoteChar; }
-//            set
-//            {
-//                if (value != '"' && value != '\'')
-//                {
-//                    throw new ArgumentException(@"Invalid JavaScript string quote character. Valid quote characters are ' and "".");
-//                }
-
-//                _quoteChar = value;
-//                UpdateCharEscapeFlags();
-//            }
-//        }
-
-//        /// <summary>
-//        /// Gets or sets which character to use for indenting when <see cref="Formatting"/> is set to <c>Formatting.Indented</c>.
-//        /// </summary>
-//        public char IndentChar
-//        {
-//            get { return _indentChar; }
-//            set
-//            {
-//                if (value != _indentChar)
-//                {
-//                    _indentChar = value;
-//                    _indentChars = null;
-//                }
-//            }
-//        }
-
-//        /// <summary>
-//        /// Gets or sets a value indicating whether object names will be surrounded with quotes.
-//        /// </summary>
-//        public bool QuoteName
-//        {
-//            get { return _quoteName; }
-//            set { _quoteName = value; }
-//        }
-
-//        /// <summary>
-//        /// Creates an instance of the <c>EdiWriter</c> class using the specified <see cref="TextWriter"/>. 
-//        /// </summary>
-//        /// <param name="textWriter">The <c>TextWriter</c> to write to.</param>
-//        public EdiTextWriter(TextWriter textWriter)
-//        {
-//            if (textWriter == null)
-//            {
-//                throw new ArgumentNullException(nameof(textWriter));
-//            }
-
-//            _writer = textWriter;
-//            _quoteChar = '"';
-//            _quoteName = true;
-//            _indentChar = ' ';
-//            _indentation = 2;
-
-//            UpdateCharEscapeFlags();
-//        }
-
-//        /// <summary>
-//        /// Flushes whatever is in the buffer to the underlying streams and also flushes the underlying stream.
-//        /// </summary>
-//        public override void Flush()
-//        {
-//            _writer.Flush();
-//        }
-
-//        /// <summary>
-//        /// Closes this stream and the underlying stream.
-//        /// </summary>
-//        public override void Close()
-//        {
-//            base.Close();
-
-//            if (_writeBuffer != null)
-//            {
-//                BufferUtils.ReturnBuffer(_arrayPool, _writeBuffer);
-//                _writeBuffer = null;
-//            }
-
-//            if (CloseOutput && _writer != null)
-//            {
-//#if !(DOTNET || PORTABLE40 || PORTABLE)
-//                _writer.Close();
-//#else
-//                _writer.Dispose();
-//#endif
-//            }
-//        }
-
-//        /// <summary>
-//        /// Writes the beginning of a Edi object.
-//        /// </summary>
-//        public override void WriteStartObject()
-//        {
-//            InternalWriteStart(EdiToken.StartObject, EdiContainerType.Object);
-
-//            _writer.Write('{');
-//        }
-
-//        /// <summary>
-//        /// Writes the beginning of a Edi array.
-//        /// </summary>
-//        public override void WriteStartArray()
-//        {
-//            InternalWriteStart(EdiToken.StartArray, EdiContainerType.Array);
-
-//            _writer.Write('[');
-//        }
-
-//        /// <summary>
-//        /// Writes the start of a constructor with the given name.
-//        /// </summary>
-//        /// <param name="name">The name of the constructor.</param>
-//        public override void WriteStartConstructor(string name)
-//        {
-//            InternalWriteStart(EdiToken.StartConstructor, EdiContainerType.Constructor);
-
-//            _writer.Write("new ");
-//            _writer.Write(name);
-//            _writer.Write('(');
-//        }
-
-//        /// <summary>
-//        /// Writes the specified end token.
-//        /// </summary>
-//        /// <param name="token">The end token to write.</param>
-//        protected override void WriteEnd(EdiToken token)
-//        {
-//            switch (token)
-//            {
-//                case EdiToken.EndObject:
-//                    _writer.Write('}');
-//                    break;
-//                case EdiToken.EndArray:
-//                    _writer.Write(']');
-//                    break;
-//                case EdiToken.EndConstructor:
-//                    _writer.Write(')');
-//                    break;
-//                default:
-//                    throw EdiWriterException.Create(this, "Invalid EdiToken: " + token, null);
-//            }
-//        }
-
-//        /// <summary>
-//        /// Writes the property name of a name/value pair on a Edi object.
-//        /// </summary>
-//        /// <param name="name">The name of the property.</param>
-//        public override void WritePropertyName(string name)
-//        {
-//            InternalWritePropertyName(name);
-
-//            WriteEscapedString(name, _quoteName);
-
-//            _writer.Write(':');
-//        }
-
-//        /// <summary>
-//        /// Writes the property name of a name/value pair on a Edi object.
-//        /// </summary>
-//        /// <param name="name">The name of the property.</param>
-//        /// <param name="escape">A flag to indicate whether the text should be escaped when it is written as a Edi property name.</param>
-//        public override void WritePropertyName(string name, bool escape)
-//        {
-//            InternalWritePropertyName(name);
-
-//            if (escape)
-//            {
-//                WriteEscapedString(name, _quoteName);
-//            }
-//            else
-//            {
-//                if (_quoteName)
-//                {
-//                    _writer.Write(_quoteChar);
-//                }
-
-//                _writer.Write(name);
-
-//                if (_quoteName)
-//                {
-//                    _writer.Write(_quoteChar);
-//                }
-//            }
-
-//            _writer.Write(':');
-//        }
-
-//        internal override void OnStringEscapeHandlingChanged()
-//        {
-//            UpdateCharEscapeFlags();
-//        }
-
-//        private void UpdateCharEscapeFlags()
-//        {
-//            _charEscapeFlags = JavaScriptUtils.GetCharEscapeFlags(StringEscapeHandling, _quoteChar);
-//        }
-
-//        /// <summary>
-//        /// Writes indent characters.
-//        /// </summary>
-//        protected override void WriteIndent()
-//        {
-//            _writer.WriteLine();
-
-//            // levels of indentation multiplied by the indent count
-//            int currentIndentCount = Top * _indentation;
-
-//            if (currentIndentCount > 0)
-//            {
-//                if (_indentChars == null)
-//                {
-//                    _indentChars = new string(_indentChar, 10).ToCharArray();
-//                }
-
-//                while (currentIndentCount > 0)
-//                {
-//                    int writeCount = Math.Min(currentIndentCount, 10);
-
-//                    _writer.Write(_indentChars, 0, writeCount);
-
-//                    currentIndentCount -= writeCount;
-//                }
-//            }
-//        }
-
-//        /// <summary>
-//        /// Writes the Edi value delimiter.
-//        /// </summary>
-//        protected override void WriteValueDelimiter()
-//        {
-//            _writer.Write(',');
-//        }
-
-//        /// <summary>
-//        /// Writes an indent space.
-//        /// </summary>
-//        protected override void WriteIndentSpace()
-//        {
-//            _writer.Write(' ');
-//        }
-
-//        private void WriteValueInternal(string value, EdiToken token)
-//        {
-//            _writer.Write(value);
-//        }
-
-//        #region WriteValue methods
-//        /// <summary>
-//        /// Writes a <see cref="Object"/> value.
-//        /// An error will raised if the value cannot be written as a single Edi token.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Object"/> value to write.</param>
-//        public override void WriteValue(object value)
-//        {
-//#if !(NET20 || NET35 || PORTABLE || PORTABLE40)
-//            if (value is BigInteger)
-//            {
-//                InternalWriteValue(EdiToken.Integer);
-//                WriteValueInternal(((BigInteger)value).ToString(CultureInfo.InvariantCulture), EdiToken.String);
-//            }
-//            else
-//#endif
-//            {
-//                base.WriteValue(value);
-//            }
-//        }
-
-//        /// <summary>
-//        /// Writes a null value.
-//        /// </summary>
-//        public override void WriteNull()
-//        {
-//            InternalWriteValue(EdiToken.Null);
-//            WriteValueInternal(EdiConvert.Null, EdiToken.Null);
-//        }
-
-//        /// <summary>
-//        /// Writes an undefined value.
-//        /// </summary>
-//        public override void WriteUndefined()
-//        {
-//            InternalWriteValue(EdiToken.Undefined);
-//            WriteValueInternal(EdiConvert.Undefined, EdiToken.Undefined);
-//        }
-
-//        /// <summary>
-//        /// Writes raw Edi.
-//        /// </summary>
-//        /// <param name="Edi">The raw Edi to write.</param>
-//        public override void WriteRaw(string Edi)
-//        {
-//            InternalWriteRaw();
-
-//            _writer.Write(Edi);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="String"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="String"/> value to write.</param>
-//        public override void WriteValue(string value)
-//        {
-//            InternalWriteValue(EdiToken.String);
-
-//            if (value == null)
-//            {
-//                WriteValueInternal(EdiConvert.Null, EdiToken.Null);
-//            }
-//            else
-//            {
-//                WriteEscapedString(value, true);
-//            }
-//        }
-
-//        private void WriteEscapedString(string value, bool quote)
-//        {
-//            EnsureWriteBuffer();
-//            JavaScriptUtils.WriteEscapedJavaScriptString(_writer, value, _quoteChar, quote, _charEscapeFlags, StringEscapeHandling, _arrayPool, ref _writeBuffer);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Int32"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Int32"/> value to write.</param>
-//        public override void WriteValue(int value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="UInt32"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="UInt32"/> value to write.</param>
-//        [CLSCompliant(false)]
-//        public override void WriteValue(uint value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Int64"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Int64"/> value to write.</param>
-//        public override void WriteValue(long value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="UInt64"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="UInt64"/> value to write.</param>
-//        [CLSCompliant(false)]
-//        public override void WriteValue(ulong value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Single"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Single"/> value to write.</param>
-//        public override void WriteValue(float value)
-//        {
-//            InternalWriteValue(EdiToken.Float);
-//            WriteValueInternal(EdiConvert.ToString(value, FloatFormatHandling, QuoteChar, false), EdiToken.Float);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Nullable{Single}"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Nullable{Single}"/> value to write.</param>
-//        public override void WriteValue(float? value)
-//        {
-//            if (value == null)
-//            {
-//                WriteNull();
-//            }
-//            else
-//            {
-//                InternalWriteValue(EdiToken.Float);
-//                WriteValueInternal(EdiConvert.ToString(value.GetValueOrDefault(), FloatFormatHandling, QuoteChar, true), EdiToken.Float);
-//            }
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Double"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Double"/> value to write.</param>
-//        public override void WriteValue(double value)
-//        {
-//            InternalWriteValue(EdiToken.Float);
-//            WriteValueInternal(EdiConvert.ToString(value, FloatFormatHandling, QuoteChar, false), EdiToken.Float);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Nullable{Double}"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Nullable{Double}"/> value to write.</param>
-//        public override void WriteValue(double? value)
-//        {
-//            if (value == null)
-//            {
-//                WriteNull();
-//            }
-//            else
-//            {
-//                InternalWriteValue(EdiToken.Float);
-//                WriteValueInternal(EdiConvert.ToString(value.GetValueOrDefault(), FloatFormatHandling, QuoteChar, true), EdiToken.Float);
-//            }
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Boolean"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Boolean"/> value to write.</param>
-//        public override void WriteValue(bool value)
-//        {
-//            InternalWriteValue(EdiToken.Boolean);
-//            WriteValueInternal(EdiConvert.ToString(value), EdiToken.Boolean);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Int16"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Int16"/> value to write.</param>
-//        public override void WriteValue(short value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="UInt16"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="UInt16"/> value to write.</param>
-//        [CLSCompliant(false)]
-//        public override void WriteValue(ushort value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Char"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Char"/> value to write.</param>
-//        public override void WriteValue(char value)
-//        {
-//            InternalWriteValue(EdiToken.String);
-//            WriteValueInternal(EdiConvert.ToString(value), EdiToken.String);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Byte"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Byte"/> value to write.</param>
-//        public override void WriteValue(byte value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="SByte"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="SByte"/> value to write.</param>
-//        [CLSCompliant(false)]
-//        public override void WriteValue(sbyte value)
-//        {
-//            InternalWriteValue(EdiToken.Integer);
-//            WriteIntegerValue(value);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Decimal"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Decimal"/> value to write.</param>
-//        public override void WriteValue(decimal value)
-//        {
-//            InternalWriteValue(EdiToken.Float);
-//            WriteValueInternal(EdiConvert.ToString(value), EdiToken.Float);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="DateTime"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="DateTime"/> value to write.</param>
-//        public override void WriteValue(DateTime value)
-//        {
-//            InternalWriteValue(EdiToken.Date);
-//            value = DateTimeUtils.EnsureDateTime(value, DateTimeZoneHandling);
-
-//            if (string.IsNullOrEmpty(DateFormatString))
-//            {
-//                EnsureWriteBuffer();
-
-//                int pos = 0;
-//                _writeBuffer[pos++] = _quoteChar;
-//                pos = DateTimeUtils.WriteDateTimeString(_writeBuffer, pos, value, null, value.Kind, DateFormatHandling);
-//                _writeBuffer[pos++] = _quoteChar;
-
-//                _writer.Write(_writeBuffer, 0, pos);
-//            }
-//            else
-//            {
-//                _writer.Write(_quoteChar);
-//                _writer.Write(value.ToString(DateFormatString, Culture));
-//                _writer.Write(_quoteChar);
-//            }
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Byte"/>[] value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Byte"/>[] value to write.</param>
-//        public override void WriteValue(byte[] value)
-//        {
-//            if (value == null)
-//            {
-//                WriteNull();
-//            }
-//            else
-//            {
-//                InternalWriteValue(EdiToken.Bytes);
-//                _writer.Write(_quoteChar);
-//                Base64Encoder.Encode(value, 0, value.Length);
-//                Base64Encoder.Flush();
-//                _writer.Write(_quoteChar);
-//            }
-//        }
-
-//#if !NET20
-//        /// <summary>
-//        /// Writes a <see cref="DateTimeOffset"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="DateTimeOffset"/> value to write.</param>
-//        public override void WriteValue(DateTimeOffset value)
-//        {
-//            InternalWriteValue(EdiToken.Date);
-
-//            if (string.IsNullOrEmpty(DateFormatString))
-//            {
-//                EnsureWriteBuffer();
-
-//                int pos = 0;
-//                _writeBuffer[pos++] = _quoteChar;
-//                pos = DateTimeUtils.WriteDateTimeString(_writeBuffer, pos, (DateFormatHandling == DateFormatHandling.IsoDateFormat) ? value.DateTime : value.UtcDateTime, value.Offset, DateTimeKind.Local, DateFormatHandling);
-//                _writeBuffer[pos++] = _quoteChar;
-
-//                _writer.Write(_writeBuffer, 0, pos);
-//            }
-//            else
-//            {
-//                _writer.Write(_quoteChar);
-//                _writer.Write(value.ToString(DateFormatString, Culture));
-//                _writer.Write(_quoteChar);
-//            }
-//        }
-//#endif
-
-//        /// <summary>
-//        /// Writes a <see cref="Guid"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Guid"/> value to write.</param>
-//        public override void WriteValue(Guid value)
-//        {
-//            InternalWriteValue(EdiToken.String);
-
-//            string text = null;
-
-//#if !(DOTNET || PORTABLE40 || PORTABLE)
-//            text = value.ToString("D", CultureInfo.InvariantCulture);
-//#else
-//            text = value.ToString("D");
-//#endif
-
-//            _writer.Write(_quoteChar);
-//            _writer.Write(text);
-//            _writer.Write(_quoteChar);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="TimeSpan"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="TimeSpan"/> value to write.</param>
-//        public override void WriteValue(TimeSpan value)
-//        {
-//            InternalWriteValue(EdiToken.String);
-
-//            string text;
-//#if (NET35 || NET20)
-//            text = value.ToString();
-//#else
-//            text = value.ToString(null, CultureInfo.InvariantCulture);
-//#endif
-
-//            _writer.Write(_quoteChar);
-//            _writer.Write(text);
-//            _writer.Write(_quoteChar);
-//        }
-
-//        /// <summary>
-//        /// Writes a <see cref="Uri"/> value.
-//        /// </summary>
-//        /// <param name="value">The <see cref="Uri"/> value to write.</param>
-//        public override void WriteValue(Uri value)
-//        {
-//            if (value == null)
-//            {
-//                WriteNull();
-//            }
-//            else
-//            {
-//                InternalWriteValue(EdiToken.String);
-//                WriteEscapedString(value.OriginalString, true);
-//            }
-//        }
-//        #endregion
-
-//        /// <summary>
-//        /// Writes out a comment <code>/*...*/</code> containing the specified text. 
-//        /// </summary>
-//        /// <param name="text">Text to place inside the comment.</param>
-//        public override void WriteComment(string text)
-//        {
-//            InternalWriteComment();
-
-//            _writer.Write("/*");
-//            _writer.Write(text);
-//            _writer.Write("*/");
-//        }
-
-//        /// <summary>
-//        /// Writes out the given white space.
-//        /// </summary>
-//        /// <param name="ws">The string of white space characters.</param>
-//        public override void WriteWhitespace(string ws)
-//        {
-//            InternalWriteWhitespace(ws);
-
-//            _writer.Write(ws);
-//        }
-
-//        private void EnsureWriteBuffer()
-//        {
-//            if (_writeBuffer == null)
-//            {
-//                // maximum buffer sized used when writing iso date
-//                _writeBuffer = BufferUtils.RentBuffer(_arrayPool, 35);
-//            }
-//        }
-
-//        private void WriteIntegerValue(long value)
-//        {
-//            if (value >= 0 && value <= 9)
-//            {
-//                _writer.Write((char)('0' + value));
-//            }
-//            else
-//            {
-//                ulong uvalue = (value < 0) ? (ulong)-value : (ulong)value;
-
-//                if (value < 0)
-//                {
-//                    _writer.Write('-');
-//                }
-
-//                WriteIntegerValue(uvalue);
-//            }
-//        }
-
-//        private void WriteIntegerValue(ulong uvalue)
-//        {
-//            if (uvalue <= 9)
-//            {
-//                _writer.Write((char)('0' + uvalue));
-//            }
-//            else
-//            {
-//                EnsureWriteBuffer();
-
-//                int totalLength = MathUtils.IntLength(uvalue);
-//                int length = 0;
-
-//                do
-//                {
-//                    _writeBuffer[totalLength - ++length] = (char)('0' + (uvalue % 10));
-//                    uvalue /= 10;
-//                } while (uvalue != 0);
-
-//                _writer.Write(_writeBuffer, 0, length);
-//            }
-//        }
-//    }
+        /// <summary>
+        /// Writes the segment name of a name/value pair on a Edi object.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        public override void WriteSegmentName(string name) {
+            InternalWriteSegmentName(name);
+            WriteSegmentNameDelimiter();
+        }
+
+        public override void WriteSegmentTerminator() {
+            _writer.Write(Grammar.SegmentTerminator);
+        }
+
+        protected override void WriteComponentDelimiter() {
+            _writer.Write(Grammar.ComponentDataElementSeparator);
+        }
+
+        protected override void WriteElementDelimiter() {
+            _writer.Write(Grammar.DataElementSeparator);
+        }
+
+        protected override void WriteSegmentNameDelimiter() {
+            _writer.Write(Grammar.SegmentNameDelimiter);
+        }
+
+        protected override void WriteNewLine() {
+            _writer.WriteLine();
+        }
+        
+        #region WriteValue methods
+        /// <summary>
+        /// Writes a <see cref="Object"/> value.
+        /// An error will raised if the value cannot be written as a single Edi token.
+        /// </summary>
+        /// <param name="value">The <see cref="Object"/> value to write.</param>
+        public override void WriteValue(object value) {
+#if !PORTABLE
+            if (value is BigInteger) {
+                InternalWriteValue(EdiToken.Integer);
+
+                _writer.Write(((BigInteger)value).ToString(CultureInfo.InvariantCulture));
+            } else
+#endif
+            {
+                base.WriteValue(value);
+            }
+        }
+
+        /// <summary>
+        /// Writes raw Edi.
+        /// </summary>
+        /// <param name="fragment">The raw Edi fragment to write.</param>
+        public override void WriteRaw(string fragment) {
+            _writer.Write(fragment);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="String"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> value to write.</param>
+        public override void WriteValue(string value) {
+            InternalWriteValue(EdiToken.String);
+            WriteEscapedString(value);
+        }
+
+        private void WriteEscapedString(string value) {
+            EnsureWriteBuffer();
+            var bufferPool = _arrayPool;
+
+            if (value != null) {
+                int lastWritePosition = 0;
+
+                for (int i = 0; i < value.Length; i++) {
+                    var c = value[i];
+
+                    if (c < _charEscapeFlags.Length && !_charEscapeFlags[c]) {
+                        continue;
+                    }
+
+                    string escapedValue = null;
+
+                    if (c < _charEscapeFlags.Length) {
+                        escapedValue = $"{Grammar.ReleaseCharacter.Value}{c}"; 
+                    } else {
+                        escapedValue = null;
+                    }
+
+                    if (escapedValue == null) {
+                        continue;
+                    }
+
+                    if (i > lastWritePosition) {
+                        int length = i - lastWritePosition;
+                        int start = 0;
+
+                        if (_writeBuffer == null || _writeBuffer.Length < length) {
+                            char[] newBuffer = BufferUtils.RentBuffer(bufferPool, length);
+                            
+                            BufferUtils.ReturnBuffer(bufferPool, _writeBuffer);
+
+                            _writeBuffer = newBuffer;
+                        }
+
+                        value.CopyTo(lastWritePosition, _writeBuffer, start, length - start);
+
+                        // write unchanged chars before writing escaped text
+                        _writer.Write(_writeBuffer, start, length - start);
+                    }
+
+                    lastWritePosition = i + 1;
+                    _writer.Write(escapedValue);
+                }
+
+                if (lastWritePosition == 0) {
+                    // no escaped text, write entire string
+                    _writer.Write(value);
+                } else {
+                    int length = value.Length - lastWritePosition;
+
+                    if (_writeBuffer == null || _writeBuffer.Length < length) {
+                        _writeBuffer = BufferUtils.EnsureBufferSize(bufferPool, length, _writeBuffer);
+                    }
+
+                    value.CopyTo(lastWritePosition, _writeBuffer, 0, length);
+
+                    // write remaining text
+                    _writer.Write(_writeBuffer, 0, length);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Int32"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Int32"/> value to write.</param>
+        public override void WriteValue(int value, Picture? picture = null) {
+            InternalWriteValue(EdiToken.Integer);
+            WriteIntegerValue(value, picture);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="UInt32"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="UInt32"/> value to write.</param>
+        [CLSCompliant(false)]
+        public override void WriteValue(uint value, Picture? picture = null) {
+            InternalWriteValue(EdiToken.Integer);
+            WriteIntegerValue(value, picture);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Int64"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Int64"/> value to write.</param>
+        public override void WriteValue(long value, Picture? picture = null) {
+            InternalWriteValue(EdiToken.Integer);
+            WriteIntegerValue(value, picture);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="UInt64"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="UInt64"/> value to write.</param>
+        [CLSCompliant(false)]
+        public override void WriteValue(ulong value, Picture? picture = null) {
+            InternalWriteValue(EdiToken.Integer);
+            WriteIntegerValue(value, picture);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Single"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Single"/> value to write.</param>
+        public override void WriteValue(float value, Picture? picture) {
+            InternalWriteValue(EdiToken.Float);
+            _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Nullable{Single}"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Nullable{Single}"/> value to write.</param>
+        public override void WriteValue(float? value, Picture? picture = null) {
+            if (value == null) {
+                WriteNull();
+            } else {
+                InternalWriteValue(EdiToken.Float);
+                _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Double"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Double"/> value to write.</param>
+        public override void WriteValue(double value, Picture? picture = null) {
+            InternalWriteValue(EdiToken.Float);
+            _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Nullable{Double}"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Nullable{Double}"/> value to write.</param>
+        public override void WriteValue(double? value, Picture? picture = null) {
+            if (value == null) {
+                WriteNull();
+            } else {
+                InternalWriteValue(EdiToken.Float);
+                _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Boolean"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Boolean"/> value to write.</param>
+        public override void WriteValue(bool value) {
+            InternalWriteValue(EdiToken.Boolean);
+            _writer.Write(value);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Int16"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Int16"/> value to write.</param>
+        public override void WriteValue(short value, Picture? picture) {
+            InternalWriteValue(EdiToken.Integer);
+            WriteIntegerValue(value, picture);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="UInt16"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="UInt16"/> value to write.</param>
+        [CLSCompliant(false)]
+        public override void WriteValue(ushort value, Picture? picture) {
+            InternalWriteValue(EdiToken.Integer);
+            WriteIntegerValue(value, picture);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Char"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Char"/> value to write.</param>
+        public override void WriteValue(char value) {
+            InternalWriteValue(EdiToken.String);
+            _writer.Write(value);
+        }
+
+       
+        /// <summary>
+        /// Writes a <see cref="SByte"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="SByte"/> value to write.</param>
+        [CLSCompliant(false)]
+        public override void WriteValue(sbyte value, Picture? picture) {
+            InternalWriteValue(EdiToken.Integer);
+            WriteIntegerValue(value, picture);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Decimal"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Decimal"/> value to write.</param>
+        public override void WriteValue(decimal value, Picture? picture) {
+            InternalWriteValue(EdiToken.Float);
+            _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+        }
+
+        /// <summary>
+        /// Writes a <see cref="DateTime"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="DateTime"/> value to write.</param>
+        public override void WriteValue(DateTime value, string format) {
+            InternalWriteValue(EdiToken.Date);
+            _writer.Write(value.ToString(format ?? "yyyyMMddHHmmss", Culture));
+        }
+
+        /// <summary>
+        /// Writes a <see cref="DateTimeOffset"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="DateTimeOffset"/> value to write.</param>
+        public override void WriteValue(DateTimeOffset value, string format) {
+            InternalWriteValue(EdiToken.Date);
+            _writer.Write(value.UtcDateTime.ToString(format ?? "yyyyMMddHHmmss", Culture));
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Guid"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Guid"/> value to write.</param>
+        public override void WriteValue(Guid value) {
+            InternalWriteValue(EdiToken.String);
+
+            string text = null;
+
+#if !(DOTNET || PORTABLE)
+            text = value.ToString("D", CultureInfo.InvariantCulture);
+#else
+            text = value.ToString("D");
+#endif
+            _writer.Write(text);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="TimeSpan"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="TimeSpan"/> value to write.</param>
+        public override void WriteValue(TimeSpan value) {
+            InternalWriteValue(EdiToken.String);
+            string text = value.ToString(null, CultureInfo.InvariantCulture);
+            _writer.Write(text);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Uri"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Uri"/> value to write.</param>
+        public override void WriteValue(Uri value) {
+            if (value == null) {
+                WriteNull();
+            } else {
+                InternalWriteValue(EdiToken.String);
+                WriteEscapedString(value.OriginalString);
+            }
+        }
+        #endregion
+
+        private void EnsureWriteBuffer() {
+            if (_writeBuffer == null) {
+                // maximum buffer sized used when writing iso date
+                _writeBuffer = BufferUtils.RentBuffer(_arrayPool, 35);
+            }
+        }
+
+        private void WriteIntegerValue(long value, Picture? picture) {
+            if (value >= 0 && value <= 9) {
+                _writer.Write((char)('0' + value));
+            } else {
+                ulong uvalue = (value < 0) ? (ulong)-value : (ulong)value;
+
+                if (value < 0) {
+                    _writer.Write('-');
+                }
+
+                WriteIntegerValue(uvalue, picture);
+            }
+        }
+
+        private void WriteIntegerValue(ulong uvalue, Picture? picture) {
+            if (uvalue <= 9) {
+                _writer.Write((char)('0' + uvalue));
+            } else {
+                EnsureWriteBuffer();
+
+                int totalLength = MathUtils.IntLength(uvalue);
+                int length = 0;
+
+                do {
+                    _writeBuffer[totalLength - ++length] = (char)('0' + (uvalue % 10));
+                    uvalue /= 10;
+                } while (uvalue != 0);
+
+                _writer.Write(_writeBuffer, 0, length);
+            }
+        }
+    }
 }

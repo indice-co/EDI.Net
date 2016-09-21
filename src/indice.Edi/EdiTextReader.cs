@@ -139,12 +139,12 @@ namespace indice.Edi
                             break;
                         }
                         if (Grammar.IsSpecial(currentChar)) {
-                            if (Grammar.ComponentDataElementSeparator.Contains(currentChar)) {
+                            if (Grammar.ComponentDataElementSeparator == currentChar) {
                                 _charPos++;
                                 // finished parsing
                                 SetToken(EdiToken.ComponentStart);
                                 return true;
-                            } else if (Grammar.DataElementSeparator.Contains(currentChar)) {
+                            } else if (Grammar.DataElementSeparator == currentChar || Grammar.SegmentNameDelimiter == currentChar) {
                                 _charPos++;
                                 SetToken(EdiToken.ElementStart);
                                 return true;
@@ -239,8 +239,8 @@ namespace indice.Edi
             }
             EatWhitespace(false);
 
-            if (!Grammar.DataElementSeparator.Contains(_chars[_charPos]))
-                throw EdiReaderException.Create(this, "Invalid character after parsing property name. Expected '{1}' but got: {0}.".FormatWith(CultureInfo.InvariantCulture, _chars[_charPos], string.Join("', '", Grammar.DataElementSeparator)));
+            if (Grammar.SegmentNameDelimiter != _chars[_charPos])
+                throw EdiReaderException.Create(this, "Invalid character after parsing segment name. Expected '{1}' but got: {0}.".FormatWith(CultureInfo.InvariantCulture, _chars[_charPos], string.Join("', '", Grammar.DataElementSeparator)));
             
             SetToken(EdiToken.SegmentName, segmentName);
 

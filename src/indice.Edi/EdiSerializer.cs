@@ -27,7 +27,7 @@ namespace indice.Edi
         /// Deserializes the EDI structure contained by the specified <see cref="TextReader"/>
         /// into an instance of the specified type.
         /// </summary>
-        /// /// <param name="reader">The <see cref="TextReader"/> containing the object.</param>
+        /// <param name="reader">The <see cref="TextReader"/> containing the object.</param>
         /// <param name="grammar">The <see cref="IEdiGrammar"/> to use for reading from the text reader</param>
         /// <typeparam name="T">The type of the object to deserialize.</typeparam>
         /// <returns>The instance of <typeparamref name="T"/> being deserialized.</returns>
@@ -69,6 +69,8 @@ namespace indice.Edi
             return DeserializeInternal(reader, objectType);
         }
 
+        #region Read internals
+
         internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -94,7 +96,7 @@ namespace indice.Edi
                         TryCreateContainer(reader, stack, EdiStructureType.Group);
                     } else if (reader.IsStartMessage) {
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
-                    }  else if (reader.TokenType == EdiToken.SegmentName) {
+                    } else if (reader.TokenType == EdiToken.SegmentName) {
                         TryCreateContainer(reader, stack, EdiStructureType.Segment);
                     } else if (reader.TokenType == EdiToken.ElementStart) {
                         TryCreateContainer(reader, stack, EdiStructureType.Element);
@@ -119,13 +121,13 @@ namespace indice.Edi
             // stack always enumerates backwards so this is a search upwards :-)
             // we search only if we need to have more than one property populated with the value from the reader.
             // maxLevelsUp = zero means only the current level (quicker).
-            foreach (var structure in stack) { 
+            foreach (var structure in stack) {
                 if (level++ > maxLevelsUp)
                     break;
                 var typeDescriptor = structure.Descriptor;
                 var valueProps = typeDescriptor.Properties
-                                               .Where(p => p.ValueInfo != null && 
-                                                            (reader.Path == p.Path  || structure.CachedReads.ContainsPath(p.Path))
+                                               .Where(p => p.ValueInfo != null &&
+                                                            (reader.Path == p.Path || structure.CachedReads.ContainsPath(p.Path))
                                                            ).OrderByDescending(p => reader.Path == p.Path).ToArray();
 
                 for (var i = 0; i < valueProps.Length; i++) {
@@ -134,7 +136,7 @@ namespace indice.Edi
                     // Values must be read only once on first pass! 
                     // Otherwise the reader position moves forward 
                     // and the serializer gets out of sync.
-                    var read = current == structure && reader.Path == descriptor.Path && i == 0; 
+                    var read = current == structure && reader.Path == descriptor.Path && i == 0;
                     switch (ConvertUtils.GetTypeCode(descriptor.Info.PropertyType)) {
                         case PrimitiveTypeCode.Empty: break;
                         case PrimitiveTypeCode.Object: break;
@@ -143,7 +145,7 @@ namespace indice.Edi
                             PopulateCharValue(reader, structure, descriptor, read);
                             break;
                         case PrimitiveTypeCode.Boolean:
-                        case PrimitiveTypeCode.BooleanNullable: 
+                        case PrimitiveTypeCode.BooleanNullable:
                             PopulateBooleanValue(reader, structure, descriptor, read);
                             break;
                         case PrimitiveTypeCode.SByte: break;
@@ -195,10 +197,10 @@ namespace indice.Edi
             }
         }
 
-        private static void PopulateStringValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+        internal static void PopulateStringValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
             var cache = structure.CachedReads;
             var valueInfo = descriptor.ValueInfo;
-            var text = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) : 
+            var text = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
                                                      read ? reader.ReadAsString() : (string)reader.Value;
             descriptor.Info.SetValue(structure.Instance, text);
         }
@@ -284,8 +286,7 @@ namespace indice.Edi
                 if (int.TryParse(text, NumberStyles.Integer, reader.Culture, out integerValue)) {
                     booleanValue = integerValue == 1;
                 } else if (bool.TryParse(text, out booleanValue)) {
-                } 
-                else { 
+                } else {
                     throw new EdiException("Unable to convert string '{0}' to boolean.".FormatWith(reader.Culture, text));
                 }
                 descriptor.Info.SetValue(structure.Instance, booleanValue);
@@ -302,7 +303,7 @@ namespace indice.Edi
                     index = previous.Index + 1;
                 }
             }
-            
+
             var current = stack.Peek();
             var property = default(EdiPropertyDescriptor);
             if (newContainer == EdiStructureType.Segment) {
@@ -312,14 +313,14 @@ namespace indice.Edi
                 if (stack.Count > 0 && current.Container == EdiStructureType.SegmentGroup) {
                     var groupMark = current.Descriptor.SegmentGroupInfo;
                     if (groupMark.SequenceEndInternal.Segment.Equals(reader.Value) ||
-                        groupMark.StartInternal.Segment.Equals(reader.Value)) { 
+                        groupMark.StartInternal.Segment.Equals(reader.Value)) {
                         stack.Pop();
                         current = stack.Peek();
                     }
                 }
                 property = FindForCurrentSegment(reader, current, newContainer);
                 // for segment group start we must inspect the descriptor
-                if (property != null && property.MarksSegmentGroup && 
+                if (property != null && property.MarksSegmentGroup &&
                                         property.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
                     return TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup);
                 }
@@ -388,6 +389,7 @@ namespace indice.Edi
             }
             return property;
         }
+
         private EdiPropertyDescriptor FindForCurrentElement(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
             var candidates = currentStructure.GetMatchingProperties(newContainerType);
             if (candidates.Length == 0) {
@@ -398,8 +400,7 @@ namespace indice.Edi
                 var matches = candidates.Where(p => p.PathInfo.PathInternal.ToString("E").Equals(reader.Path)).ToArray();
                 if (matches.Length == 0) {
                     property = null;
-                } 
-                else if (matches.Length == 1 && matches[0].ConditionInfo == null) {
+                } else if (matches.Length == 1 && matches[0].ConditionInfo == null) {
                     property = matches[0];
                 } else {
                     property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
@@ -407,7 +408,7 @@ namespace indice.Edi
             }
             return property;
         }
-        
+
         private EdiPropertyDescriptor FindForCurrentLogicalStructure(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
             var candidates = currentStructure.GetMatchingProperties(newContainerType);
             var property = default(EdiPropertyDescriptor);
@@ -416,7 +417,7 @@ namespace indice.Edi
             }
             if (candidates.Length == 1 && candidates[0].ConditionInfo == null) {
                 property = candidates[0];
-            }else {
+            } else {
                 property = ConditionalMatch(reader, currentStructure, newContainerType, candidates);
             }
             //if (property.MarksSegmentGroupStart && !property.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
@@ -449,5 +450,59 @@ namespace indice.Edi
             readCache.Enqueue(new EdiEntry(path, reader.TokenType, discriminator));
             return property;
         }
+        #endregion
+
+        /// <summary>
+        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// to a <c>Stream</c> using the specified <see cref="TextWriter"/>. 
+        /// </summary>
+        /// <param name="textWriter">The <see cref="TextWriter"/> used to write the EDI structure.</param>
+        /// <param name="grammar">The <see cref="IEdiGrammar"/> to use for reading from the text reader</param>
+        /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        public void Serialize(TextWriter textWriter, IEdiGrammar grammar, object value) {
+            Serialize(new EdiTextWriter(textWriter, grammar), value, null);
+        }
+
+
+        /// <summary>
+        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// to a <c>Stream</c> using the specified <see cref="TextWriter"/>. 
+        /// </summary>
+        /// <param name="textWriter">The <see cref="TextWriter"/> used to write the EDI structure.</param>
+        /// <param name="grammar">The <see cref="IEdiGrammar"/> to use for reading from the text reader</param>
+        /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        /// <param name="objectType">
+        /// The type of the value being serialized.
+        /// Specifing the type is optional.
+        /// </param>
+        public void Serialize(TextWriter textWriter, IEdiGrammar grammar, object value, Type objectType) {
+            Serialize(new EdiTextWriter(textWriter, grammar), value, objectType);
+        }
+
+        /// <summary>
+        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// to a <c>Stream</c> using the specified <see cref="EdiWriter"/>. 
+        /// </summary>
+        /// <param name="ediWriter">The <see cref="EdiWriter"/> used to write the EDI structure.</param>
+        /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        /// <param name="objectType">
+        /// The type of the value being serialized.
+        /// Specifing the type is optional.
+        /// </param>
+        public void Serialize(EdiWriter ediWriter, object value, Type objectType) {
+            SerializeInternal(ediWriter, value, objectType);
+        }
+
+        #region Write internals
+        
+        internal virtual void SerializeInternal(EdiWriter writer, object value, Type objectType) {
+            if (value == null) {
+                writer.WriteNull();
+                return;
+            }
+            objectType = objectType ?? value.GetType();
+        }
+
+        #endregion
     }
 }

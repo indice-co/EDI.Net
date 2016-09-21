@@ -8,14 +8,16 @@ namespace indice.Edi
 {
     public class EdiGrammar : IEdiGrammar
     {
-        protected char[] _ComponentDataElementSeparator;
-        protected char[] _DataElementSeparator;
+        protected char _SegmentNameDelimiter;
+        protected char _ComponentDataElementSeparator;
+        protected char _DataElementSeparator;
         protected char? _DecimalMark;
         protected char? _ReleaseCharacter;
         protected char[] _Reserved;
         protected char _SegmentTerminator;
 
         char[] _separators;
+        bool[] _charEscapeFlags;
 
         protected string _ServiceStringAdviceTag;
         protected string _InterchangeHeaderTag;
@@ -26,8 +28,8 @@ namespace indice.Edi
         protected string _InterchangeTrailerTag;
 
         public EdiGrammar() {
-            _ComponentDataElementSeparator = new[] { ':' };
-            _DataElementSeparator = new[] { '+' };
+            _ComponentDataElementSeparator = ':';
+            _SegmentNameDelimiter = _DataElementSeparator = '+';
             _DecimalMark = '.';
             _ReleaseCharacter = '?';
             _Reserved = new[] { ' ' };
@@ -43,8 +45,8 @@ namespace indice.Edi
         }
 
         public EdiGrammar(IEdiGrammar grammar) {
-            _ComponentDataElementSeparator = grammar.ComponentDataElementSeparator.Clone() as char[];
-            _DataElementSeparator = grammar.DataElementSeparator.Clone() as char[];
+            _ComponentDataElementSeparator = grammar.ComponentDataElementSeparator;
+            _DataElementSeparator = grammar.DataElementSeparator;
             _DecimalMark = grammar.DecimalMark;
             _ReleaseCharacter = grammar.ReleaseCharacter;
             _Reserved = grammar.Reserved.Clone() as char[];
@@ -62,20 +64,26 @@ namespace indice.Edi
         public char[] Separators {
             get {
                 if (_separators == null) {
-                    _separators = _ComponentDataElementSeparator.Union(
-                                      _DataElementSeparator).Union(
-                               new[] { _SegmentTerminator }).ToArray();
+                    _separators = new[] {
+                        _SegmentNameDelimiter,
+                        _ComponentDataElementSeparator,
+                        _DataElementSeparator,
+                        _SegmentTerminator
+                    }.Distinct().ToArray();
                 }
                 return _separators;
             }
         }
-
-        public char[] ComponentDataElementSeparator {
-            get { return _ComponentDataElementSeparator; }
-
+        
+        public char SegmentNameDelimiter {
+            get { return _SegmentNameDelimiter; }
         }
 
-        public char[] DataElementSeparator {
+        public char ComponentDataElementSeparator {
+            get { return _ComponentDataElementSeparator; }
+        }
+
+        public char DataElementSeparator {
             get { return _DataElementSeparator; }
         }
 
@@ -113,8 +121,8 @@ namespace indice.Edi
         }
 
         public void SetAdvice(char[] _chars) {
-            _ComponentDataElementSeparator = new[] { _chars[0] };
-            _DataElementSeparator = new[] { _chars[1] };
+            _ComponentDataElementSeparator = _chars[0];
+            _SegmentNameDelimiter = _DataElementSeparator = _chars[1];
             _DecimalMark = _chars[2];
             _ReleaseCharacter = _chars[3];
             _Reserved = new[] { _chars[4] };
@@ -127,8 +135,9 @@ namespace indice.Edi
 
         public static IEdiGrammar NewTradacoms() {
             return new EdiGrammar() {
-                _ComponentDataElementSeparator = new[] { ':' },
-                _DataElementSeparator = new[] { '=', '+' },
+                _SegmentNameDelimiter = '=',
+                _ComponentDataElementSeparator = ':',
+                _DataElementSeparator = '+',
                 _DecimalMark = null,
                 _ReleaseCharacter = '?',
                 _Reserved = new[] { ' ' },
@@ -145,8 +154,9 @@ namespace indice.Edi
         
         public static IEdiGrammar NewX12() {
             return new EdiGrammar() {
-                _ComponentDataElementSeparator = new[] { '>' },
-                _DataElementSeparator = new[] { '*' },
+                _SegmentNameDelimiter = '*',
+                _ComponentDataElementSeparator = '>',
+                _DataElementSeparator = '*',
                 _DecimalMark = '.',
                 _ReleaseCharacter = null,
                 _Reserved = new char[0],

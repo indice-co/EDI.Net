@@ -5,16 +5,21 @@ namespace indice.Edi
     public interface IEdiGrammar
     {
         /// <summary>
+        /// Segment name delimiter is the character used to seperate between a segment name and its elements. Default value <value>'+'</value> same as <see cref="DataElementSeparator"/>
+        /// </summary>
+        char SegmentNameDelimiter { get; }
+
+        /// <summary>
         /// Component data element separator is the "second level" separator of data elements within a message segment. Default value  <value>':'</value>
         /// </summary>
-        /// <value>An array of possible characters</value>
-        char[] ComponentDataElementSeparator { get; }
+        /// <value>The character used to separate between components</value>
+        char ComponentDataElementSeparator { get; }
 
         /// <summary>
         /// Data element separator is the "first level" separator of data elements within a message segment. Default value <value>'+'</value>
         /// </summary>
         /// <value>An array of possible characters</value>
-        char[] DataElementSeparator { get; }
+        char DataElementSeparator { get; }
 
         /// <summary>
         /// Used in EDI-Fact Only. Otherwize null

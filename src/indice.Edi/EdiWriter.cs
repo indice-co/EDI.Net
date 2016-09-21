@@ -18,9 +18,9 @@ namespace indice.Edi
         internal enum State
         {
             Start = 0,
-            SegmentName = 1,
-            SegmentStart = 2,
-            Segment = 3,
+            Segment = 1,
+            SegmentName = 2,
+            SegmentStart = 3,
             ElementStart = 4,
             Element = 5,
             ComponentStart = 6,
@@ -34,11 +34,19 @@ namespace indice.Edi
             
         }
 
+        private readonly IEdiGrammar _grammar;
         private List<EdiPosition> _stack;
         private EdiPosition _currentPosition;
         private State _currentState;
         private Formatting _formatting;
-
+        
+        /// <summary>
+        /// Gets the <see cref="IEdiGrammar"/> rules for use in the reader.
+        /// </summary>
+        /// <value>The current reader state.</value>
+        public IEdiGrammar Grammar {
+            get { return _grammar; }
+        }
         /// <summary>
         /// Gets or sets a value indicating whether the underlying stream or
         /// <see cref="TextReader"/> should be closed when the writer is closed.
@@ -126,7 +134,7 @@ namespace indice.Edi
         private CultureInfo _culture;
 
         /// <summary>
-        /// Indicates how JSON text output is formatted.
+        /// Indicates how Edi text output is formatted.
         /// </summary>
         public Formatting Formatting {
             get { return _formatting; }
@@ -138,17 +146,9 @@ namespace indice.Edi
                 _formatting = value;
             }
         }
-
+        
         /// <summary>
-        /// Get or set how <see cref="DateTime"/> and <see cref="DateTimeOffset"/> values are formatting when writing JSON text.
-        /// </summary>
-        public string DateFormatString {
-            get { return _dateFormatString; }
-            set { _dateFormatString = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the culture used when writing JSON. Defaults to <see cref="CultureInfo.InvariantCulture"/>.
+        /// Gets or sets the culture used when writing Edi. Defaults to <see cref="CultureInfo.InvariantCulture"/>.
         /// </summary>
         public CultureInfo Culture {
             get { return _culture ?? CultureInfo.InvariantCulture; }
@@ -158,7 +158,10 @@ namespace indice.Edi
         /// <summary>
         /// Creates an instance of the <c>EdiWriter</c> class. 
         /// </summary>
-        protected EdiWriter() {
+        protected EdiWriter(IEdiGrammar grammar) {
+            if (null == grammar)
+                throw new ArgumentNullException(nameof(grammar));
+            _grammar = grammar;
             _currentState = State.Start;
             _formatting = Formatting.None;
 
@@ -218,15 +221,7 @@ namespace indice.Edi
         public virtual void WriteSegmentName() {
             InternalWriteStart(EdiToken.SegmentName, EdiContainerType.Segment);
         }
-
-        /// <summary>
-        /// Writes the end of a JSON object.
-        /// </summary>
-        public virtual void WriteSegmentTerminator() {
-            InternalWriteEnd(EdiContainerType.Segment);
-        }
-
-
+        
         /// <summary>
         /// Writes the segmant name.
         /// </summary>
@@ -236,7 +231,7 @@ namespace indice.Edi
         }
 
         /// <summary>
-        /// Writes the end of the current JSON object or array.
+        /// Writes the end of the current EDI structure.
         /// </summary>
         public virtual void WriteEnd() {
             WriteEnd(Peek());
@@ -267,7 +262,7 @@ namespace indice.Edi
         /// <param name="token">The <see cref="EdiToken"/> to write.</param>
         /// <param name="value">
         /// The value to write.
-        /// A value is only required for tokens that have an associated value, e.g. the <see cref="String"/> property name for <see cref="EdiToken.SegmentName"/>.
+        /// A value is only required for tokens that have an associated value, e.g. the <see cref="String"/> segmanet name name for <see cref="EdiToken.SegmentName"/>.
         /// A null value can be passed to the method for token's that don't have a value, e.g. <see cref="EdiToken.SegmentStart"/>.</param>
         public void WriteToken(EdiToken token, object value) {
             switch (token) {
@@ -279,6 +274,8 @@ namespace indice.Edi
                     break;
                 case EdiToken.SegmentName:
                     // read to next
+                    ValidationUtils.ArgumentNotNull(value, nameof(value));
+                    WriteSegmentName(value.ToString());
                     break;
                 case EdiToken.ElementStart:
                     // read to next
@@ -363,9 +360,11 @@ namespace indice.Edi
 
         private void WriteEnd(EdiContainerType type) {
             switch (type) {
-                case EdiContainerType.Segment: break;
-                case EdiContainerType.Element: break;
-                case EdiContainerType.Component: break;
+                case EdiContainerType.Segment:
+                case EdiContainerType.Element:
+                case EdiContainerType.Component:
+                    InternalWriteEnd(type);
+                    break;
                 default:
                     throw EdiWriterException.Create(this, "Unexpected type when writing end: " + type, null);
             }
@@ -381,10 +380,6 @@ namespace indice.Edi
             switch (type) {
                 case EdiContainerType.Segment:
                     return EdiToken.SegmentStart;
-                case EdiContainerType.Element:
-                    return EdiToken.ElementStart;
-                case EdiContainerType.Component:
-                    return EdiToken.ComponentStart;
                 default:
                     throw EdiWriterException.Create(this, "No close token for type: " + type, null);
             }
@@ -422,19 +417,19 @@ namespace indice.Edi
 
                 switch (currentLevelType) {
                     case EdiContainerType.Segment:
-                        _currentState = State.Segment;
+                        _currentState = State.SegmentStart;
                         break;
                     case EdiContainerType.Element:
-                        _currentState = State.Element;
+                        _currentState = State.ElementStart;
                         break;
                     case EdiContainerType.Component:
-                        _currentState = State.Component;
+                        _currentState = State.ComponentStart;
                         break;
                     case EdiContainerType.None:
                         _currentState = State.Start;
                         break;
                     default:
-                        throw EdiWriterException.Create(this, "Unknown JsonType: " + currentLevelType, null);
+                        throw EdiWriterException.Create(this, "Unknown EdiContainerType: " + currentLevelType, null);
                 }
             }
         }
@@ -450,15 +445,73 @@ namespace indice.Edi
         /// Writes indent characters.
         /// </summary>
         protected virtual void WriteNewLine() {
+
+        }
+        
+        /// <summary>
+        /// Writes indent characters.
+        /// </summary>
+        protected virtual void WriteSegmentNameDelimiter() {
+            
+        }
+        
+        /// <summary>
+        /// Writes the end of a Edi object.
+        /// </summary>
+        public virtual void WriteSegmentTerminator() {
+            InternalWriteEnd(EdiContainerType.Segment);
+        }
+
+        /// <summary>
+        /// Writes segment terminator.
+        /// </summary>
+        protected virtual void WriteElementDelimiter() {
+
+        }
+
+        /// <summary>
+        /// Writes segment terminator.
+        /// </summary>
+        protected virtual void WriteComponentDelimiter() {
+
         }
 
         internal void AutoComplete(EdiToken tokenBeingWritten) {
-            // gets new state based on the current state and what is being written
-            // TODO: fix this too.
             State newState = State.Error;
-
+            // gets new state based on the current state and what is being written
+            var validOriginStates = new[] {
+                State.Component,
+                State.ComponentStart,
+                State.SegmentName,
+                State.ElementStart,
+                State.Start
+            };
+            if (validOriginStates.Contains(_currentState)) {
+                switch (tokenBeingWritten) {
+                    case EdiToken.None:
+                        newState = State.Error;
+                        break;
+                    case EdiToken.SegmentStart:
+                    case EdiToken.SegmentName:
+                        newState = State.Segment;
+                        break;
+                    case EdiToken.ElementStart:
+                        newState = State.Element;
+                        break;
+                    case EdiToken.ComponentStart:
+                    case EdiToken.String:
+                    case EdiToken.Integer:
+                    case EdiToken.Float:
+                    case EdiToken.Boolean:
+                    case EdiToken.Date:
+                    case EdiToken.Null:
+                        newState = State.Component;
+                        break;
+                    default: break;
+                }
+            }
             if (newState == State.Error) {
-                throw EdiWriterException.Create(this, "Token {0} in state {1} would result in an invalid JSON object.".FormatWith(CultureInfo.InvariantCulture, tokenBeingWritten.ToString(), _currentState.ToString()), null);
+                throw EdiWriterException.Create(this, "Token {0} in state {1} would result in an invalid Edi object.".FormatWith(CultureInfo.InvariantCulture, tokenBeingWritten.ToString(), _currentState.ToString()), null);
             }
             
             _currentState = newState;
@@ -492,7 +545,7 @@ namespace indice.Edi
         /// Writes a <see cref="Int32"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int32"/> value to write.</param>
-        public virtual void WriteValue(int value) {
+        public virtual void WriteValue(int value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -501,7 +554,7 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="UInt32"/> value to write.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(uint value) {
+        public virtual void WriteValue(uint value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -509,7 +562,7 @@ namespace indice.Edi
         /// Writes a <see cref="Int64"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int64"/> value to write.</param>
-        public virtual void WriteValue(long value) {
+        public virtual void WriteValue(long value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -518,7 +571,7 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="UInt64"/> value to write.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(ulong value) {
+        public virtual void WriteValue(ulong value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -526,7 +579,7 @@ namespace indice.Edi
         /// Writes a <see cref="Single"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Single"/> value to write.</param>
-        public virtual void WriteValue(float value) {
+        public virtual void WriteValue(float value, Picture? picture) {
             InternalWriteValue(EdiToken.Float);
         }
 
@@ -534,7 +587,7 @@ namespace indice.Edi
         /// Writes a <see cref="Double"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Double"/> value to write.</param>
-        public virtual void WriteValue(double value) {
+        public virtual void WriteValue(double value, Picture? picture) {
             InternalWriteValue(EdiToken.Float);
         }
 
@@ -550,7 +603,7 @@ namespace indice.Edi
         /// Writes a <see cref="Int16"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int16"/> value to write.</param>
-        public virtual void WriteValue(short value) {
+        public virtual void WriteValue(short value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -559,7 +612,7 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="UInt16"/> value to write.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(ushort value) {
+        public virtual void WriteValue(ushort value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -584,7 +637,7 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="SByte"/> value to write.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(sbyte value) {
+        public virtual void WriteValue(sbyte value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -592,7 +645,7 @@ namespace indice.Edi
         /// Writes a <see cref="Decimal"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Decimal"/> value to write.</param>
-        public virtual void WriteValue(decimal value) {
+        public virtual void WriteValue(decimal value, Picture? picture) {
             InternalWriteValue(EdiToken.Float);
         }
 
@@ -600,7 +653,7 @@ namespace indice.Edi
         /// Writes a <see cref="DateTime"/> value.
         /// </summary>
         /// <param name="value">The <see cref="DateTime"/> value to write.</param>
-        public virtual void WriteValue(DateTime value) {
+        public virtual void WriteValue(DateTime value, string format) {
             InternalWriteValue(EdiToken.Date);
         }
 
@@ -608,7 +661,7 @@ namespace indice.Edi
         /// Writes a <see cref="DateTimeOffset"/> value.
         /// </summary>
         /// <param name="value">The <see cref="DateTimeOffset"/> value to write.</param>
-        public virtual void WriteValue(DateTimeOffset value) {
+        public virtual void WriteValue(DateTimeOffset value, string format) {
             InternalWriteValue(EdiToken.Date);
         }
 
@@ -632,11 +685,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Int32}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Int32}"/> value to write.</param>
-        public virtual void WriteValue(int? value) {
+        public virtual void WriteValue(int? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -645,11 +698,11 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt32}"/> value to write.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(uint? value) {
+        public virtual void WriteValue(uint? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -657,11 +710,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Int64}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Int64}"/> value to write.</param>
-        public virtual void WriteValue(long? value) {
+        public virtual void WriteValue(long? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -670,11 +723,11 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt64}"/> value to write.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(ulong? value) {
+        public virtual void WriteValue(ulong? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -682,11 +735,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Single}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Single}"/> value to write.</param>
-        public virtual void WriteValue(float? value) {
+        public virtual void WriteValue(float? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -694,11 +747,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Double}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Double}"/> value to write.</param>
-        public virtual void WriteValue(double? value) {
+        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
+        public virtual void WriteValue(double? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -718,11 +772,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Int16}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Int16}"/> value to write.</param>
-        public virtual void WriteValue(short? value) {
+        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
+        public virtual void WriteValue(short? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -730,12 +785,13 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{UInt16}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt16}"/> value to write.</param>
+        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(ushort? value) {
+        public virtual void WriteValue(ushort? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -767,12 +823,13 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{SByte}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{SByte}"/> value to write.</param>
+        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
         [CLSCompliant(false)]
-        public virtual void WriteValue(sbyte? value) {
+        public virtual void WriteValue(sbyte? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -780,11 +837,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Decimal}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Decimal}"/> value to write.</param>
-        public virtual void WriteValue(decimal? value) {
+        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
+        public virtual void WriteValue(decimal? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), picture);
             }
         }
 
@@ -792,11 +850,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{DateTime}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{DateTime}"/> value to write.</param>
-        public virtual void WriteValue(DateTime? value) {
+        public virtual void WriteValue(DateTime? value, string format = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), format);
             }
         }
 
@@ -850,7 +908,7 @@ namespace indice.Edi
 
         /// <summary>
         /// Writes a <see cref="Object"/> value.
-        /// An error will raised if the value cannot be written as a single JSON token.
+        /// An error will raised if the value cannot be written as a single Edi token.
         /// </summary>
         /// <param name="value">The <see cref="Object"/> value to write.</param>
         public virtual void WriteValue(object value) {
@@ -869,14 +927,7 @@ namespace indice.Edi
             }
         }
         #endregion
-
-        /// <summary>
-        /// Writes out the given white space.
-        /// </summary>
-        /// <param name="ws">The string of white space characters.</param>
-        public virtual void WriteWhitespace(string ws) {
-            InternalWriteWhitespace(ws);
-        }
+        
 
         void IDisposable.Dispose() {
             Dispose(true);
@@ -1070,7 +1121,6 @@ namespace indice.Edi
                     if (!(value is string)) {
                         throw new ArgumentException("A name is required when setting property name state.", nameof(value));
                     }
-
                     InternalWriteSegmentName((string)value);
                     break;
                 case EdiToken.Integer:
