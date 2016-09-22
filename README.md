@@ -14,7 +14,7 @@ as well as describe component values size length and precision with the [picture
 - [Attributes](#attributes)
 - [Example usage](#example-usage)
 - [Contributions](#contributions)
-- [The Picture clause](#roadmap-todo)
+- [The Picture clause](#the-picture-clause)
 - [Roadmap](#roadmap-todo)
 
 ## Installation
