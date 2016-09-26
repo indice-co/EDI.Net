@@ -18,20 +18,56 @@ namespace indice.Edi
         internal enum State
         {
             Start = 0,
-            Segment = 1,
-            SegmentName = 2,
-            SegmentStart = 3,
-            ElementStart = 4,
-            Element = 5,
-            ComponentStart = 6,
-            Component = 7,
-            Closed = 8,
-            Error = 9
+            SegmentName = 1,
+            Segment = 2,
+            Element = 3,
+            Component = 4,
+            Closed = 5,
+            Error = 6
+        }
+        // array that gives a new state based on the current state an the token being written
+        private static readonly State[][] StateArray;
+
+        internal static readonly State[][] StateArrayTempate =
+        {
+            //                                       Start                   SegmentName         Segment           Element           Component         Closed       Error
+            //
+            /* None                         */new[] { State.Error,           State.Error,        State.Error,      State.Error,      State.Error,       State.Error, State.Error },
+            /* SegmentStart                 */new[] { State.Segment,         State.Segment,      State.Error,      State.Segment,    State.Segment,     State.Error, State.Error },
+            /* SegmentName                  */new[] { State.SegmentName,     State.SegmentName,  State.SegmentName,State.SegmentName,State.SegmentName, State.Error, State.Error },
+            /* ElementStart                 */new[] { State.Error,           State.Error,        State.Error,      State.Element,    State.Element,     State.Error, State.Error },
+            /* ComponentStart               */new[] { State.Error,           State.Component,    State.Error,      State.Component,  State.Component,   State.Error, State.Error },
+            /* Value (this will be copied)  */new[] { State.Error,           State.Component,    State.Error,      State.Component,  State.Component,   State.Error, State.Error }
+        };
+
+        internal static State[][] BuildStateArray() {
+            var allStates = StateArrayTempate.ToList();
+            var errorStates = StateArrayTempate[0];
+            var valueStates = StateArrayTempate[5];
+
+            foreach (EdiToken valueToken in Enum.GetValues(typeof(EdiToken))) {
+                if (allStates.Count <= (int)valueToken) {
+                    switch (valueToken) {
+                        case EdiToken.Integer:
+                        case EdiToken.Float:
+                        case EdiToken.String:
+                        case EdiToken.Boolean:
+                        case EdiToken.Null:
+                        case EdiToken.Date:
+                            allStates.Add(valueStates);
+                            break;
+                        default:
+                            allStates.Add(errorStates);
+                            break;
+                    }
+                }
+            }
+
+            return allStates.ToArray();
         }
         
-
         static EdiWriter() {
-            
+            StateArray = BuildStateArray();
         }
 
         private readonly IEdiGrammar _grammar;
@@ -82,15 +118,12 @@ namespace indice.Edi
                         return WriteState.Error;
                     case State.Closed:
                         return WriteState.Closed;
-                    case State.SegmentStart:
                     case State.SegmentName:
                     case State.Segment:
                         return WriteState.Segment;
                     case State.Element:
-                    case State.ElementStart:
                         return WriteState.Element;
                     case State.Component:
-                    case State.ComponentStart:
                         return WriteState.Component;
                     case State.Start:
                         return WriteState.Start;
@@ -119,14 +152,12 @@ namespace indice.Edi
                     return string.Empty;
                 }
 
-                bool insideContainer = (_currentState != State.ComponentStart
-                                        && _currentState != State.ElementStart
-                                        && _currentState != State.SegmentStart
-                                        && _currentState != State.SegmentName);
+                bool insideContainer = (_currentState != State.Closed
+                                        && _currentState != State.Error);
 
                 EdiPosition? current = insideContainer ? (EdiPosition?)_currentPosition : null;
-
-                return EdiPosition.BuildPath(current != null ? _stack.Concat(new[] { current.Value }) : _stack);
+                var stack = _stack ?? new List<EdiPosition>();
+                return EdiPosition.BuildPath(current != null ? stack.Concat(new [] { current.Value }) : _stack);
             }
         }
 
@@ -163,7 +194,7 @@ namespace indice.Edi
                 throw new ArgumentNullException(nameof(grammar));
             _grammar = grammar;
             _currentState = State.Start;
-            _formatting = Formatting.None;
+            _formatting = Formatting.LinePerSegment;
 
             CloseOutput = true;
         }
@@ -214,19 +245,13 @@ namespace indice.Edi
         public virtual void Close() {
             AutoCompleteAll();
         }
-
-        /// <summary>
-        /// Writes the beginning of a Segment which; the name.
-        /// </summary>
-        public virtual void WriteSegmentName() {
-            InternalWriteStart(EdiToken.SegmentName, EdiContainerType.Segment);
-        }
         
         /// <summary>
-        /// Writes the segmant name.
+        /// Writes the segmant name. And marks the beginning of a Segment.
         /// </summary>
         /// <param name="name">The name of the segment.</param>
         public virtual void WriteSegmentName(string name) {
+            InternalWriteStart(EdiToken.SegmentName, EdiContainerType.Segment);
             InternalWriteSegmentName(name);
         }
 
@@ -339,23 +364,7 @@ namespace indice.Edi
         }
 
         internal virtual void WriteTokenInternal(EdiReader reader, bool writeChildren) {
-            int initialDepth;
-
-            if (reader.TokenType == EdiToken.None) {
-                initialDepth = -1;
-            } else if (!reader.TokenType.IsStartToken()) {
-                initialDepth = reader.Depth + 1;
-            } else {
-                initialDepth = reader.Depth;
-            }
-
-            do {
-
-            } while (false); // TODO: Make this right.
-                //// stop if we have reached the end of the token being read
-                //initialDepth - 1 < reader.Depth - reader.TokenType.IsEndToken() ? 1 : 0)
-                //&& writeChildren
-                //&& reader.Read());
+            // TODO: Write using an open EDI reader (Copy). Make this right.
         }
 
         private void WriteEnd(EdiContainerType type) {
@@ -380,6 +389,10 @@ namespace indice.Edi
             switch (type) {
                 case EdiContainerType.Segment:
                     return EdiToken.SegmentStart;
+                case EdiContainerType.Element:
+                    return EdiToken.None;
+                case EdiContainerType.Component:
+                    return EdiToken.None;
                 default:
                     throw EdiWriterException.Create(this, "No close token for type: " + type, null);
             }
@@ -417,13 +430,13 @@ namespace indice.Edi
 
                 switch (currentLevelType) {
                     case EdiContainerType.Segment:
-                        _currentState = State.SegmentStart;
+                        _currentState = State.Segment;
                         break;
                     case EdiContainerType.Element:
-                        _currentState = State.ElementStart;
+                        _currentState = State.Element;
                         break;
                     case EdiContainerType.Component:
-                        _currentState = State.ComponentStart;
+                        _currentState = State.Component;
                         break;
                     case EdiContainerType.None:
                         _currentState = State.Start;
@@ -439,6 +452,11 @@ namespace indice.Edi
         /// </summary>
         /// <param name="token">The end token to write.</param>
         protected virtual void WriteEnd(EdiToken token) {
+            switch (token) {
+                case EdiToken.SegmentStart:
+                    WriteSegmentTerminator();
+                    break;
+            }
         }
 
         /// <summary>
@@ -460,6 +478,9 @@ namespace indice.Edi
         /// </summary>
         public virtual void WriteSegmentTerminator() {
             InternalWriteEnd(EdiContainerType.Segment);
+            if (_formatting == Formatting.LinePerSegment) { 
+                WriteNewLine();
+            }
         }
 
         /// <summary>
@@ -477,41 +498,16 @@ namespace indice.Edi
         }
 
         internal void AutoComplete(EdiToken tokenBeingWritten) {
-            State newState = State.Error;
+
             // gets new state based on the current state and what is being written
-            var validOriginStates = new[] {
-                State.Component,
-                State.ComponentStart,
-                State.SegmentName,
-                State.ElementStart,
-                State.Start
-            };
-            if (validOriginStates.Contains(_currentState)) {
-                switch (tokenBeingWritten) {
-                    case EdiToken.None:
-                        newState = State.Error;
-                        break;
-                    case EdiToken.SegmentStart:
-                    case EdiToken.SegmentName:
-                        newState = State.Segment;
-                        break;
-                    case EdiToken.ElementStart:
-                        newState = State.Element;
-                        break;
-                    case EdiToken.ComponentStart:
-                    case EdiToken.String:
-                    case EdiToken.Integer:
-                    case EdiToken.Float:
-                    case EdiToken.Boolean:
-                    case EdiToken.Date:
-                    case EdiToken.Null:
-                        newState = State.Component;
-                        break;
-                    default: break;
-                }
-            }
+            State newState = StateArray[(int)tokenBeingWritten][(int)_currentState];
+            
             if (newState == State.Error) {
                 throw EdiWriterException.Create(this, "Token {0} in state {1} would result in an invalid Edi object.".FormatWith(CultureInfo.InvariantCulture, tokenBeingWritten.ToString(), _currentState.ToString()), null);
+            }
+
+            if ((_currentState == State.Element || _currentState == State.Component || _currentState == State.SegmentName) && tokenBeingWritten == EdiToken.SegmentName) {
+                AutoCompleteClose(EdiContainerType.Segment);
             }
             
             _currentState = newState;
@@ -1129,6 +1125,8 @@ namespace indice.Edi
                 case EdiToken.Boolean:
                 case EdiToken.Date:
                 case EdiToken.Null:
+                    InternalWriteValue(token);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(token));
             }
@@ -1140,7 +1138,6 @@ namespace indice.Edi
 
         internal void InternalWriteSegmentName(string name) {
             _currentPosition.SegmentName = name;
-            AutoComplete(EdiToken.SegmentName);
         }
 
         internal void InternalWriteRaw() {

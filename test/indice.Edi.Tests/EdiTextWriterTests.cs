@@ -51,6 +51,13 @@ UNZ+1+20101000064507'";
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
                 writer.WriteToken(EdiToken.SegmentName, "UNA");
+                writer.WriteToken(EdiToken.SegmentName, "UNB");
+                writer.WriteToken(EdiToken.SegmentName, "UNH");
+                writer.WriteToken(EdiToken.SegmentName, "BGM");
+                writer.WriteToken(EdiToken.SegmentName, "DTM");
+                writer.WriteToken(EdiToken.SegmentName, "DTM");
+                writer.WriteToken(EdiToken.SegmentName, "UNT");
+                writer.WriteToken(EdiToken.SegmentName, "UNZ");
             }
             Assert.Equal(expected, output.ToString());
         }

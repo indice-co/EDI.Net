@@ -89,12 +89,17 @@ namespace indice.Edi
         /// </summary>
         /// <param name="name">The name of the property.</param>
         public override void WriteSegmentName(string name) {
+            InternalWriteStart(EdiToken.SegmentName, EdiContainerType.Segment);
             InternalWriteSegmentName(name);
+            _writer.Write(name);
             WriteSegmentNameDelimiter();
         }
 
         public override void WriteSegmentTerminator() {
-            _writer.Write(Grammar.SegmentTerminator);
+            _writer.Write(Grammar.SegmentTerminator); 
+            if (Formatting == Formatting.LinePerSegment) {
+                WriteNewLine();
+            }
         }
 
         protected override void WriteComponentDelimiter() {
