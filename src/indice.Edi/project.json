@@ -12,12 +12,12 @@
       "type": "git",
       "url": "https://github.com/indice-co/EDI.Net"
     },
-    "releaseNotes": "Segment Group feature. New attribute available for declaring of custom logical structures other than the EDI standard ones. Search for `SegmentGroupAttribute`",
+    "releaseNotes": "`EdiWriter` is functional but Serilizer not yet finished. Bug fixes",
     "summary": "Edi.Net Class Library for Reading Deserializing EDIFact, Tradacoms and X12 files into Clr Objects."
   },
   "scripts": {
     "postcompile": [
-      //"dotnet pack --no-build --configuration %compile:Configuration%"
+      "dotnet pack --no-build --configuration %compile:Configuration%"
     ]
   },
   "title": "Edi.Net",
