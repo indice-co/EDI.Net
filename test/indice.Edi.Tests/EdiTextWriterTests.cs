@@ -10,6 +10,18 @@ namespace indice.Edi.Tests
 {
     public class EdiTextWriterTests
     {
+        [Fact, Trait("Writer", "ServiceStringAdvice")]
+        public void WriterWrites_ServiceStringAdvice_Test() {
+            var expected = "UNA:+.? '";
+            var output = new StringBuilder();
+            var grammar = EdiGrammar.NewEdiFact();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
+                writer.WriteServiceStringAdvice();
+            }
+            Assert.Equal(expected, output.ToString().TrimEnd());
+        }
+
+
         [Fact]
         public void WriterWritesStructureTest() {
             var grammar = EdiGrammar.NewEdiFact();
@@ -17,47 +29,44 @@ namespace indice.Edi.Tests
 @"UNA:+.? '
 UNB+UNOC:3+1234567891123:14+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'
 UNH+1+QUOTES:D:96A:UN:EDIEL2+S'
-BGM+310+2010101900026812+9+AB'
-DTM+137:201010191104:203'
-DTM+163:201010192300:203'
-DTM+164:201010202300:203'
-DTM+ZZZ:1:805'
-CUX+2:SEK'
-NAD+FR+1234567891123::9'
-LOC+105+SE1::SM'
-NAD+DO+7080005059275::9'
-LIN+1++1420:::SM'
-DTM+324:201010192300201010192400:Z13'
-PRI+CAL:-2100'
-RNG+4+Z01:-0.1'
-PRI+CAL:21000'
-RNG+4+Z01:-0.1'
-LIN+2++1420:::SM'
-DTM+324:201010200000201010200100:Z13'
-PRI+CAL:-2100'
-RNG+4+Z01:0'
-PRI+CAL:21000'
-RNG+4+Z01:0'
-LIN+3++1420:::SM'
-DTM+324:201010200100201010200200:Z13'
-PRI+CAL:-2100'
-RNG+4+Z01:0'
-PRI+CAL:21000'
-UNS+S'
-CNT+1:0'
-CNT+ZZZ:453600'
-UNT+158+1'
-UNZ+1+20101000064507'";
+";
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
-                writer.WriteToken(EdiToken.SegmentName, "UNA");
-                writer.WriteToken(EdiToken.SegmentName, "UNB");
-                writer.WriteToken(EdiToken.SegmentName, "UNH");
-                writer.WriteToken(EdiToken.SegmentName, "BGM");
-                writer.WriteToken(EdiToken.SegmentName, "DTM");
-                writer.WriteToken(EdiToken.SegmentName, "DTM");
-                writer.WriteToken(EdiToken.SegmentName, "UNT");
-                writer.WriteToken(EdiToken.SegmentName, "UNZ");
+                writer.WriteServiceStringAdvice();
+                writer.WriteToken(EdiToken.SegmentName, "UNB");         Assert.Equal("UNB", writer.Path);
+                writer.WriteToken(EdiToken.String, "UNOC");             Assert.Equal("UNB[0][0]", writer.Path);
+                writer.WriteToken(EdiToken.ComponentStart);             Assert.Equal("UNB[0][1]", writer.Path);
+                writer.WriteToken(EdiToken.Integer, 3);                 Assert.Equal("UNB[0][1]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[1]", writer.Path);
+                writer.WriteToken(EdiToken.String, "1234567891123");    Assert.Equal("UNB[1][0]", writer.Path);
+                writer.WriteToken(EdiToken.Integer, 14);                Assert.Equal("UNB[1][1]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[2]", writer.Path);
+                writer.WriteValue(7080005059275);                       Assert.Equal("UNB[2][0]", writer.Path);
+                writer.WriteValue(14);                                  Assert.Equal("UNB[2][1]", writer.Path);
+                writer.WriteValue("SPOTMARKED");                        Assert.Equal("UNB[2][2]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[3]", writer.Path);
+                writer.WriteValue(new DateTime(2012, 10, 10, 11, 04, 0), "ddMMyy"); Assert.Equal("UNB[3][0]", writer.Path);
+                writer.WriteValue(new DateTime(2012, 10, 10, 11, 04, 0), "HHmm");   Assert.Equal("UNB[3][1]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[4]", writer.Path);
+                writer.WriteValue("HBQ001");                            Assert.Equal("UNB[4][0]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[5]", writer.Path);
+                writer.WriteValue((string)null);                        Assert.Equal("UNB[5][0]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[6]", writer.Path);
+                writer.WriteValue((string)null);                        Assert.Equal("UNB[6][0]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[7]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNB[8]", writer.Path);
+                writer.WriteValue(1);                                   Assert.Equal("UNB[8][0]", writer.Path);
+
+                writer.WriteToken(EdiToken.SegmentName, "UNH");         Assert.Equal("UNH", writer.Path);
+                writer.WriteValue(1);                                   Assert.Equal("UNH[0][0]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNH[1]", writer.Path);
+                writer.WriteValue("QUOTES");                            Assert.Equal("UNH[1][0]", writer.Path);
+                writer.WriteValue('D');                                 Assert.Equal("UNH[1][1]", writer.Path);
+                writer.WriteValue("96A");                               Assert.Equal("UNH[1][2]", writer.Path);
+                writer.WriteValue("UN");                                Assert.Equal("UNH[1][3]", writer.Path);
+                writer.WriteValue("EDIEL2");                            Assert.Equal("UNH[1][4]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);               Assert.Equal("UNH[2]", writer.Path);
+                writer.WriteValue("S");                                 Assert.Equal("UNH[2][0]", writer.Path);
             }
             Assert.Equal(expected, output.ToString());
         }

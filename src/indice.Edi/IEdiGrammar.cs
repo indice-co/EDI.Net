@@ -68,7 +68,7 @@ namespace indice.Edi
         /// <summary>
         /// Populates the Edi grammar delimiters using a eg UNA:+.? '
         /// </summary>
-        /// <param name="_chars"></param>
-        void SetAdvice(char[] _chars);
+        /// <param name="chars"></param>
+        void SetAdvice(char[] chars);
     }
 }
