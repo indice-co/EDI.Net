@@ -10,23 +10,12 @@ namespace indice.Edi.Tests
 {
     public class EdiTextReaderTests
     {
-        private static readonly Assembly _assembly = typeof(EdiTextReaderTests).GetTypeInfo().Assembly;
-        private static Stream GetResourceStream(string fileName) {
-            var qualifiedResources = _assembly.GetManifestResourceNames().OrderBy(x => x).ToArray();
-            Stream stream = _assembly.GetManifestResourceStream("indice.Edi.Tests.Samples." + fileName);
-            return stream;
-        }
-
-        private static MemoryStream StreamFromString(string value) {
-            return new MemoryStream(Encoding.UTF8.GetBytes(value ?? ""));
-        }
-
         [Fact]
         public void ReaderTest() {
             var msgCount = 0;
             var grammar = EdiGrammar.NewTradacoms();
 
-            using (var ediReader = new EdiTextReader(new StreamReader(GetResourceStream("tradacoms.order9.edi")), grammar)) {
+            using (var ediReader = new EdiTextReader(new StreamReader(Helpers.GetResourceStream("tradacoms.order9.edi")), grammar)) {
                 while (ediReader.Read()) {
                     if (ediReader.IsStartMessage) {
                         msgCount++;
@@ -40,7 +29,7 @@ namespace indice.Edi.Tests
         public void DeserializeTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
-            using (var stream = GetResourceStream("tradacoms.utilitybill.edi")) {
+            using (var stream = Helpers.GetResourceStream("tradacoms.utilitybill.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
             }
             Assert.Equal(1, interchange.Invoices.Count);
@@ -50,7 +39,7 @@ namespace indice.Edi.Tests
         public void EscapeCharactersTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
-            using (var stream = GetResourceStream("tradacoms.utilitybill.escape.edi")) {
+            using (var stream = Helpers.GetResourceStream("tradacoms.utilitybill.escape.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
             }
             Assert.Equal("GEORGE'S FRIED CHIKEN + SONS. Could be the best chicken yet?", interchange.Head.ClientName);
@@ -61,7 +50,7 @@ namespace indice.Edi.Tests
         {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(Models.EdiFact01.Interchange);
-            using (var stream = GetResourceStream("edifact.01.edi"))
+            using (var stream = Helpers.GetResourceStream("edifact.01.edi"))
             {
                 interchange = new EdiSerializer().Deserialize<Models.EdiFact01.Interchange>(new StreamReader(stream), grammar);
             }
@@ -140,7 +129,7 @@ namespace indice.Edi.Tests
         public void X12_Grammar_Test() {
             var grammar = EdiGrammar.NewX12();
             var interchange = default(Models.X12_01.PurchaseOrder_850);
-            using (var stream = GetResourceStream("x12.850.edi")) {
+            using (var stream = Helpers.GetResourceStream("x12.850.edi")) {
                 interchange = new EdiSerializer().Deserialize<Models.X12_01.PurchaseOrder_850>(new StreamReader(stream), grammar);
             }
             Assert.Equal(new DateTime(2009, 8, 27, 9, 36, 00), interchange.Date);
@@ -153,7 +142,7 @@ namespace indice.Edi.Tests
         public void X12_214_Test() {
             var grammar = EdiGrammar.NewX12();
             var interchange = default(Models.Transportation_214);
-            using (var stream = GetResourceStream("x12.214.edi")) {
+            using (var stream = Helpers.GetResourceStream("x12.214.edi")) {
                 interchange = new EdiSerializer().Deserialize<Models.Transportation_214>(new StreamReader(stream), grammar);
             }
             var message = interchange.Groups[0].Messages[0];

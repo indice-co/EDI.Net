@@ -485,6 +485,16 @@ namespace indice.Edi
         /// </summary>
         /// <param name="ediWriter">The <see cref="EdiWriter"/> used to write the EDI structure.</param>
         /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        public void Serialize(EdiWriter ediWriter, object value) {
+            SerializeInternal(ediWriter, value, null);
+        }
+
+        /// <summary>
+        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// to a <c>Stream</c> using the specified <see cref="EdiWriter"/>. 
+        /// </summary>
+        /// <param name="ediWriter">The <see cref="EdiWriter"/> used to write the EDI structure.</param>
+        /// <param name="value">The <see cref="Object"/> to serialize.</param>
         /// <param name="objectType">
         /// The type of the value being serialized.
         /// Specifing the type is optional.

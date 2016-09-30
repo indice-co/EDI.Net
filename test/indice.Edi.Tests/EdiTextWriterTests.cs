@@ -10,7 +10,7 @@ namespace indice.Edi.Tests
 {
     public class EdiTextWriterTests
     {
-        [Fact, Trait("Writer", "ServiceStringAdvice")]
+        [Fact, Trait("Category", "Writer")]
         public void WriterWrites_ServiceStringAdvice_Test() {
             var expected = "UNA:+.? '";
             var output = new StringBuilder();
@@ -22,7 +22,7 @@ namespace indice.Edi.Tests
         }
 
 
-        [Fact]
+        [Fact, Trait("Category", "Writer")]
         public void WriterWritesStructureTest() {
             var grammar = EdiGrammar.NewEdiFact();
             var expected =
