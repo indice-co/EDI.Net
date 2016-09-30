@@ -148,5 +148,17 @@ namespace indice.Edi.Tests
             Assert.Equal(19.95M, interchange.Groups[0].Orders[0].UnitPrice);
             Assert.Equal("126 Any St", interchange.Groups[0].Orders[0].StreetAddress);
         }
+        
+        [Fact]
+        public void X12_214_Test() {
+            var grammar = EdiGrammar.NewX12();
+            var interchange = default(Models.Transportation_214);
+            using (var stream = GetResourceStream("x12.214.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.Transportation_214>(new StreamReader(stream), grammar);
+            }
+            var message = interchange.Groups[0].Messages[0];
+            Assert.Equal(3, message.Places.Count);
+            Assert.Equal(1751807, message.ReferenceIdentification);
+        }
     }
 }
