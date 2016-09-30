@@ -28,5 +28,15 @@ namespace indice.Edi.Tests
             var path = EdiPath.Parse(text);
             Assert.Equal("GS[0][0]", path.ToString());
         }
+
+        [InlineData("B10[0][0]")]
+        [InlineData("B10/0/0")]
+        [InlineData("B10/0")]
+        [InlineData("B10")]
+        [Theory]
+        public void ParseHandlesOneLetterTwoNumberSegmentNames(string text) {
+            var path = EdiPath.Parse(text);
+            Assert.Equal("B10[0][0]", path.ToString());
+        }
     }
 }
