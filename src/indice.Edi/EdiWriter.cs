@@ -116,19 +116,20 @@ namespace indice.Edi
         public WriteState WriteState {
             get {
                 switch (_currentState) {
-                    case State.Error:
-                        return WriteState.Error;
-                    case State.Closed:
-                        return WriteState.Closed;
+                    case State.Start:
+                        return WriteState.Start;
                     case State.SegmentName:
                     case State.Segment:
                         return WriteState.Segment;
                     case State.Element:
                         return WriteState.Element;
                     case State.Component:
+                    case State.Value:
                         return WriteState.Component;
-                    case State.Start:
-                        return WriteState.Start;
+                    case State.Closed:
+                        return WriteState.Closed;
+                    case State.Error:
+                        return WriteState.Error;
                     default:
                         throw EdiWriterException.Create(this, "Invalid state: " + _currentState, null);
                 }
@@ -550,12 +551,12 @@ namespace indice.Edi
         public virtual void WriteRaw(string fragment) {
             InternalWriteRaw();
         }
-
+        
         /// <summary>
         /// Writes a <see cref="String"/> value.
         /// </summary>
         /// <param name="value">The <see cref="String"/> value to write.</param>
-        public virtual void WriteValue(string value) {
+        public virtual void WriteValue(string value, Picture? picture) {
             InternalWriteValue(EdiToken.String);
         }
 
@@ -880,11 +881,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{DateTimeOffset}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{DateTimeOffset}"/> value to write.</param>
-        public virtual void WriteValue(DateTimeOffset? value) {
+        public virtual void WriteValue(DateTimeOffset? value, string format = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault());
+                WriteValue(value.GetValueOrDefault(), format);
             }
         }
 
@@ -930,6 +931,17 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="Object"/> value to write.</param>
         public virtual void WriteValue(object value) {
+            WriteValue(value, null, null);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Object"/> value.
+        /// An error will raised if the value cannot be written as a single Edi token.
+        /// </summary>
+        /// <param name="value">The <see cref="Object"/> value to write.</param>
+        /// <param name="picture"></param>
+        /// <param name="format">traditional string format mask</param>
+        public virtual void WriteValue(object value, Picture? picture, string format) {
             if (value == null) {
                 WriteNull();
             } else {
@@ -941,7 +953,7 @@ namespace indice.Edi
                 }
 #endif
 
-                WriteValue(this, ConvertUtils.GetTypeCode(value.GetType()), value);
+                WriteValue(this, ConvertUtils.GetTypeCode(value.GetType()), value, picture, format);
             }
         }
         #endregion
@@ -962,7 +974,7 @@ namespace indice.Edi
             }
         }
 
-        internal static void WriteValue(EdiWriter writer, PrimitiveTypeCode typeCode, object value) {
+        internal static void WriteValue(EdiWriter writer, PrimitiveTypeCode typeCode, object value, Picture? picture, string format) {
             switch (typeCode) {
                 case PrimitiveTypeCode.Char:
                     writer.WriteValue((char)value);
@@ -977,22 +989,22 @@ namespace indice.Edi
                     writer.WriteValue((value == null) ? (bool?)null : (bool)value);
                     break;
                 case PrimitiveTypeCode.SByte:
-                    writer.WriteValue((sbyte)value);
+                    writer.WriteValue((sbyte)value, picture);
                     break;
                 case PrimitiveTypeCode.SByteNullable:
-                    writer.WriteValue((value == null) ? (sbyte?)null : (sbyte)value);
+                    writer.WriteValue((value == null) ? (sbyte?)null : (sbyte)value, picture);
                     break;
                 case PrimitiveTypeCode.Int16:
-                    writer.WriteValue((short)value);
+                    writer.WriteValue((short)value, picture);
                     break;
                 case PrimitiveTypeCode.Int16Nullable:
-                    writer.WriteValue((value == null) ? (short?)null : (short)value);
+                    writer.WriteValue((value == null) ? (short?)null : (short)value, picture);
                     break;
                 case PrimitiveTypeCode.UInt16:
-                    writer.WriteValue((ushort)value);
+                    writer.WriteValue((ushort)value, picture);
                     break;
                 case PrimitiveTypeCode.UInt16Nullable:
-                    writer.WriteValue((value == null) ? (ushort?)null : (ushort)value);
+                    writer.WriteValue((value == null) ? (ushort?)null : (ushort)value, picture);
                     break;
                 case PrimitiveTypeCode.Int32:
                     writer.WriteValue((int)value);
@@ -1001,58 +1013,58 @@ namespace indice.Edi
                     writer.WriteValue((value == null) ? (int?)null : (int)value);
                     break;
                 case PrimitiveTypeCode.Byte:
-                    writer.WriteValue((byte)value);
+                    writer.WriteValue((byte)value, picture);
                     break;
                 case PrimitiveTypeCode.ByteNullable:
-                    writer.WriteValue((value == null) ? (byte?)null : (byte)value);
+                    writer.WriteValue((value == null) ? (byte?)null : (byte)value, picture);
                     break;
                 case PrimitiveTypeCode.UInt32:
-                    writer.WriteValue((uint)value);
+                    writer.WriteValue((uint)value, picture);
                     break;
                 case PrimitiveTypeCode.UInt32Nullable:
                     writer.WriteValue((value == null) ? (uint?)null : (uint)value);
                     break;
                 case PrimitiveTypeCode.Int64:
-                    writer.WriteValue((long)value);
+                    writer.WriteValue((long)value, picture);
                     break;
                 case PrimitiveTypeCode.Int64Nullable:
-                    writer.WriteValue((value == null) ? (long?)null : (long)value);
+                    writer.WriteValue((value == null) ? (long?)null : (long)value, picture);
                     break;
                 case PrimitiveTypeCode.UInt64:
-                    writer.WriteValue((ulong)value);
+                    writer.WriteValue((ulong)value, picture);
                     break;
                 case PrimitiveTypeCode.UInt64Nullable:
-                    writer.WriteValue((value == null) ? (ulong?)null : (ulong)value);
+                    writer.WriteValue((value == null) ? (ulong?)null : (ulong)value, picture);
                     break;
                 case PrimitiveTypeCode.Single:
-                    writer.WriteValue((float)value);
+                    writer.WriteValue((float)value, picture);
                     break;
                 case PrimitiveTypeCode.SingleNullable:
                     writer.WriteValue((value == null) ? (float?)null : (float)value);
                     break;
                 case PrimitiveTypeCode.Double:
-                    writer.WriteValue((double)value);
+                    writer.WriteValue((double)value, picture);
                     break;
                 case PrimitiveTypeCode.DoubleNullable:
-                    writer.WriteValue((value == null) ? (double?)null : (double)value);
+                    writer.WriteValue((value == null) ? (double?)null : (double)value, picture);
                     break;
                 case PrimitiveTypeCode.DateTime:
-                    writer.WriteValue((DateTime)value);
+                    writer.WriteValue((DateTime)value, format);
                     break;
                 case PrimitiveTypeCode.DateTimeNullable:
-                    writer.WriteValue((value == null) ? (DateTime?)null : (DateTime)value);
+                    writer.WriteValue((value == null) ? (DateTime?)null : (DateTime)value, format);
                     break;
                 case PrimitiveTypeCode.DateTimeOffset:
-                    writer.WriteValue((DateTimeOffset)value);
+                    writer.WriteValue((DateTimeOffset)value, format);
                     break;
                 case PrimitiveTypeCode.DateTimeOffsetNullable:
-                    writer.WriteValue((value == null) ? (DateTimeOffset?)null : (DateTimeOffset)value);
+                    writer.WriteValue((value == null) ? (DateTimeOffset?)null : (DateTimeOffset)value, format);
                     break;
                 case PrimitiveTypeCode.Decimal:
-                    writer.WriteValue((decimal)value);
+                    writer.WriteValue((decimal)value, picture);
                     break;
                 case PrimitiveTypeCode.DecimalNullable:
-                    writer.WriteValue((value == null) ? (decimal?)null : (decimal)value);
+                    writer.WriteValue((value == null) ? (decimal?)null : (decimal)value, picture);
                     break;
                 case PrimitiveTypeCode.Guid:
                     writer.WriteValue((Guid)value);
@@ -1080,7 +1092,7 @@ namespace indice.Edi
                     writer.WriteValue((Uri)value);
                     break;
                 case PrimitiveTypeCode.String:
-                    writer.WriteValue((string)value);
+                    writer.WriteValue((string)value, picture);
                     break;
                 case PrimitiveTypeCode.Bytes:
                     writer.WriteValue((byte[])value);
@@ -1105,7 +1117,7 @@ namespace indice.Edi
 
                         object convertedValue = convertable.ToType(resolvedType, CultureInfo.InvariantCulture);
 
-                        WriteValue(writer, resolvedTypeCode, convertedValue);
+                        WriteValue(writer, resolvedTypeCode, convertedValue, picture, format);
                         break;
                     } else
 #endif

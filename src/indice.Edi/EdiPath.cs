@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace indice.Edi
 {
-    public struct EdiPath {
+    public struct EdiPath : IComparable<EdiPath>, IEquatable<EdiPath>
+    {
+
         private const string PARSE_PATTERN = @"^([A-Z]{1}[A-Z0-9]{1,2})?([\[/]{1}(\d+?)\]?)?([\[/]{1}(\d+?)\]?)?$"; // supports both "STX/2/1 and STX[2][1]"
         private readonly string _Segment;
         private readonly int _ElementIndex;
@@ -42,6 +44,10 @@ namespace indice.Edi
             return _Segment.GetHashCode() ^ _ElementIndex.GetHashCode() ^ _ComponentIndex.GetHashCode();
         }
 
+        public bool Equals(EdiPath other) {
+            return other.Segment == Segment && other.ElementIndex == ElementIndex && other.ComponentIndex == ComponentIndex;
+        }
+
         public override bool Equals(object obj) {
             if (obj != null && (obj is EdiPath || obj is string)) {
                 var other = default(EdiPath);
@@ -49,7 +55,7 @@ namespace indice.Edi
                     other = (EdiPath)obj;
                 else
                     other = (EdiPath)(string)obj;
-                return other.Segment == Segment && other.ElementIndex == ElementIndex && other.ComponentIndex == ComponentIndex;
+                return Equals(other);
             }
             return base.Equals(obj);
         }
@@ -83,6 +89,13 @@ namespace indice.Edi
             }
         }
 
+        public int CompareTo(EdiPath other) {
+            var result = string.Compare(Segment, other.Segment, StringComparison.OrdinalIgnoreCase);
+            if (result == 0) result = ElementIndex.CompareTo(other.ElementIndex);
+            if (result == 0) result = ComponentIndex.CompareTo(other.ComponentIndex);
+            return result;
+        }
+        
         public static implicit operator string (EdiPath value) {
             return value.ToString();
         }

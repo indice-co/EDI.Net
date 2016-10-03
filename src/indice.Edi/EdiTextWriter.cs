@@ -149,7 +149,7 @@ namespace indice.Edi
         /// Writes a <see cref="String"/> value.
         /// </summary>
         /// <param name="value">The <see cref="String"/> value to write.</param>
-        public override void WriteValue(string value) {
+        public override void WriteValue(string value, Picture? picture) {
             InternalWriteValue(EdiToken.String);
             WriteEscapedString(value);
         }

@@ -506,11 +506,48 @@ namespace indice.Edi
         #region Write internals
         
         internal virtual void SerializeInternal(EdiWriter writer, object value, Type objectType) {
+            if (writer == null) 
+                throw new ArgumentNullException(nameof(writer));
             if (value == null) {
                 writer.WriteNull();
                 return;
             }
             objectType = objectType ?? value.GetType();
+
+            var stack = new Stack<EdiStructure>();
+
+            // If this is not a collection type asume this type is the interchange.
+            if (!objectType.IsCollectionType()) {
+                var structure = new EdiStructure(EdiStructureType.Interchange, value);
+                stack.Push(structure);
+                var structuralComparer = new EdiPathComparer(writer.Grammar);
+                var props = structure.GetOrderedProperties(structuralComparer);
+                
+                foreach (var prop in props) {
+                    if (writer.WriteState == WriteState.Start)
+                        writer.WriteServiceStringAdvice();
+                    
+                    value = prop.Info.GetValue(structure.Instance);
+                    if (prop.ValueInfo != null) {
+                        var path = (EdiPath)writer.Path;
+                        if (path.Segment != prop.PathInfo.Segment)
+                            writer.WriteSegmentName(prop.PathInfo.Segment);
+                        while (structuralComparer.Compare(path, prop.PathInfo.PathInternal) < 0) {
+                            path = (EdiPath)writer.Path;
+                            if (path.ElementIndex != prop.PathInfo.ElementIndex)
+                                writer.WriteToken(EdiToken.ElementStart);
+                            else if (path.ComponentIndex != prop.PathInfo.ComponentIndex)
+                                writer.WriteToken(EdiToken.ComponentStart);
+                        }
+                        writer.WriteValue(value, prop.ValueInfo.Picture, prop.ValueInfo.Format);
+                    }
+                }
+            }
+            // else if this is indeed a collection type this must be a collection of messages.
+            else {
+                throw new NotImplementedException("Collection types are not supported as the root Type. Try to wrap List of Messages inside a container type.");
+            }
+
         }
 
         #endregion

@@ -13,7 +13,7 @@ namespace indice.Edi
         private const string SEGMENT_FORMAT = "{0}";
         private const string ELEMENT_URI_FORMAT = "{0}/{1}";
         private const string ELEMENT_ARRAY_FORMAT = "{0}[{1}]";
-        private static readonly string[] availableFormatStrings = new [] { "S", "E", "C", "s", "e", "c" };
+        private static readonly string[] availableFormatStrings = { "S", "E", "C", "s", "e", "c" };
 
         public object GetFormat(Type formatType) {
             if (formatType == typeof(ICustomFormatter))

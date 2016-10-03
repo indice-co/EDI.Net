@@ -38,5 +38,15 @@ namespace indice.Edi.Tests
             var path = EdiPath.Parse(text);
             Assert.Equal("B10[0][0]", path.ToString());
         }
+
+        [Fact]
+        public void OrderByStructureTest() {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            var input =    new[] { "BGM", "DTM/0/1", "DTM", "DTM/1", "CUX", "UNA", "UNT", "UNB", "UNZ" }.Select(i => (EdiPath)i).ToArray();             
+            var expected = new[] { "UNA", "UNB", "BGM", "DTM", "DTM/0/1", "DTM/1/0", "CUX", "UNT", "UNZ" }.Select(i => (EdiPath)i).ToArray();
+            var output = input.OrderBy(p => p, new EdiPathComparer(grammar));
+            Assert.True(Enumerable.SequenceEqual(expected, output));
+        }
     }
 }

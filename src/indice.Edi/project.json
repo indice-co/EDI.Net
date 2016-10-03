@@ -17,7 +17,7 @@
   },
   "scripts": {
     "postcompile": [
-      "dotnet pack --no-build --configuration %compile:Configuration%"
+      //"dotnet pack --no-build --configuration %compile:Configuration%"
     ]
   },
   "title": "Edi.Net",

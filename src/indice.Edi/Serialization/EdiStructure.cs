@@ -48,13 +48,20 @@ namespace indice.Edi.Serialization
             _CachedReads = cache;
         }
 
-        private static EdiTypeDescriptor GetTypeDescriptor(Type type) {
-            return new EdiTypeDescriptor(type);
-        }
+        private static EdiTypeDescriptor GetTypeDescriptor(Type type) => new EdiTypeDescriptor(type);
 
-        public EdiPropertyDescriptor[] GetMatchingProperties(EdiStructureType sructureType) {
-            return Descriptor.Properties.Where(p => p.Attributes.OfType(sructureType).Any()).ToArray();
-        }
+        public EdiPropertyDescriptor[] GetMatchingProperties(EdiStructureType sructureType) => 
+            Descriptor.Properties.Where(p => p.Attributes.OfType(sructureType).Any()).ToArray();
+
+        public EdiPropertyDescriptor[] GetMatchingProperties(string segmentName) =>
+            Descriptor.Properties.Where(p => p.PathInfo?.PathInternal.Segment == segmentName).ToArray();
+
+        public IEnumerable<EdiPropertyDescriptor> GetOrderedProperties(IEdiGrammar grammar) => 
+            GetOrderedProperties(new EdiPathComparer(grammar));
+
+        public IEnumerable<EdiPropertyDescriptor> GetOrderedProperties(IComparer<EdiPath> comparer) => 
+            Descriptor.Properties.OrderBy(p => p.PathInfo?.PathInternal ?? default(EdiPath), comparer);
+
 
         public override string ToString() {
             if (Index > 0)
