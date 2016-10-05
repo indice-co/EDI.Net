@@ -35,7 +35,12 @@ namespace indice.Edi.Utilities
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="attributes">The list of available attributes</param>
+        /// <param name="container">This is the type of container we are searchig attributes for.</param>
+        /// <returns>The attributes matching the <see cref="EdiStructureType"/></returns>
         public static IEnumerable<EdiAttribute> OfType(this IEnumerable<EdiAttribute> attributes, EdiStructureType container) {
             var typesToSearch = new Type[0];
             switch (container) {
@@ -63,7 +68,30 @@ namespace indice.Edi.Utilities
 
             return null == typesToSearch ? Enumerable.Empty<EdiAttribute>() : attributes.Where(a => typesToSearch.Contains(a.GetType()));
         }
-        
+
+        /// <summary>
+        /// Figures out the container (<see cref="EdiStructureType"/>) based upon the current pool of <seealso cref="EdiStructureAttribute"/>.
+        /// </summary>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public static EdiStructureType InferStructure(this IEnumerable<EdiAttribute> attributes) {
+            var structureType = EdiStructureType.None;
+            foreach (var attribute in attributes) {
+                if (!(attribute is EdiStructureAttribute)) { 
+                    continue;
+                }
+                structureType = attribute is EdiSegmentGroupAttribute ? EdiStructureType.SegmentGroup :
+                                attribute is EdiSegmentAttribute ? EdiStructureType.Segment :
+                                attribute is EdiElementAttribute ? EdiStructureType.Element :
+                                attribute is EdiMessageAttribute ? EdiStructureType.Message :
+                                attribute is EdiGroupAttribute ? EdiStructureType.Group : EdiStructureType.None;
+                if (structureType != EdiStructureType.None) {
+                    return structureType;
+                }
+            }
+            return structureType;
+        }
+
         public static bool TryParse(this string value, Picture? picture, char? decimalMark, out decimal number) {
             number = 0.0M;
             try {
@@ -77,6 +105,8 @@ namespace indice.Edi.Utilities
         }
 
         public static decimal? Parse(this string value, Picture? picture, char? decimalMark) {
+            if (value != null)
+                value = value.Trim('Z'); // Z suppresses leading zeros
             if (string.IsNullOrEmpty(value))
                 return null;
             decimal d;

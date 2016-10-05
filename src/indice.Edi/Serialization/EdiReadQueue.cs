@@ -30,6 +30,9 @@ namespace indice.Edi.Serialization
 
         public static int? ReadAsInt32(this Queue<EdiEntry> queue, string path, CultureInfo culture = null) {
             var text = ReadAsString(queue, path);
+            if (text != null) {
+                text = text.TrimStart('Z'); // Z suppresses leading zeros
+            }
             if (string.IsNullOrEmpty(text))
                 return null;
 

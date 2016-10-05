@@ -360,6 +360,9 @@ namespace indice.Edi
                 return null;
             if (t == EdiToken.String) {
                 string s = (string)Value;
+                if (s != null) {
+                    s = s.TrimStart('Z'); // Z suppresses leading zeros
+                }
                 if (string.IsNullOrEmpty(s)) {
                     SetToken(EdiToken.Null);
                     return null;
@@ -387,6 +390,9 @@ namespace indice.Edi
             int i;
             if (t == EdiToken.String) {
                 string s = (string)Value;
+                if (s != null) {
+                    s = s.TrimStart('Z'); // Z suppresses leading zeros
+                }
                 if (string.IsNullOrEmpty(s)) {
                     SetToken(EdiToken.Null);
                     return null;
