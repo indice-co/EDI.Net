@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 namespace indice.Edi
 {
     /// <summary>
-    /// Compares two paths based on their logical structure.
-    /// The resulting order would be:
+    /// Compares two <see cref="EdiPath"/>s based on their logical structure.
+    /// 
     /// <list type="bullet">
-    /// <item><description>ServiceStringAdviceTag.</description></item>
-    /// <item><description>InterchangeHeaderTag.</description></item>
-    /// <item><description>FunctionalGroupHeaderTag.</description></item>
-    /// <item><description>MessageHeaderTag.</description></item>
-    /// <item><description>MessageTrailerTag.</description></item>
-    /// <item><description>FunctionalGroupTrailerTag.</description></item>
-    /// <item><description>InterchangeTrailerTag.</description></item>
+    /// <listheader>The resulting order would be:</listheader>
+    /// <item><description>ServiceStringAdvice</description></item>
+    /// <item><description>InterchangeHeader</description></item>
+    /// <item><description>FunctionalGroupHeader</description></item>
+    /// <item><description>MessageHeader</description></item>
+    /// <item><description>CustomSegments</description></item>
+    /// <item><description>MessageTrailer</description></item>
+    /// <item><description>FunctionalGroupTrailer</description></item>
+    /// <item><description>InterchangeTrailer</description></item>
     /// </list>
     /// </summary>
     public class EdiPathComparer : IComparer<EdiPath>

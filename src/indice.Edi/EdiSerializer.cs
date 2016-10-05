@@ -12,6 +12,10 @@ using System.Reflection;
 
 namespace indice.Edi
 {
+    /// <summary>
+    /// Serializes and deserializes objects into and from the EDI format.
+    /// The <see cref="EdiSerializer"/> enables you to control how objects are encoded into EDI.
+    /// </summary>
     public class EdiSerializer
     {
         /// <summary>
@@ -139,7 +143,9 @@ namespace indice.Edi
                     var read = current == structure && reader.Path == descriptor.Path && i == 0;
                     switch (ConvertUtils.GetTypeCode(descriptor.Info.PropertyType)) {
                         case PrimitiveTypeCode.Empty: break;
-                        case PrimitiveTypeCode.Object: break;
+                        case PrimitiveTypeCode.Object:
+                            PopulateObjectValue(reader, structure, descriptor, read);
+                            break;
                         case PrimitiveTypeCode.Char:
                         case PrimitiveTypeCode.CharNullable:
                             PopulateCharValue(reader, structure, descriptor, read);
@@ -196,7 +202,6 @@ namespace indice.Edi
                 }
             }
         }
-
         internal static void PopulateStringValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
             var cache = structure.CachedReads;
             var valueInfo = descriptor.ValueInfo;
@@ -213,7 +218,7 @@ namespace indice.Edi
             if (dateString != null) {
                 dateString = dateString.Substring(0, valueInfo.Picture.Scale);
                 var date = default(DateTime);
-                if (DateTime.TryParseExact(dateString, valueInfo.Format, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out date)) {
+                if (dateString.TryParseEdiDate(valueInfo.Format, CultureInfo.InvariantCulture, out date)) {
                     var existingDateObject = descriptor.Info.GetValue(structure.Instance);
                     var existingDate = default(DateTime);
                     if (existingDateObject != null && !existingDateObject.Equals(default(DateTime))) {
@@ -292,13 +297,31 @@ namespace indice.Edi
                 descriptor.Info.SetValue(structure.Instance, booleanValue);
             }
         }
+        
+        internal static void PopulateObjectValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            var text = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
+                                                     read ? reader.ReadAsString() : (string)reader.Value;
+            descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(text, reader.Culture, descriptor.Info.PropertyType));
+        }
 
         internal bool TryCreateContainer(EdiReader reader, Stack<EdiStructure> stack, EdiStructureType newContainer) {
             var index = 0;
             if (stack.Count == 0)
                 return false;
             while (stack.Peek().Container >= newContainer) {
-                var previous = stack.Pop();
+                // The only structure allowed to be nested is segment group.
+                // So when a new segment group comes allong there it is either 
+                // a new item in the existing list or a deeper nested segment group.
+                // echeck if they are the same.
+                var previous = stack.Peek();
+                if (previous.Container == newContainer && 
+                    EdiStructureType.SegmentGroup == newContainer &&
+                    !previous.Descriptor.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
+                    break;
+                }
+                previous = stack.Pop();
                 if (previous.Container == newContainer) {
                     index = previous.Index + 1;
                 }
@@ -312,8 +335,9 @@ namespace indice.Edi
                 // This is indicated by the end segment on the segment group attribute.
                 if (stack.Count > 0 && current.Container == EdiStructureType.SegmentGroup) {
                     var groupMark = current.Descriptor.SegmentGroupInfo;
-                    if (groupMark.SequenceEndInternal.Segment.Equals(reader.Value) ||
-                        groupMark.StartInternal.Segment.Equals(reader.Value)) {
+                    if (groupMark.StartInternal.Segment.Equals(reader.Value) ||
+                        (groupMark.SequenceEndInternal.Segment != null && 
+                         groupMark.SequenceEndInternal.Segment.Equals(reader.Value))) {
                         stack.Pop();
                         current = stack.Peek();
                     }
@@ -420,9 +444,6 @@ namespace indice.Edi
             } else {
                 property = ConditionalMatch(reader, currentStructure, newContainerType, candidates);
             }
-            //if (property.MarksSegmentGroupStart && !property.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
-            //    return null;
-            //}
             return property;
         }
 
@@ -513,41 +534,78 @@ namespace indice.Edi
                 return;
             }
             objectType = objectType ?? value.GetType();
-
             var stack = new Stack<EdiStructure>();
-
             // If this is not a collection type asume this type is the interchange.
             if (!objectType.IsCollectionType()) {
-                var structure = new EdiStructure(EdiStructureType.Interchange, value);
-                stack.Push(structure);
-                var structuralComparer = new EdiPathComparer(writer.Grammar);
-                var props = structure.GetOrderedProperties(structuralComparer);
-                
-                foreach (var prop in props) {
-                    if (writer.WriteState == WriteState.Start)
-                        writer.WriteServiceStringAdvice();
-                    
-                    value = prop.Info.GetValue(structure.Instance);
-                    if (prop.ValueInfo != null) {
-                        var path = (EdiPath)writer.Path;
-                        if (path.Segment != prop.PathInfo.Segment)
-                            writer.WriteSegmentName(prop.PathInfo.Segment);
-                        while (structuralComparer.Compare(path, prop.PathInfo.PathInternal) < 0) {
-                            path = (EdiPath)writer.Path;
-                            if (path.ElementIndex != prop.PathInfo.ElementIndex)
-                                writer.WriteToken(EdiToken.ElementStart);
-                            else if (path.ComponentIndex != prop.PathInfo.ComponentIndex)
-                                writer.WriteToken(EdiToken.ComponentStart);
-                        }
-                        writer.WriteValue(value, prop.ValueInfo.Picture, prop.ValueInfo.Format);
-                    }
-                }
+                stack.Push(new EdiStructure(EdiStructureType.Interchange, value));
+                if (writer.WriteState == WriteState.Start)
+                    writer.WriteServiceStringAdvice();
+                SerializeStructure(writer, stack);
             }
             // else if this is indeed a collection type this must be a collection of messages.
             else {
                 throw new NotImplementedException("Collection types are not supported as the root Type. Try to wrap List of Messages inside a container type.");
             }
+        }
 
+        private static void SerializeStructure(EdiWriter writer, Stack<EdiStructure> stack, EdiPathComparer structuralComparer = null) {
+            structuralComparer = structuralComparer ?? new EdiPathComparer(writer.Grammar);
+            var structure = stack.Peek();
+            var properies = structure.GetOrderedProperties(structuralComparer);
+
+            foreach (var property in properies) {
+
+                var value = property.Info.GetValue(structure.Instance);
+                if (property.ValueInfo != null) {
+                    var path = (EdiPath)writer.Path;
+                    if (path.Segment != property.PathInfo.Segment ||
+                        structuralComparer.Compare(path, property.PathInfo.PathInternal) > 0) { 
+                        writer.WriteSegmentName(property.PathInfo.Segment);
+                    }
+
+                    while (structuralComparer.Compare(path, property.PathInfo.PathInternal) < 0) {
+                        path = (EdiPath)writer.Path;
+                        if (path.ElementIndex != property.PathInfo.ElementIndex)
+                            writer.WriteToken(EdiToken.ElementStart);
+                        else if (path.ComponentIndex != property.PathInfo.ComponentIndex)
+                            writer.WriteToken(EdiToken.ComponentStart);
+                    }
+                    writer.WriteValue(value, property.ValueInfo.Picture, property.ValueInfo.Format);
+                } else { // this is somekind of structure. Group/Message/Segment/SegmentGroup/Element
+                    // is it a collection of some kind?
+                    var container = property.Attributes.InferStructure();
+                    if (property.Info.PropertyType.IsCollectionType()) {
+                        var itemType = default(Type);
+                        var collection = value as IList;
+                        if (property.Info.PropertyType.IsArray) {
+                            itemType = property.Info.PropertyType.GetElementType();
+                        } else {
+                            itemType = property.Info.PropertyType.GetGenericArguments().First();
+                        }
+                        for (var i = 0; i < collection.Count; i++) {
+                            var item = collection[i];
+                            if (stack.Count == 0) { 
+                                throw new EdiException($"Serialization stack empty while in the middle of proccessing a collection of {itemType.Name}");
+                            }
+                            while (stack.Peek().Container >= container) {
+                                var previous = stack.Pop();
+                            }
+                            stack.Push(new EdiStructure(container, item, i, null));
+                            SerializeStructure(writer, stack, structuralComparer);
+                        }
+                    } else {
+                        // or a simple Container.
+                        if (stack.Count == 0) {
+                            throw new EdiException($"Serialization stack empty while in the middle of proccessing a collection of {property.Info.PropertyType.Name}");
+                        }
+                        while (stack.Peek().Container >= container) {
+                            var previous = stack.Pop();
+                        }
+                        stack.Push(new EdiStructure(container, value));
+                        SerializeStructure(writer, stack, structuralComparer);
+                    }
+                }
+            }
         }
 
         #endregion

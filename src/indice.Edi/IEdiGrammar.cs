@@ -70,5 +70,23 @@ namespace indice.Edi
         /// </summary>
         /// <param name="chars"></param>
         void SetAdvice(char[] chars);
+
+        /// <summary>
+        /// Populates the Edi grammar delimiters using a eg UNA:+.? '
+        /// </summary>
+        /// <param name="segmentNameDelimiter">populates <see cref="SegmentNameDelimiter"/></param>
+        /// <param name="dataElementSeparator">populates <see cref="DataElementSeparator"/></param>
+        /// <param name="componentDataElementSeparator">populates <see cref="ComponentDataElementSeparator"/></param>
+        /// <param name="segmentTerminator">populates <see cref="SegmentTerminator"/></param>
+        /// <param name="releaseCharacter">populates <see cref="ReleaseCharacter"/></param>
+        /// <param name="reserved">populates <see cref="Reserved"/></param>
+        /// <param name="decimalMark">populates <see cref="DecimalMark"/> character</param>
+        void SetAdvice(char segmentNameDelimiter,
+                       char dataElementSeparator,
+                       char componentDataElementSeparator, 
+                       char segmentTerminator,
+                       char? releaseCharacter,
+                       char? reserved,
+                       char? decimalMark);
     }
 }

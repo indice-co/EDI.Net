@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace indice.Edi.Utilities
@@ -77,7 +78,7 @@ namespace indice.Edi.Utilities
         public static EdiStructureType InferStructure(this IEnumerable<EdiAttribute> attributes) {
             var structureType = EdiStructureType.None;
             foreach (var attribute in attributes) {
-                if (!(attribute is EdiStructureAttribute)) { 
+                if (!(attribute is EdiStructureAttribute)) {
                     continue;
                 }
                 structureType = attribute is EdiSegmentGroupAttribute ? EdiStructureType.SegmentGroup :
@@ -103,10 +104,41 @@ namespace indice.Edi.Utilities
                 return false;
             }
         }
+        public static DateTime ParseEdiDate(this string value, string format, CultureInfo culture = null) {
+            var date = ParseEdiDateInternal(value, format, culture);
+            return date.Value;
+        }
+
+        public static bool TryParseEdiDate(this string value, string format, CultureInfo culture, out DateTime date) {
+            date = default(DateTime);
+            var dateNullable = ParseEdiDateInternal(value, format, culture);
+            if (dateNullable.HasValue)
+                date = dateNullable.Value;
+            return dateNullable.HasValue;
+        }
+
+        private static DateTime? ParseEdiDateInternal(string value, string format, CultureInfo culture = null) {
+            if (string.IsNullOrWhiteSpace(format))
+                throw new ArgumentOutOfRangeException(nameof(format));
+
+            var wrapped = new StringBuilder(value);
+            if (format.Contains("HH")) {
+                var startIndex = format.IndexOf('H');
+                if (wrapped[startIndex] == '2' && wrapped[startIndex + 1] == '4')
+                    wrapped[startIndex] = wrapped[startIndex + 1] = '0';
+            }
+            DateTime dt;
+            if (DateTime.TryParseExact(wrapped.ToString(), format, culture ?? CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dt)) {
+                return wrapped.ToString() != value
+                ? dt.AddDays(1)
+                : dt;
+            } 
+            return null;
+        }
 
         public static decimal? Parse(this string value, Picture? picture, char? decimalMark) {
             if (value != null)
-                value = value.Trim('Z'); // Z suppresses leading zeros
+                value = value.TrimStart('Z'); // Z suppresses leading zeros
             if (string.IsNullOrEmpty(value))
                 return null;
             decimal d;

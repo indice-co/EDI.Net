@@ -129,6 +129,22 @@ namespace indice.Edi
             _SegmentTerminator = _chars[5];
         }
 
+        public void SetAdvice(char segmentNameDelimiter,
+                              char dataElementSeparator,
+                              char componentDataElementSeparator,
+                              char segmentTerminator,
+                              char? releaseCharacter,
+                              char? reserved,
+                              char? decimalMark) {
+            _ComponentDataElementSeparator = componentDataElementSeparator;
+            _DataElementSeparator = dataElementSeparator;
+            _SegmentNameDelimiter = segmentNameDelimiter;
+            _ReleaseCharacter = releaseCharacter;
+            _Reserved = reserved.HasValue ? new[] { reserved.Value } : new char[0];
+            _DecimalMark = decimalMark;
+            _SegmentTerminator = segmentTerminator;
+        }
+
         public static IEdiGrammar NewEdiFact() {
             return new EdiGrammar();
         }

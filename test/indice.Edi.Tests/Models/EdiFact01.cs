@@ -1,27 +1,80 @@
 ﻿using indice.Edi.Serialization;
+using indice.Edi.Utilities;
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace indice.Edi.Tests.Models.EdiFact01
 {
+    public struct DTMPeriod
+    {
+        public readonly DateTime From;
+        public readonly DateTime To;
+
+        public DTMPeriod(DateTime from, DateTime to) {
+            From = from;
+            To = to;
+        }
+
+        public static DTMPeriod Parse(string text) {
+            var textFrom  = text?.Substring(0, 12);
+            var textTo = text?.Substring(12, 12);
+            return new DTMPeriod(
+                    textFrom.ParseEdiDate("yyyyMMddHHmm"),
+                    textTo.ParseEdiDate("yyyyMMddHHmm")
+                );
+        }
+
+        public override string ToString() {
+            return $"{From:yyyyMMddHHmm}{To:yyyyMMddHHmm}";
+        }
+
+        public static implicit operator string(DTMPeriod value) {
+            return value.ToString();
+        }
+
+        public static explicit operator DTMPeriod(string value) {
+            return DTMPeriod.Parse(value);
+        }
+    }
+
     [EdiElement, EdiPath("DTM/0")]
     public class DTM
     {
         [EdiValue("9(3)", Path = "DTM/0/0")]
-        public int Code { get; set; }
+        public int ID { get; set; }
         [EdiValue("X(12)", Path = "DTM/0/1", Format = "yyyyMMddHHmm")]
-        public DateTime Date { get; set; }
+        public DateTime DateTime { get; set; }
+        [EdiValue("9(3)", Path = "DTM/0/2")]
+        public int Code { get; set; }
     }
     
     [EdiElement, EdiPath("DTM/0"), EdiCondition("ZZZ", Path = "DTM/0/0")]
     public class UTCOffset
     {
-        [EdiValue("X(3)", Path = "DTM/0/0")]
-        public string Code { get; set; }
+        [EdiValue("9(3)", Path = "DTM/0/0")]
+        public int? ID { get; set; }
         [EdiValue("9(2)", Path = "DTM/0/1")]
         public int Hours { get; set; }
+        [EdiValue("9(3)", Path = "DTM/0/2")]
+        public int Code { get; set; }
+    }
+
+    [EdiElement, EdiPath("DTM/0"), EdiCondition("ZZZ", Path = "DTM/0/0")]
+    public class Period
+    {
+        [EdiValue("9(3)", Path = "DTM/0/0")]
+        public int ID { get; set; }
+
+        [EdiValue("9(24)", Path = "DTM/0/1")]
+        public DTMPeriod Date { get; set; }
+
+        [EdiValue("9(3)", Path = "DTM/0/2")]
+        public int Code { get; set; }
+        
     }
 
     [EdiSegment, EdiPath("NAD")]
@@ -140,29 +193,52 @@ namespace indice.Edi.Tests.Models.EdiFact01
         [EdiValue("X(3)", Path = "LOC/1/2")]
         public string LocationResponsibleAgency { get; set; }
 
-        public List<LinItem> ItemsOfLin { get; set; }
+        public List<LineItem> Lines { get; set; }
 
         [EdiValue("X(1)", Path = "UNS/0/0")]
         public char? UNS { get; set; }
     }
 
     [EdiSegment, EdiSegmentGroup("LIN", SequenceEnd = "UNS")]
-    public class LinItem
+    public class LineItem
     {
         [EdiCondition("324", Path = "DTM/0/0")]
-        public DTM SomeOtherDate { get; set; }
+        public Period Period { get; set; }
 
-        public List<PRI> PREList { get; set; }
+        public List<PriceDetails> Prices { get; set; }
     }
 
-    [EdiSegment, EdiPath("PRI")]
-    public class PRI
+    [EdiSegment, EdiSegmentGroup("PRI")]
+    public class PriceDetails
     {
+        public Price Price { get; set; }
 
+        public Range Range { get; set; }
+
+    }
+    [EdiElement, EdiPath("PRI/0")]
+    public class Price
+    {
         [EdiValue("X(3)", Path = "PRI/0/0")]
-        public string PRI_Text { get; set; }
+        public string Code { get; set; }
 
-        [EdiValue("9(3)", Path = "PRI/0/1")]
-        public int PRI_Value { get; set; }
+        [EdiValue("X(15)", Path = "PRI/0/1")]
+        public decimal? Amount { get; set; }
+
+        [EdiValue("X(3)", Path = "PRI/0/2")]
+        public string Type { get; set; }
+    }
+
+    [EdiSegment, EdiPath("RNG")]
+    public class Range
+    {
+        [EdiValue("X(3)", Path = "RNG/0/0")]
+        public string MeasurementUnitCode { get; set; }
+
+        [EdiValue("X(18)", Path = "RNG/1/0")]
+        public decimal? Minimum { get; set; }
+
+        [EdiValue("X(18)", Path = "RNG/1/1")]
+        public decimal? Maximum { get; set; }
     }
 }

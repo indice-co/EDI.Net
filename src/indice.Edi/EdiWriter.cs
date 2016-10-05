@@ -366,7 +366,8 @@ namespace indice.Edi
         }
 
         internal virtual void WriteTokenInternal(EdiReader reader, bool writeChildren) {
-            // TODO: Write using an open EDI reader (Copy). Make this right.
+            // TODO: Write using an open EDI reader (Copy).
+            throw new NotImplementedException();
         }
 
         private void WriteEnd(EdiContainerType type) {
@@ -408,10 +409,6 @@ namespace indice.Edi
                 bool forcebreak = false;
                 if (Peek() == type && _currentPosition.HasIndex) {
                     token = GetCloseTokenForType(type);
-                    //if () { 
-                    //    Pop();
-                    //    return;
-                    //}
                     forcebreak = true;
                 } else {
                     token = GetCloseTokenForType(Pop());

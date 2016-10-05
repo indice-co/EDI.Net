@@ -27,12 +27,12 @@ namespace indice.Edi.Serialization
 
         public string Path {
             get {
-                return _PathInfo.Path;
+                return _PathInfo?.Path;
             }
         }
         public string Segment {
             get {
-                return _PathInfo.Segment;
+                return _PathInfo?.Segment;
             }
         }
         public EdiConditionAttribute ConditionInfo {
@@ -92,6 +92,16 @@ namespace indice.Edi.Serialization
             if (_SegmentGroupInfo != null && _SegmentGroupInfo.StartInternal.Segment != null && _PathInfo == null) {
                 _PathInfo = new EdiPathAttribute(_SegmentGroupInfo.StartInternal.Segment);
             }
+        }
+
+        public override string ToString() {
+            if (ValueInfo != null) {
+                return $"Value @ {Path}";
+            }
+            if (Attributes.Count > 0) {
+                return $"{Attributes.InferStructure()} @ {Path}";
+            }
+            return base.ToString();
         }
     }
 }

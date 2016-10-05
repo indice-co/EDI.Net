@@ -83,14 +83,14 @@ namespace indice.Edi.Tests
             Assert.Equal("9", quote.MessageFunction);
             Assert.Equal("AB", quote.ResponseType);
 
-            Assert.NotNull(interchange.QuoteMessage.MessageDate.Code);
-            Assert.NotNull(interchange.QuoteMessage.ProcessingStartDate.Code);
-            Assert.NotNull(interchange.QuoteMessage.ProcessingEndDate.Code);
+            Assert.NotNull(interchange.QuoteMessage.MessageDate.ID);
+            Assert.NotNull(interchange.QuoteMessage.ProcessingStartDate.ID);
+            Assert.NotNull(interchange.QuoteMessage.ProcessingEndDate.ID);
 
 
-            Assert.Equal(new DateTime(2010, 10, 19, 11, 04, 00), quote.MessageDate.Date);
-            Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), quote.ProcessingStartDate.Date);
-            Assert.Equal(new DateTime(2010, 10, 20, 23, 00, 00), quote.ProcessingEndDate.Date);
+            Assert.Equal(new DateTime(2010, 10, 19, 11, 04, 00), quote.MessageDate.DateTime);
+            Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), quote.ProcessingStartDate.DateTime);
+            Assert.Equal(new DateTime(2010, 10, 20, 23, 00, 00), quote.ProcessingEndDate.DateTime);
 
             Assert.Equal(1, quote.UTCOffset.Hours);
 
@@ -114,15 +114,15 @@ namespace indice.Edi.Tests
             Assert.Equal("SE1", quote.LocationId);
             Assert.Equal("SM", quote.LocationResponsibleAgency);
             
-            var linArray = quote.ItemsOfLin;
+            var linArray = quote.Lines;
             Assert.All(linArray, lin => {
-                Assert.Equal(2, lin.PREList.Count);
-                Assert.Equal(-2100, lin.PREList[0].PRI_Value);
-                Assert.Equal(324, linArray[2].SomeOtherDate.Code);
+                Assert.Equal(2, lin.Prices.Count);
+                Assert.Equal(-2100M, lin.Prices[0].Price.Amount);
+                Assert.Equal(324, linArray[2].Period.ID);
             });
-            Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), linArray[0].SomeOtherDate.Date);
-            Assert.Equal(new DateTime(2010, 10, 20, 00, 00, 00), linArray[1].SomeOtherDate.Date);
-            Assert.Equal(new DateTime(2010, 10, 20, 01, 00, 00), linArray[2].SomeOtherDate.Date);
+            Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), linArray[0].Period.Date.From);
+            Assert.Equal(new DateTime(2010, 10, 20, 00, 00, 00), linArray[1].Period.Date.From);
+            Assert.Equal(new DateTime(2010, 10, 20, 01, 00, 00), linArray[2].Period.Date.From);
         }
         
         [Fact]
@@ -148,6 +148,25 @@ namespace indice.Edi.Tests
             var message = interchange.Groups[0].Messages[0];
             Assert.Equal(3, message.Places.Count);
             Assert.Equal(1751807, message.ReferenceIdentification);
+        }
+
+        [Fact]
+        public void ReaderStrips_Z_Padding_Test() {
+            var grammar = EdiGrammar.NewEdiFact();
+            using (var ediReader = new EdiTextReader(new StreamReader(Helpers.StreamFromString("DTM+ZZZ'DTM+ZZ1'")), grammar)) {
+                ediReader.Read();
+                ediReader.Read();
+                ediReader.Read();
+                ediReader.Read(); // move to component
+                var number = ediReader.ReadAsInt32();
+                Assert.Null(number);
+                ediReader.Read();
+                ediReader.Read();
+                ediReader.Read();
+                ediReader.Read(); // move to component;
+                var number2 = ediReader.ReadAsInt32();
+                Assert.Equal(1, number2.Value);
+            }
         }
     }
 }
