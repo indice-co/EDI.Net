@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace indice.Edi.Serialization
 {
+    /// <summary>
+    /// Base class for <see cref="EdiAttribute"/>s 
+    /// </summary>
     public abstract class EdiAttribute : Attribute
     {
         

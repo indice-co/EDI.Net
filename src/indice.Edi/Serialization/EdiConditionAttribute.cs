@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace indice.Edi.Serialization
 {
+    /// <summary>
+    /// In case multiple MessageTypes or Segment types with the same name. <see cref="EdiConditionAttribute"/> is used 
+    /// to discriminate the classes based on a component value
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public sealed class EdiConditionAttribute : EdiPathAttribute
     {

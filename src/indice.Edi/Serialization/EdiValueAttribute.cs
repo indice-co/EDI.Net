@@ -2,6 +2,9 @@
 
 namespace indice.Edi.Serialization
 {
+    /// <summary>
+    /// Use <see cref="EdiValueAttribute"/> for any value inside a segment. 
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
     public sealed class EdiValueAttribute : EdiAttribute
     {

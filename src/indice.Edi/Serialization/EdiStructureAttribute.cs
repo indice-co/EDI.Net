@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace indice.Edi.Serialization
 {
+    /// <summary>
+    /// Base class for all structure difining attributes 
+    /// </summary>
     public abstract class EdiStructureAttribute : EdiAttribute
     {
         private bool _Mandatory;

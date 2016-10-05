@@ -5,6 +5,12 @@ using System.Threading.Tasks;
 
 namespace indice.Edi.Serialization
 {
+    /// <summary>
+    /// <see cref="EdiSegmentGroupAttribute"/> Marks a propery/class as a logical container of segments. 
+    /// This allows a user to decorate a class whith information regarding the starting and ending segments 
+    /// that define a virtual group other than the standard ones (Functional Group etc). 
+    /// Can be applied on Lists the same way that [Message] or [Segment] attributes work
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public sealed class EdiSegmentGroupAttribute : EdiStructureAttribute
     {
