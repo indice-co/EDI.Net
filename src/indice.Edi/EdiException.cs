@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace indice.Edi
 {
     /// <summary>
-    /// The exception thrown when an error occurs during JSON serialization or deserialization.
+    /// The exception thrown when an error occurs during EDI serialization or deserialization.
     /// </summary>
     public class EdiException : Exception
     {

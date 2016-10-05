@@ -3,7 +3,7 @@ using System;
 namespace indice.Edi
 {
     /// <summary>
-    /// The exception thrown when an error occurs while reading JSON text.
+    /// The exception thrown when an error occurs while reading EDI text.
     /// </summary>
 #if !(DOTNET || PORTABLE)
     [Serializable]
@@ -23,9 +23,9 @@ namespace indice.Edi
         public int LinePosition { get; private set; }
 
         /// <summary>
-        /// Gets the path to the JSON where the error occurred.
+        /// Gets the path to the EDI where the error occurred.
         /// </summary>
-        /// <value>The path to the JSON where the error occurred.</value>
+        /// <value>The path to the EDI where the error occurred.</value>
         public string Path { get; private set; }
 
         /// <summary>
