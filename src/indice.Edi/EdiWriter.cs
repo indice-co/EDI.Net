@@ -1004,10 +1004,10 @@ namespace indice.Edi
                     writer.WriteValue((value == null) ? (ushort?)null : (ushort)value, picture);
                     break;
                 case PrimitiveTypeCode.Int32:
-                    writer.WriteValue((int)value);
+                    writer.WriteValue((int)value, picture);
                     break;
                 case PrimitiveTypeCode.Int32Nullable:
-                    writer.WriteValue((value == null) ? (int?)null : (int)value);
+                    writer.WriteValue((value == null) ? (int?)null : (int)value, picture);
                     break;
                 case PrimitiveTypeCode.Byte:
                     writer.WriteValue((byte)value, picture);

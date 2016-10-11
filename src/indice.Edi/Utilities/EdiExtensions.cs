@@ -196,18 +196,18 @@ namespace indice.Edi.Utilities
         }
 
         public static string ToEdiString(this int? value, Picture? picture) {
-            if (!value.HasValue)
+            if (!value.HasValue && !picture.HasValue)
                 return null;
             if (picture.HasValue) {
                 var pic = picture.Value;
-                var integer = value.Value;
-                if (pic.Kind == PictureKind.Numeric) {
+                if (pic.Kind == PictureKind.Alphanumeric) {
+                    var integer = value ?? 0;
                     var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
                     var result = integer.ToString();
                     return result;
-                } else if (pic.Kind == PictureKind.Alphanumeric) {
+                } else if (pic.Kind == PictureKind.Numeric) {
                     var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => 'Z').ToArray());
-                    var result = (padding + integer);
+                    var result = value.HasValue ? (padding + value.Value) : padding;
                     return result.Substring(result.Length - pic.Scale, pic.Scale);
                 }
             }

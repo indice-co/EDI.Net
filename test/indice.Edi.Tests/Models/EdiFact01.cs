@@ -1,11 +1,7 @@
 ﻿using indice.Edi.Serialization;
 using indice.Edi.Utilities;
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace indice.Edi.Tests.Models.EdiFact01
 {
@@ -59,9 +55,9 @@ namespace indice.Edi.Tests.Models.EdiFact01
     [EdiElement, EdiPath("DTM/0"), EdiCondition("ZZZ", Path = "DTM/0/0")]
     public class UTCOffset
     {
-        [EdiValue("9(3)", Path = "DTM/0/0")]
+        [EdiValue("X(3)", Path = "DTM/0/0")]
         public int? ID { get; set; }
-        [EdiValue("9(2)", Path = "DTM/0/1")]
+        [EdiValue("9(1)", Path = "DTM/0/1")]
         public int Hours { get; set; }
         [EdiValue("9(3)", Path = "DTM/0/2")]
         public int Code { get; set; }
@@ -84,14 +80,14 @@ namespace indice.Edi.Tests.Models.EdiFact01
         public int Code { get; set; }
 
         public override string ToString() {
-            return $"{Date.From} to {Date.To}";
+            return $"{Date.From} | {Date.To}";
         }
     }
 
     [EdiElement, EdiPath("LIN/2")]
     public class ItemNumber
     {
-        [EdiValue("9(3)", Path = "LIN/2/0")]
+        [EdiValue("X(1)", Path = "LIN/2/0")]
         public string Number { get; set; }
 
         [EdiValue("9(3)", Path = "LIN/2/1")]
@@ -233,7 +229,7 @@ namespace indice.Edi.Tests.Models.EdiFact01
     [EdiSegment, EdiSegmentGroup("LIN", SequenceEnd = "UNS")]
     public class LineItem
     {
-        [EdiValue("9(6)", Path = "LIN/0/0")]
+        [EdiValue("X(1)", Path = "LIN/0/0")]
         public int LineNumber { get; set; }
 
         [EdiValue("9(3)", Path = "LIN/1/0")]
