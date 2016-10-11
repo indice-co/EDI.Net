@@ -27,11 +27,13 @@ namespace indice.Edi.Tests.Models.EdiFact01
         public override string ToString() {
             return $"{From:yyyyMMddHHmm}{To:yyyyMMddHHmm}";
         }
-
+        
         public static implicit operator string(DTMPeriod value) {
             return value.ToString();
         }
 
+        // With a cast operator from string --> MyClass or MyStruct 
+        // we can convert any edi component value to our custom implementation.
         public static explicit operator DTMPeriod(string value) {
             return DTMPeriod.Parse(value);
         }
@@ -152,6 +154,12 @@ namespace indice.Edi.Tests.Models.EdiFact01
         public int AckRequest { get; set; }
 
         public Quote QuoteMessage { get; set; }
+
+        [EdiValue("X(1)", Path = "UNZ/0")]
+        public int TrailerControlCount { get; set; }
+
+        [EdiValue("X(14)", Path = "UNZ/1")]
+        public string TrailerControlReference { get; set; }
     }
 
     [EdiMessage]
@@ -224,6 +232,12 @@ namespace indice.Edi.Tests.Models.EdiFact01
 
         [EdiValue("X(1)", Path = "UNS/0/0")]
         public char? UNS { get; set; }
+
+        [EdiValue("X(1)", Path = "UNT/0")]
+        public int TrailerMessageSegmentsCount { get; set; }
+
+        [EdiValue("X(14)", Path = "UNT/1")]
+        public string TrailerMessageReference { get; set; }
     }
 
     [EdiSegment, EdiSegmentGroup("LIN", SequenceEnd = "UNS")]
@@ -250,6 +264,7 @@ namespace indice.Edi.Tests.Models.EdiFact01
         public Range Range { get; set; }
 
     }
+
     [EdiElement, EdiPath("PRI/0")]
     public class Price
     {
