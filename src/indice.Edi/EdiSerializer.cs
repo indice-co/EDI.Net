@@ -583,12 +583,13 @@ namespace indice.Edi
                             writer.WriteToken(EdiToken.ComponentStart);
                     }
                     writer.WriteValue(value, property.ValueInfo.Picture, property.ValueInfo.Format);
-                } else { // this is somekind of structure. Group/Message/Segment/SegmentGroup/Element
+                } else {
+                    // this is somekind of structure. Group/Message/Segment/SegmentGroup/Element
                     // is it a collection of some kind?
                     var container = property.Attributes.InferStructure();
                     if (property.Info.PropertyType.IsCollectionType()) {
                         var itemType = default(Type);
-                        var collection = value as IList;
+                        var collection = (value ?? new object[0]) as IList;
                         if (property.Info.PropertyType.IsArray) {
                             itemType = property.Info.PropertyType.GetElementType();
                         } else {
@@ -613,6 +614,8 @@ namespace indice.Edi
                         while (stack.Peek().Container >= container) {
                             var previous = stack.Pop();
                         }
+                        if (value == null)
+                            continue;
                         stack.Push(new EdiStructure(container, value));
                         SerializeStructure(writer, stack, structuralComparer);
                     }

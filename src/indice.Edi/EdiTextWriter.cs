@@ -226,7 +226,8 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Int32"/> value to write.</param>
         public override void WriteValue(int value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Integer);
-            WriteIntegerValue(value, picture);
+            _writer.Write(((int?)value).ToEdiString(picture));
+            //WriteIntegerValue(value, picture);
         }
 
         /// <summary>
@@ -236,7 +237,8 @@ namespace indice.Edi
         [CLSCompliant(false)]
         public override void WriteValue(uint value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Integer);
-            WriteIntegerValue(value, picture);
+            _writer.Write(((int?)value).ToEdiString(picture));
+            //WriteIntegerValue(value, picture);
         }
 
         /// <summary>
@@ -245,7 +247,8 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Int64"/> value to write.</param>
         public override void WriteValue(long value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Integer);
-            WriteIntegerValue(value, picture);
+            _writer.Write(((int?)value).ToEdiString(picture));
+            //WriteIntegerValue(value, picture);
         }
 
         /// <summary>
@@ -255,7 +258,8 @@ namespace indice.Edi
         [CLSCompliant(false)]
         public override void WriteValue(ulong value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Integer);
-            WriteIntegerValue(value, picture);
+            _writer.Write(((int?)value).ToEdiString(picture));
+            //WriteIntegerValue(value, picture);
         }
 
         /// <summary>
@@ -264,7 +268,7 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Single"/> value to write.</param>
         public override void WriteValue(float value, Picture? picture) {
             InternalWriteValue(EdiToken.Float);
-            _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
         }
 
         /// <summary>
@@ -276,7 +280,7 @@ namespace indice.Edi
                 WriteNull();
             } else {
                 InternalWriteValue(EdiToken.Float);
-                _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+                _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
             }
         }
 
@@ -286,7 +290,7 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Double"/> value to write.</param>
         public override void WriteValue(double value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Float);
-            _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
         }
 
         /// <summary>
@@ -298,7 +302,7 @@ namespace indice.Edi
                 WriteNull();
             } else {
                 InternalWriteValue(EdiToken.Float);
-                _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+                _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
             }
         }
 
@@ -308,7 +312,7 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Boolean"/> value to write.</param>
         public override void WriteValue(bool value) {
             InternalWriteValue(EdiToken.Boolean);
-            _writer.Write(value);
+            _writer.Write(value ? 0 : 1);
         }
 
         /// <summary>
@@ -317,17 +321,18 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Int16"/> value to write.</param>
         public override void WriteValue(short value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
-            WriteIntegerValue(value, picture);
+            _writer.Write(((int?)value).ToEdiString(picture));
+            //WriteIntegerValue(value, picture);
         }
 
         /// <summary>
         /// Writes a <see cref="UInt16"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt16"/> value to write.</param>
-        [CLSCompliant(false)]
         public override void WriteValue(ushort value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
-            WriteIntegerValue(value, picture);
+            _writer.Write(((int?)value).ToEdiString(picture));
+            //WriteIntegerValue(value, picture);
         }
 
         /// <summary>
@@ -344,10 +349,10 @@ namespace indice.Edi
         /// Writes a <see cref="SByte"/> value.
         /// </summary>
         /// <param name="value">The <see cref="SByte"/> value to write.</param>
-        [CLSCompliant(false)]
         public override void WriteValue(sbyte value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
-            WriteIntegerValue(value, picture);
+            _writer.Write(((int?)value).ToEdiString(picture));
+            //WriteIntegerValue(value, picture);
         }
 
         /// <summary>
@@ -356,7 +361,7 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Decimal"/> value to write.</param>
         public override void WriteValue(decimal value, Picture? picture) {
             InternalWriteValue(EdiToken.Float);
-            _writer.Write(value.ToEdiString(picture, Grammar.ReleaseCharacter));
+            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
         }
 
         /// <summary>

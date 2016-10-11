@@ -1119,7 +1119,10 @@ namespace indice.Edi
                     } else
 #endif
                     {
-                        throw CreateUnsupportedTypeException(writer, value);
+                        WriteValue(writer, PrimitiveTypeCode.String, $"{value}", picture, format);
+                        break;
+                        // consider throwing some times...
+                        //throw CreateUnsupportedTypeException(writer, value);
                     }
             }
         }
