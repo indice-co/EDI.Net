@@ -115,14 +115,10 @@ namespace indice.Edi.Tests
             Assert.Equal("SM", quote.LocationResponsibleAgency);
             
             var linArray = quote.Lines;
-            Assert.All(linArray, lin => {
-                Assert.Equal(2, lin.Prices.Count);
-                Assert.Equal(-2100M, lin.Prices[0].Price.Amount);
-                Assert.Equal(324, linArray[2].Period.ID);
-            });
             Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), linArray[0].Period.Date.From);
             Assert.Equal(new DateTime(2010, 10, 20, 00, 00, 00), linArray[1].Period.Date.From);
             Assert.Equal(new DateTime(2010, 10, 20, 01, 00, 00), linArray[2].Period.Date.From);
+            Assert.All(quote.Lines, i => Assert.Equal(2, i.Prices.Count));
         }
         
         [Fact]

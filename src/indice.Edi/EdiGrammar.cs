@@ -127,6 +127,9 @@ namespace indice.Edi
             _ReleaseCharacter = _chars[3];
             _Reserved = new[] { _chars[4] };
             _SegmentTerminator = _chars[5];
+
+            ///TODO: must figure this out to work both for EDIFact and X12. 
+            /// The above is only used by the former. http://stackoverflow.com/a/20112217/61577
         }
 
         public void SetAdvice(char segmentNameDelimiter,

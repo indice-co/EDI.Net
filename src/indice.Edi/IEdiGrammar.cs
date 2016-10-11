@@ -2,6 +2,10 @@
 
 namespace indice.Edi
 {
+    /// <summary>
+    /// The <see cref="IEdiGrammar"/> comprises of all the basic structural settings.
+    /// Essentialy these are the rules for X12, EDIFact or TRADACOMS.
+    /// </summary>
     public interface IEdiGrammar
     {
         /// <summary>

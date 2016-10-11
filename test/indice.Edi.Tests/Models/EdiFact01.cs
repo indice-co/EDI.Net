@@ -50,6 +50,10 @@ namespace indice.Edi.Tests.Models.EdiFact01
         public DateTime DateTime { get; set; }
         [EdiValue("9(3)", Path = "DTM/0/2")]
         public int Code { get; set; }
+
+        public override string ToString() {
+            return DateTime.ToString();
+        }
     }
     
     [EdiElement, EdiPath("DTM/0"), EdiCondition("ZZZ", Path = "DTM/0/0")]
@@ -61,9 +65,13 @@ namespace indice.Edi.Tests.Models.EdiFact01
         public int Hours { get; set; }
         [EdiValue("9(3)", Path = "DTM/0/2")]
         public int Code { get; set; }
+
+        public override string ToString() {
+            return Hours.ToString();
+        }
     }
 
-    [EdiElement, EdiPath("DTM/0"), EdiCondition("ZZZ", Path = "DTM/0/0")]
+    [EdiElement, EdiPath("DTM/0"), EdiCondition("324", Path = "DTM/0/0")]
     public class Period
     {
         [EdiValue("9(3)", Path = "DTM/0/0")]
@@ -74,7 +82,30 @@ namespace indice.Edi.Tests.Models.EdiFact01
 
         [EdiValue("9(3)", Path = "DTM/0/2")]
         public int Code { get; set; }
-        
+
+        public override string ToString() {
+            return $"{Date.From} to {Date.To}";
+        }
+    }
+
+    [EdiElement, EdiPath("LIN/2")]
+    public class ItemNumber
+    {
+        [EdiValue("9(3)", Path = "LIN/2/0")]
+        public string Number { get; set; }
+
+        [EdiValue("9(3)", Path = "LIN/2/1")]
+        public string Type { get; set; }
+
+        [EdiValue("9(3)", Path = "LIN/2/2")]
+        public string CodeListQualifier { get; set; }
+
+        [EdiValue("9(3)", Path = "LIN/2/3")]
+        public string CodeListResponsibleAgency { get; set; }
+
+        public override string ToString() {
+            return $"{Number} {Type} {CodeListQualifier}";
+        }
     }
 
     [EdiSegment, EdiPath("NAD")]
@@ -202,7 +233,14 @@ namespace indice.Edi.Tests.Models.EdiFact01
     [EdiSegment, EdiSegmentGroup("LIN", SequenceEnd = "UNS")]
     public class LineItem
     {
-        [EdiCondition("324", Path = "DTM/0/0")]
+        [EdiValue("9(6)", Path = "LIN/0/0")]
+        public int LineNumber { get; set; }
+
+        [EdiValue("9(3)", Path = "LIN/1/0")]
+        public string Code { get; set; }
+
+        public ItemNumber NumberIdentification { get; set; }
+
         public Period Period { get; set; }
 
         public List<PriceDetails> Prices { get; set; }

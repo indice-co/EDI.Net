@@ -101,7 +101,8 @@ namespace indice.Edi
                     } else if (reader.IsStartMessage) {
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
                     } else if (reader.TokenType == EdiToken.SegmentName) {
-                        TryCreateContainer(reader, stack, EdiStructureType.Segment);
+                        if (!TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup))
+                            TryCreateContainer(reader, stack, EdiStructureType.Segment);
                     } else if (reader.TokenType == EdiToken.ElementStart) {
                         TryCreateContainer(reader, stack, EdiStructureType.Element);
                     }
@@ -172,8 +173,8 @@ namespace indice.Edi
                         case PrimitiveTypeCode.Int64Nullable: break;
                         case PrimitiveTypeCode.UInt64: break;
                         case PrimitiveTypeCode.UInt64Nullable: break;
-                        case PrimitiveTypeCode.Single: break;
-                        case PrimitiveTypeCode.SingleNullable: break;
+                        case PrimitiveTypeCode.Single:
+                        case PrimitiveTypeCode.SingleNullable:
                         case PrimitiveTypeCode.Double:
                         case PrimitiveTypeCode.DoubleNullable:
                         case PrimitiveTypeCode.Decimal:
@@ -202,6 +203,7 @@ namespace indice.Edi
                 }
             }
         }
+
         internal static void PopulateStringValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
             var cache = structure.CachedReads;
             var valueInfo = descriptor.ValueInfo;
@@ -297,7 +299,7 @@ namespace indice.Edi
                 descriptor.Info.SetValue(structure.Instance, booleanValue);
             }
         }
-        
+
         internal static void PopulateObjectValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
             var cache = structure.CachedReads;
             var valueInfo = descriptor.ValueInfo;
@@ -310,48 +312,58 @@ namespace indice.Edi
             var index = 0;
             if (stack.Count == 0)
                 return false;
-            while (stack.Peek().Container >= newContainer) {
-                // The only structure allowed to be nested is segment group.
-                // So when a new segment group comes allong there it is either 
-                // a new item in the existing list or a deeper nested segment group.
-                // echeck if they are the same.
-                var previous = stack.Peek();
-                if (previous.Container == newContainer && 
-                    EdiStructureType.SegmentGroup == newContainer &&
-                    !previous.Descriptor.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
-                    break;
+
+            if (newContainer == EdiStructureType.SegmentGroup && 
+                stack.Peek().Container >= EdiStructureType.SegmentGroup) {
+                // strict hierarchy
+                while (stack.Peek().Container > newContainer) {
+                    var previous = stack.Pop(); // close this level
                 }
-                previous = stack.Pop();
-                if (previous.Container == newContainer) {
-                    index = previous.Index + 1;
+                // nested hierarchy
+                foreach (var level in stack) {
+                    if (!level.IsGroup)
+                        continue;
+                    var groupStart = level.Descriptor.SegmentGroupInfo.StartInternal;
+                    var sequenceEnd = level.Descriptor.SegmentGroupInfo.SequenceEndInternal;
+                    if (reader.Value.Equals(groupStart.Segment)) {
+                        level.Close(); // Close this level
+                        index = level.Index + 1;
+                        break;
+                    } else if (reader.Value.Equals(sequenceEnd.Segment)) {
+                        level.Close(); // Close this level
+                        break;
+                    }
+                }
+                if (stack.Any(s => s.IsClosed)) {
+                    var previous = stack.Peek();
+                    do previous = stack.Pop();
+                    while (!previous.IsClosed);
+                }
+            } else {
+                // strict hierarchy
+                while (stack.Peek().Container >= newContainer) {
+                    var previous = stack.Pop(); // close this level
+                    if (previous.Container == newContainer)
+                        index = previous.Index + 1; // seed collection index 
                 }
             }
 
             var current = stack.Peek();
             var property = default(EdiPropertyDescriptor);
-            if (newContainer == EdiStructureType.Segment) {
-                // for custom segment group structures that live side by side with other segments
-                // we must inspect the stack in order to findout if we reached the end of the container. 
-                // This is indicated by the end segment on the segment group attribute.
-                if (stack.Count > 0 && current.Container == EdiStructureType.SegmentGroup) {
-                    var groupMark = current.Descriptor.SegmentGroupInfo;
-                    if (groupMark.StartInternal.Segment.Equals(reader.Value) ||
-                        (groupMark.SequenceEndInternal.Segment != null && 
-                         groupMark.SequenceEndInternal.Segment.Equals(reader.Value))) {
-                        stack.Pop();
-                        current = stack.Peek();
-                    }
-                }
-                property = FindForCurrentSegment(reader, current, newContainer);
-                // for segment group start we must inspect the descriptor
-                if (property != null && property.MarksSegmentGroup &&
-                                        property.SegmentGroupInfo.StartInternal.Segment.Equals(reader.Value)) {
-                    return TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup);
-                }
-            } else if (newContainer == EdiStructureType.Element) {
-                property = FindForCurrentElement(reader, current, newContainer);
-            } else {
-                property = FindForCurrentLogicalStructure(reader, current, newContainer);
+
+            switch (newContainer) {
+                case EdiStructureType.SegmentGroup:
+                    property = FindForCurrentSegment(reader, current, newContainer);
+                    break;
+                case EdiStructureType.Segment:
+                    property = FindForCurrentSegment(reader, current, newContainer);
+                    break;
+                case EdiStructureType.Element:
+                    property = FindForCurrentElement(reader, current, newContainer);
+                    break;
+                default:
+                    property = FindForCurrentLogicalStructure(reader, current, newContainer);
+                    break;
             }
             if (property == null) {
                 return false;
@@ -525,9 +537,9 @@ namespace indice.Edi
         }
 
         #region Write internals
-        
+
         internal virtual void SerializeInternal(EdiWriter writer, object value, Type objectType) {
-            if (writer == null) 
+            if (writer == null)
                 throw new ArgumentNullException(nameof(writer));
             if (value == null) {
                 writer.WriteNull();
@@ -559,7 +571,7 @@ namespace indice.Edi
                 if (property.ValueInfo != null) {
                     var path = (EdiPath)writer.Path;
                     if (path.Segment != property.PathInfo.Segment ||
-                        structuralComparer.Compare(path, property.PathInfo.PathInternal) > 0) { 
+                        structuralComparer.Compare(path, property.PathInfo.PathInternal) > 0) {
                         writer.WriteSegmentName(property.PathInfo.Segment);
                     }
 
@@ -584,7 +596,7 @@ namespace indice.Edi
                         }
                         for (var i = 0; i < collection.Count; i++) {
                             var item = collection[i];
-                            if (stack.Count == 0) { 
+                            if (stack.Count == 0) {
                                 throw new EdiException($"Serialization stack empty while in the middle of proccessing a collection of {itemType.Name}");
                             }
                             while (stack.Peek().Container >= container) {
