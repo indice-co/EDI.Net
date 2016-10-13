@@ -24,7 +24,7 @@ namespace indice.Edi.Tests
             }
             Assert.Equal(4, msgCount);
         }
-
+        
         [Fact]
         public void DeserializeTest() {
             var grammar = EdiGrammar.NewTradacoms();
@@ -144,6 +144,31 @@ namespace indice.Edi.Tests
             var message = interchange.Groups[0].Messages[0];
             Assert.Equal(3, message.Places.Count);
             Assert.Equal(1751807, message.ReferenceIdentification);
+        }
+        [Fact]
+        public void X12_204_Test() {
+            var grammar = EdiGrammar.NewX12();
+            grammar.SetAdvice(
+                segmentNameDelimiter: '*', 
+                dataElementSeparator: '*', 
+                componentDataElementSeparator: ':', 
+                segmentTerminator: '~', 
+                releaseCharacter: null, 
+                reserved: null, 
+                decimalMark: '.');
+
+            string text = File.ReadAllText(@"C:\Users\cleft\Source\GitHub\indice\EDI.Net\test\indice.Edi.Tests\Samples\204-MGCTLYST-SAMPLE.EDI");
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(text.Replace('\n', '~')));
+            
+            var segmentCount = 0;
+            using (var ediReader = new EdiTextReader(new StreamReader(stream), grammar)) {
+                while (ediReader.Read()) {
+                    if (ediReader.TokenType == EdiToken.SegmentName) {
+                        segmentCount++;
+                    }
+                }
+            }
+            Assert.Equal(43, segmentCount);
         }
 
         [Fact]
