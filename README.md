@@ -67,7 +67,7 @@ using (var stream = new StreamReader(@"c:\temp\sample.edi")) {
 ```
 
 ### Serialization (POCOs to EDI)
-the foll
+In this case we are instantiating our POCO class `Interchange` and then fillit up with values before finaly serializing to `out.edi`.
 
 ```csharp
 var grammar = EdiGrammar.NewTradacoms();
