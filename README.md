@@ -205,10 +205,10 @@ The _Picture Clause_ is taken from COBOL laguage and the way it handles expressi
 
 |Symbol | Description      | Example Picture  | Component           | c# result
 |:-----:|------------------|:----------------:|---------------------|------------------|
-|   9   | Numeric          | `9(3)`          | `013`               | `int v = 13;`
+|   9   | Numeric          | `9(3)`           | `013`               | `int v = 13;`
 |   A   | Alphabetic       | not used         | -                   | -
-|   X   | Alphanumeric     | `X(20)`         | `This is alphanumeric`| `string v = "This is alphanumeric";`
-|   V   | Implicit Decimal | `9(5)V(2)`      | `01342`            | `decimal v = 13.42M;`
+|   X   | Alphanumeric     | `X(20)`          | `This is alphanumeric`| `string v = "This is alphanumeric";`
+|   V   | Implicit Decimal | `9(3)V9(2)`      | `01342`            | `decimal v = 13.42M;`
 |   S   | Sign             | not used         | - | - |
 |   P   | Assumed Decimal  | not used         | - | - |
 
