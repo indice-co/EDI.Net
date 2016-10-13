@@ -1,7 +1,7 @@
 # EDI.Net
-EDI Parser/Deserializer. 
+EDI Serializer/Deserializer. Used to read & write EDI streams. 
 
-This is a ground up implementation and does not make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong the way of getting the desired Clr object.
+This is a ground up implementation and __does not__ make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong the way of getting the desired Clr object. This makes the process quite fast.
 
 Tested with __[Tradacoms](https://en.wikipedia.org/wiki/TRADACOMS)__, __[EDIFact](https://en.wikipedia.org/wiki/EDIFACT)__ and __[ANSI ASC X12](https://en.wikipedia.org/wiki/ASC_X12) (X12)__ formats. 
 
@@ -10,12 +10,14 @@ as well as describe component values size length and precision with the [picture
 
 ## Quick links
 
-- [Installation](#installation)
-- [Attributes](#attributes)
-- [Example usage](#example-usage)
-- [Contributions](#contributions)
-- [The Picture clause](#the-picture-clause)
-- [Roadmap](#roadmap-todo)
+* [Installation](#installation)
+* [Attributes](#attributes)
+* [Example usage](#example-usage)
+  * [Deserialization (EDI to POCOs)](#deserialization-edi-to-pocos)
+  * [Serialization (POCOs to EDI)](#serialization-pocos-to-edi)
+* [Contributions](#contributions)
+* [The Picture clause](#the-picture-clause)
+* [Roadmap](#roadmap-todo)
 
 ## Installation
 
@@ -51,7 +53,9 @@ There are available configurations (`EdiGrammar`) for `EDIFact`, `Tradacoms` and
 
 _Note that all examples may be partialy implemented transmissions for demonstration purposes although they are a good starting point. If someone has complete poco classes for any transmition please feel free to contribute a complete test._
 
-The following example makes use of the `Tradacoms` grammar. 
+
+### Deserialization (EDI to POCOs)
+The following example makes use of the `Tradacoms` grammar and deserializes the `sample.edi` file to the `Interchange` class. 
 
 
 ```csharp
@@ -61,6 +65,25 @@ using (var stream = new StreamReader(@"c:\temp\sample.edi")) {
     interchange = new EdiSerializer().Deserialize<Interchange>(stream, grammar);
 }
 ```
+
+### Serialization (POCOs to EDI)
+the foll
+
+```csharp
+var grammar = EdiGrammar.NewTradacoms();
+var interchange = new Interchange();
+// fill properies 
+interchange.TransmissionDate = DateTime.Now;
+...
+// serialize to file.
+using (var textWriter = new StreamWriter(File.Open(@"c:\temp\out.edi", FileMode.Create))) {
+    using (var ediWriter = new EdiTextWriter(textWriter, grammar)) { 
+        new EdiSerializer().Serialize(ediWriter, interchange);
+    }
+}
+```
+
+### Model
 Annotated POCOS example using **part** of Tradacoms UtilityBill format:
 
 ```csharp
@@ -191,8 +214,8 @@ The _Picture Clause_ is taken from COBOL laguage and the way it handles expressi
 
 ## Roadmap (TODO)
 
-1. Implement serializer `Serialize` to write Clr classes to edi format (Using attributes). (planned for v1.1)
-1. Start github wiki page and begin documentation.
-1. Create a seperate package (or packages per EDI Format) to host well known interchange transmitions (ie Tradacoms Utitlity Bill). Then anyone can fork and contribute his own set of POCO classes.
+- [x] Implement serializer `Serialize` to write Clr classes to edi format (Using attributes). (planned for v1.1) 
+- [ ] Start github wiki page and begin documentation.
+- [ ] Create a seperate package (or packages per EDI Format) to host well known interchange transmitions (ie Tradacoms Utitlity Bill). Then anyone can fork and contribute his own set of POCO classes.
 
 _Disclaimer. The project was inspired and influenced by the work done in the excellent library [JSON.Net](https://github.com/JamesNK/Newtonsoft.Json) by James Newton King. Some utility parts for reflection string parsing etc. are used as is_
