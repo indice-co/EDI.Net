@@ -569,7 +569,6 @@ namespace indice.Edi
         /// Writes a <see cref="UInt32"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt32"/> value to write.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(uint value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
@@ -586,7 +585,6 @@ namespace indice.Edi
         /// Writes a <see cref="UInt64"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt64"/> value to write.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(ulong value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
@@ -627,7 +625,6 @@ namespace indice.Edi
         /// Writes a <see cref="UInt16"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt16"/> value to write.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(ushort value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
@@ -652,7 +649,6 @@ namespace indice.Edi
         /// Writes a <see cref="SByte"/> value.
         /// </summary>
         /// <param name="value">The <see cref="SByte"/> value to write.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(sbyte value, Picture? picture) {
             InternalWriteValue(EdiToken.Integer);
         }
@@ -713,7 +709,6 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{UInt32}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt32}"/> value to write.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(uint? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
@@ -738,7 +733,6 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{UInt64}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt64}"/> value to write.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(ulong? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
@@ -802,7 +796,6 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt16}"/> value to write.</param>
         /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(ushort? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
@@ -840,7 +833,6 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="Nullable{SByte}"/> value to write.</param>
         /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
-        [CLSCompliant(false)]
         public virtual void WriteValue(sbyte? value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();

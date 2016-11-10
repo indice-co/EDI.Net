@@ -17,8 +17,7 @@ namespace indice.Edi
         protected char _SegmentTerminator;
 
         char[] _separators;
-        bool[] _charEscapeFlags;
-
+        
         protected string _ServiceStringAdviceTag;
         protected string _InterchangeHeaderTag;
         protected string _FunctionalGroupHeaderTag;

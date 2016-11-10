@@ -234,7 +234,6 @@ namespace indice.Edi
         /// Writes a <see cref="UInt32"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt32"/> value to write.</param>
-        [CLSCompliant(false)]
         public override void WriteValue(uint value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Integer);
             _writer.Write(((int?)value).ToEdiString(picture));
@@ -255,7 +254,6 @@ namespace indice.Edi
         /// Writes a <see cref="UInt64"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt64"/> value to write.</param>
-        [CLSCompliant(false)]
         public override void WriteValue(ulong value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Integer);
             _writer.Write(((int?)value).ToEdiString(picture));
