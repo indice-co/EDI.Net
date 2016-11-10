@@ -1,0 +1,76 @@
+﻿ISA*00* *00* *ZZ*ABCMUSICSUPPLY *ZZ*ARIBAEDI*030910*1059*U*00401*000000001*0*T*>~
+	GS*IN*ABCMUSIC*AN02000012345*20030910*1059*1*X*004010~
+		ST*810*0001~
+			BIG*20030310*DO091003TESTINV01TAX*20030910*DO091003***DI*00~
+			CUR*SE*USD~
+			REF*IV*DO091003~
+				N1*SO*Aaron Copeland~
+				N2*Aaron Copeland~
+				N3*123 Symphony Street~
+				N4*San Francisco*CA*94107*US~
+				PER*CN*default*EM*aaronc@musicinsurance.com~
+				PER*CN*work*TE*14151234567*FX*14151112222~
+				  N1*RI*XYZ Bank~
+				  N2*XYZ Bank~
+				  N3*111 5th Avenue~
+				  N4*New York*NY*10007*US~
+				  REF*AP*00000-11111~
+				  REF*RT*123456789~
+				  PER*CN*default*EM*money@xyzbank.com~
+				  PER*CN*work*TE*12121234567~
+			 ITD*52*3*10**10~
+			 ITD*52*3*5**20~
+			 ITD*52*3*0**30~
+			 ITD*05*3*-5**40~
+			 ITD*05*3*-10**50~
+			DTM*003*20030910*105920*PD~
+			IT1*1*2*EA*99.99**VP*ID001~
+				PID*F****Power Cord****EN~
+				REF*FJ*1~
+				  SAC*N*B840*AB*Buyer assi*21996*Z*100******ABC123456789*Purchasing*Production Control*EN~
+				  SAC*C*G830***300~
+				  SAC*C*H850***1998**********total item tax*EN~
+				  TXI*ST*15.99*8*VD*CA***199.98~
+				  TXI*FD*3.99*2*****199.98~
+					N1*SF*Philadelphia~
+					N3*555 W. Any Street~
+					N4*Philadelphia*PA*19002*US~
+					PER*CN*default*EM*shipping@a1bestmusicwarehouse.com~
+					PER*CN*work*TE*14151234567*FX*14151112222~
+					  N1*ST*Music Insurance Co. - San Fran~
+					  N2*Aaron Copeland~
+					  N3*123 Symphony Street~
+					  N4*San Francisco*CA*94107*US~
+					  PER*CN*default*EM*aaronc@musicinsurance.com~
+					  PER*CN*work*TE*14151234567*FX*14151112222~
+			IT1*2*2*EA*79.99**VP*ID002~
+				PID*F****Power Cord****EN~
+				REF*FJ*2~ 
+				  SAC*N*B840*AB*Buyer assi*17596*Z*100******ABC123456789*Purchasing*Production Control*EN~
+				  SAC*C*G830***3~
+				  SAC*C*H850***1598**********total item tax*EN~
+				  TXI*ST*12.79*8*VD*CA***159.98~
+				  TXI*FD*3.19*2*****159.98~
+					N1*SF*Philadelphia~
+					N3*555 W. Any Street~
+					N4*Philadelphia*PA*19002*US~
+					PER*CN*default*EM*shipping@a1bestmusicwarehouse.com~
+					PER*CN*work*TE*14151234567*FX*14151112222~
+					 N1*ST*Music Insurance Co. - San Fran~
+					 N2*Aaron Copeland~
+					 N3*123 Symphony Street~
+					 N4*San Francisco*CA*94107*US~
+					 PER*CN*default*EM*aaronc@musicinsurance.com~
+					 PER*CN*work*TE*14151234567*FX*14151112222~
+			TDS*40192~
+			 AMT*1*359.96~
+			 AMT*N*401.92~
+			 AMT*BAP*401.92~
+				SAC*C*G830***600~
+				SAC*C*H850***3596**********total tax*EN~
+				TXI*ST*28.78*8*VD*CA***359.96~
+				TXI*FD*7.18*2*****359.96~
+			CTT*2~
+		SE*72*0001~
+	GE*1*1~
+IEA*1*000000001~ 

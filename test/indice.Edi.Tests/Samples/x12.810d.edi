@@ -1,0 +1,68 @@
+﻿ISA*00* *00* *ZZ*ABCMUSICSUPPLY *ZZ*ARIBAEDI*030910*1059*U*00401*000000001*0*T*>~
+	GS*IN*ABCMUSIC*AN02000012345*20030910*1059*1*X*004010~
+		ST*810*0001~
+			BIG*20030310*DO091003TESTHDRINV02*****DI*00~
+			CUR*SE*USD~
+				N1*SO*Aaron Copeland~
+				N2*Aaron Copeland~
+				N3*123 Symphony Street~
+				N4*San Francisco*CA*94107*US~
+				PER*CN*default*EM*aaronc@musicinsurance.com~
+				PER*CN*work*TE*14151234567*FX*14151112222~
+				 N1*RI*XYZ Bank~
+				 N2*XYZ Bank~
+				 N3*111 5th Avenue~
+				 N4*New York*NY*10007*US~
+				 REF*AP*00000-11111~
+				 REF*RT*123456789~
+				 PER*CN*default*EM*money@xyzbank.com~
+				 PER*CN*work*TE*12121234567~
+			DTM*003*20030910*105920*PD~
+			 IT1**1*ZZ*359.96**PO*DO091003~
+				REF*FJ*1~
+				DTM*004*20030910~
+					SAC*A*C310***4119*3*10~
+					SAC*C*G830***600~
+					SAC*C*H090***1000~
+					SAC*C*H850***3596**********tax on order*EN~
+					  N1*SF*Philadelphia~
+					  N3*555 W. Any Street~
+					  N4*Philadelphia*PA*19002*US~
+					  PER*CN*default*EM*shipping@a1bestmusicwarehouse.com~
+					  PER*CN*work*TE*14151234567*FX*14151112222~
+					   N1*ST*Music Insurance Co. - San Fran~
+					   N2*Aaron Copeland~
+					   N3*123 Symphony Street~
+					   N4*San Francisco*CA*94107*US~
+					   PER*CN*default*EM*aaronc@musicinsurance.com~
+					   PER*CN*work*TE*14151234567*FX*14151112222~
+			IT1**1*ZZ*200**PO*DO091004~
+				REF*FJ*2~
+				DTM*004*20030910~
+					SAC*A*C310***1175*3*5~
+					SAC*C*G830***500~
+					SAC*C*H090***1000~
+					SAC*C*H850***2000**********tax on order*EN~
+					  N1*SF*Philadelphia~
+					  N3*555 W. Any Street~
+					  N4*Philadelphia*PA*19002*US~ 
+					  PER*CN*default*EM*shipping@a1bestmusicwarehouse.com~
+					  PER*CN*work*TE*14151234567*FX*14151112222~
+					   N1*ST*Music Insurance Co. - San Fran~
+					   N2*Aaron Copeland~
+					   N3*123 Symphony Street~
+					   N4*San Francisco*CA*94107*US~
+					   PER*CN*default*EM*aaronc@musicinsurance.com~
+					   PER*CN*work*TE*14151234567*FX*14151112222~
+			TDS*64692~
+				AMT*1*559.96~
+				AMT*N*582.23~
+				AMT*BAP*582.23~
+				  SAC*A*C310***6469*3*10~
+				  SAC*C*G830***1100~
+				  SAC*C*H090***2000~
+				  SAC*C*H850***5596**********total tax*EN~
+			CTT*2~
+		SE*64*0001~
+	GE*1*1~
+IEA*1*000000001~
