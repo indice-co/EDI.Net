@@ -143,8 +143,11 @@ namespace indice.Edi.Tests
             }
             Assert.Equal(new DateTime(2009, 8, 27, 9, 36, 00), interchange.Date);
             Assert.Equal(new DateTime(2009, 8, 27, 10, 41, 00), interchange.Groups[0].Date);
-            Assert.Equal(19.95M, interchange.Groups[0].Orders[0].Items[0].UnitPrice);
-            Assert.Equal("126 Any St", interchange.Groups[0].Orders[0].Addresses[0].AddressInformation);
+            Assert.Equal(2.53M, interchange.Groups[0].Orders[0].Items[0].UnitPrice);
+            Assert.Equal("East Point Drive, Suite 500", interchange.Groups[0].Orders[0].Addresses[0].AddressInformation);
+            Assert.Equal(2, interchange.Groups[0].Orders[0].Items[0].MSG.Count());
+            Assert.Equal("4.4OZ 100% POLYESTER QUILT", interchange.Groups[0].Orders[0].Items[0].MSG[0].MessageText);
+            Assert.Equal("First Quality", interchange.Groups[0].Orders[0].Items[0].MSG[1].MessageText);
         }
 
         [Fact]
@@ -169,8 +172,9 @@ namespace indice.Edi.Tests
                 releaseCharacter: null, 
                 reserved: null, 
                 decimalMark: '.');
-
-            string text = File.ReadAllText(@"C:\Users\cleft\Source\GitHub\indice\EDI.Net\test\indice.Edi.Tests\Samples\204-MGCTLYST-SAMPLE.EDI");
+            
+            var workingDirectory = Directory.GetCurrentDirectory();
+            string text = File.ReadAllText(workingDirectory + @"\Samples\204-MGCTLYST-SAMPLE.EDI");
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text.Replace('\n', '~')));
             
             var segmentCount = 0;
@@ -181,7 +185,7 @@ namespace indice.Edi.Tests
                     }
                 }
             }
-            Assert.Equal(43, segmentCount);
+            Assert.Equal(42, segmentCount);
         }
 
         [Fact]
