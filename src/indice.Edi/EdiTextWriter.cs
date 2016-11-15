@@ -245,8 +245,8 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="Int64"/> value to write.</param>
         public override void WriteValue(long value, Picture? picture = null) {
-            InternalWriteValue(EdiToken.Integer);
-            _writer.Write(((int?)value).ToEdiString(picture));
+            InternalWriteValue(EdiToken.Float);
+            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
             //WriteIntegerValue(value, picture);
         }
 

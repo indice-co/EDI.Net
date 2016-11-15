@@ -168,10 +168,16 @@ namespace indice.Edi.Utilities
         public static string ToEdiString(this decimal value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
 
+        public static string ToEdiString(this long value, Picture? picture, char? decimalMark) =>
+            ToEdiString((decimal?)value, picture, decimalMark);
+
         public static string ToEdiString(this float? value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
 
         public static string ToEdiString(this double? value, Picture? picture, char? decimalMark) =>
+            ToEdiString((decimal?)value, picture, decimalMark);
+        
+        public static string ToEdiString(this long? value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
 
         public static string ToEdiString(this decimal? value, Picture? picture, char? decimalMark) {
