@@ -25,18 +25,30 @@ namespace indice.Edi
         private readonly byte _Scale;
         private readonly PictureKind _Kind;
 
+        /// <summary>
+        /// This is the total size of the string in digits
+        /// </summary>
         public int Scale {
             get { return _Scale; }
         }
 
+        /// <summary>
+        /// In case of floating point number this holds the number of decimal places. Its length.
+        /// </summary>
         public int Precision {
             get { return _Precision; }
         }
 
+        /// <summary>
+        /// indicates the <see cref="Kind" /> of the value represented. (ie <see cref="PictureKind.Alphanumeric"/>)
+        /// </summary>
         public PictureKind Kind {
             get { return _Kind; }
         }
 
+        /// <summary>
+        /// This indicated if the value is a floating point number with by checking whether <see cref="Precision"/> is positive.
+        /// </summary>
         public bool HasPrecision {
             get {
                 return _Precision > 0;

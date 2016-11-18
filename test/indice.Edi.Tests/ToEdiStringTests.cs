@@ -11,11 +11,11 @@ namespace indice.Edi.Tests
     {
         [Fact]
         public void IntegerToStringTest() {
-            int value = 12;
-            var result1 = EdiExtensions.ToEdiString(value, (Picture)"X(5)");
-            var result2 = EdiExtensions.ToEdiString(value, (Picture)"9(5)");
-            Assert.Equal("00012", result1);
-            Assert.Equal("ZZZ12", result2);
+            Assert.Equal("   12", EdiExtensions.ToEdiString(12, (Picture)"X(5)"));
+            Assert.Equal("00012", EdiExtensions.ToEdiString(12, (Picture)"9(5)"));
+            Assert.Equal("00012", EdiExtensions.ToEdiString(12, (Picture)"9(5)"));
+            Assert.Equal("12", EdiExtensions.ToEdiString(12, (Picture)"X(1)"));
+            Assert.Equal("12", EdiExtensions.ToEdiString(12, (Picture)"9(1)"));
         }
     }
 }

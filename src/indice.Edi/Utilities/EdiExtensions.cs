@@ -167,19 +167,22 @@ namespace indice.Edi.Utilities
 
         public static string ToEdiString(this decimal value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
-
-        public static string ToEdiString(this long value, Picture? picture, char? decimalMark) =>
-            ToEdiString((decimal?)value, picture, decimalMark);
-
+        
         public static string ToEdiString(this float? value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
 
         public static string ToEdiString(this double? value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
-        
-        public static string ToEdiString(this long? value, Picture? picture, char? decimalMark) =>
-            ToEdiString((decimal?)value, picture, decimalMark);
 
+        public static string ToEdiString(this int? value, Picture? picture) =>
+            ToEdiString((long?)value, picture);
+
+        public static string ToEdiString(this int value, Picture? picture) =>
+            ToEdiString((long?)value, picture);
+
+        public static string ToEdiString(this long value, Picture? picture) =>
+            ToEdiString((long?)value, picture);
+        
         public static string ToEdiString(this decimal? value, Picture? picture, char? decimalMark) {
             if (!value.HasValue)
                 return null;
@@ -201,20 +204,21 @@ namespace indice.Edi.Utilities
             return string.Format(NumberFormatInfo.InvariantInfo, "{0}", value);
         }
 
-        public static string ToEdiString(this int? value, Picture? picture) {
+        public static string ToEdiString(this long? value, Picture? picture) {
             if (!value.HasValue && !picture.HasValue)
                 return null;
             if (picture.HasValue) {
                 var pic = picture.Value;
                 if (pic.Kind == PictureKind.Alphanumeric) {
-                    var integer = value ?? 0;
-                    var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
-                    var result = integer.ToString();
-                    return result;
-                } else if (pic.Kind == PictureKind.Numeric) {
-                    var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => 'Z').ToArray());
+                    var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => ' ').ToArray());
                     var result = value.HasValue ? (padding + value.Value) : padding;
+                    if (result.Length > pic.Scale * 2) {
+                        return value.Value.ToString();
+                    }
                     return result.Substring(result.Length - pic.Scale, pic.Scale);
+                } else if (pic.Kind == PictureKind.Numeric) {
+                    var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
+                    return string.Format(CultureInfo.InvariantCulture, "{0:" + padding + "}", value ?? 0);
                 }
             }
             return string.Format(NumberFormatInfo.InvariantInfo, "{0}", value);
