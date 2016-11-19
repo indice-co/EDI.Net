@@ -1,4 +1,7 @@
-# EDI.Net
+# EDI.Net ![alt text](design/logo-64.png "Edi Net logo")
+
+
+
 EDI Serializer/Deserializer. Used to read & write EDI streams. 
 
 This is a ground up implementation and __does not__ make use of `XML Serialization` in any step of the process. This reduces the overhead of converting into multiple formats allong the way of getting the desired Clr object. This makes the process quite fast.
