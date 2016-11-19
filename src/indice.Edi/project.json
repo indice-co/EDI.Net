@@ -7,6 +7,7 @@
     "tags": [ "EDI", "EDIFact", "Tradacoms", "X12", "Serializer", "Parser" ],
     "projectUrl": "https://github.com/indice-co/EDI.Net",
     "licenseUrl": "https://github.com/indice-co/EDI.Net/blob/master/LICENSE",
+    "iconUrl": "https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true",
     "owners": [ "indice" ],
     "repository": {
       "type": "git",
