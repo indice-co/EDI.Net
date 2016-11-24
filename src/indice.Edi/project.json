@@ -13,7 +13,7 @@
       "type": "git",
       "url": "https://github.com/indice-co/EDI.Net"
     },
-    "releaseNotes": "EDI Serialization. Bug fixes",
+    "releaseNotes": "Minor update. Better handling of the numeric values when writing. Also handles Int64 serialization",
     "summary": "Edi.Net Class Library for Edi serialization. Reading & Writing EDIFact, Tradacoms and X12 files to and from Clr Objects."
   },
   "scripts": {

@@ -11,7 +11,7 @@ namespace indice.Edi.Tests
     public class SerializerTests
     {
         [Fact]
-        public void SerializeTestTest() {
+        public void SerializeTest() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(Models.EdiFact01.Interchange);
             using (var stream = Helpers.GetResourceStream("edifact.01.edi")) {
