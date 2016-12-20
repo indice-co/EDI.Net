@@ -98,6 +98,11 @@ namespace indice.Edi
                         value = stack.Peek().Instance;
                     } else if (reader.IsStartGroup) {
                         TryCreateContainer(reader, stack, EdiStructureType.Group);
+                    } else if (reader.IsEndGroup) {
+                        while (stack.Peek().Container != EdiStructureType.Group) {
+                            stack.Pop();
+                        }
+                        value = stack.Peek().Instance;
                     } else if (reader.IsStartMessage) {
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
                     } else if (reader.TokenType == EdiToken.SegmentName) {

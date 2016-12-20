@@ -108,6 +108,12 @@ namespace indice.Edi.Tests.Models
             public int ReferenceIdentification { get; set; }
 
             public List<Place> Places { get; set; }
+
+            [EdiValue("9(1)", Path = "SE/0", Description = "96 Number of Segments Included")]
+            public int MessageSegmetsCount { get; set; }
+
+            [EdiValue("X(9)", Path = "SE/1", Description = "329 Transaction Set Control Number")]
+            public string MessageControlNumber { get; set; }
         }
 
         [EdiSegment, EdiSegmentGroup("N1", SequenceEnd = "LX")]

@@ -162,6 +162,21 @@ namespace indice.Edi.Tests
             Assert.Equal(1751807, message.ReferenceIdentification);
         }
         [Fact]
+        public void X12_214_Trailers_Test() {
+            var grammar = EdiGrammar.NewX12();
+            var interchange = default(Models.Transportation_214);
+            using (var stream = Helpers.GetResourceStream("x12.214.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.Transportation_214>(new StreamReader(stream), grammar);
+            }
+            var group = interchange.Groups[0];
+            var message = group.Messages[0];
+
+            Assert.Equal(16, message.MessageSegmetsCount);
+            Assert.Equal("822650001", message.MessageControlNumber);
+            Assert.Equal(1, group.TransactionsCount);
+            Assert.Equal(82265, group.GroupTrailerControlNumber);
+        }
+        [Fact]
         public void X12_204_Test() {
             var grammar = EdiGrammar.NewX12();
             grammar.SetAdvice(
