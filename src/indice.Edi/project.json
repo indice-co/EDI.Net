@@ -13,7 +13,7 @@
       "type": "git",
       "url": "https://github.com/indice-co/EDI.Net"
     },
-    "releaseNotes": "Minor update. Better handling of the numeric values when writing. Also handles Int64 serialization",
+    "releaseNotes": "Minor update. Bug fix in deserialization of the Functional Group Trailer.",
     "summary": "Edi.Net Class Library for Edi serialization. Reading & Writing EDIFact, Tradacoms and X12 files to and from Clr Objects."
   },
   "scripts": {
