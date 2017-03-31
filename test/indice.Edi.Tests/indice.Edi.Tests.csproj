@@ -2,10 +2,7 @@
 
   <PropertyGroup>
     <Description>indice.Edi.Tests Class Library</Description>
-    <Authors>c.leftheris</Authors>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <AssemblyName>indice.Edi.Tests</AssemblyName>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
 
