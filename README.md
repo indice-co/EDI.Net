@@ -194,10 +194,12 @@ Open a new GitHub pull request with the patch.
 Ensure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.
 
 ##### Build the sourcecode
-As of v1.0.7 the solution was adapted to support the dotnet core project system. 
+
+As of v1.0.7 the solution was adapted to support the dotnet core project system. Then it was adapted again since the dotnet core tooling was officialy relased (_March 7th 2017 at the launch of Visual studio 2017_).
 In order to build and test the source code you will need either one of the following.
 
-- Visual studio 2015 Update 3 & .NET Core 1.0.0 - VS 2015 Tooling
+- Visual studio 2017 + the dotnet core workload (for `v1.1.3` onwards)
+- Visual studio 2015 Update 3 & .NET Core 1.0.0 - VS 2015 Tooling (for versions `v1.0.7` - `v1.1.2`)
 - [VS Code + .NET Core SDK](https://code.visualstudio.com/docs/runtimes/dotnet) 
 
 for more information check .Net Core [official page](https://www.microsoft.com/net/core).
