@@ -6,6 +6,9 @@ namespace indice.Edi
     /// <summary>
     /// The exception thrown when an error occurs during EDI serialization or deserialization.
     /// </summary>
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
+    [Serializable]
+#endif
     public class EdiException : Exception
     {
         /// <summary>
@@ -37,7 +40,7 @@ namespace indice.Edi
         }
 
 
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
         /// <summary>
         /// Initializes a new instance of the <see cref="EdiWriterException"/> class.
         /// </summary>

@@ -32,8 +32,7 @@ namespace indice.Edi.Utilities
 {
     internal static class TypeExtensions
     {
-#if DOTNET || PORTABLE
-#if !DOTNET
+#if PORTABLE || NETSTANDARD10 || NETSTANDARD13 
         private static BindingFlags DefaultFlags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
 
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo)
@@ -63,19 +62,16 @@ namespace indice.Edi.Utilities
 
             return null;
         }
-#endif
 
         public static bool IsSubclassOf(this Type type, Type c)
         {
             return type.GetTypeInfo().IsSubclassOf(c);
         }
-
-#if !DOTNET
+        
         public static bool IsAssignableFrom(this Type type, Type c)
         {
             return type.GetTypeInfo().IsAssignableFrom(c.GetTypeInfo());
         }
-#endif
 
         public static bool IsInstanceOfType(this Type type, object o)
         {
@@ -88,7 +84,7 @@ namespace indice.Edi.Utilities
 
         public static MethodInfo Method(this Delegate d)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return d.Method;
 #else
             return d.GetMethodInfo();
@@ -97,7 +93,7 @@ namespace indice.Edi.Utilities
 
         public static MemberTypes MemberType(this MemberInfo memberInfo)
         {
-#if !(DOTNET || PORTABLE || PORTABLE40)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return memberInfo.MemberType;
 #else
             if (memberInfo is PropertyInfo)
@@ -115,7 +111,7 @@ namespace indice.Edi.Utilities
 
         public static bool ContainsGenericParameters(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.ContainsGenericParameters;
 #else
             return type.GetTypeInfo().ContainsGenericParameters;
@@ -124,7 +120,7 @@ namespace indice.Edi.Utilities
 
         public static bool IsInterface(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsInterface;
 #else
             return type.GetTypeInfo().IsInterface;
@@ -133,7 +129,7 @@ namespace indice.Edi.Utilities
 
         public static bool IsGenericType(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsGenericType;
 #else
             return type.GetTypeInfo().IsGenericType;
@@ -142,7 +138,7 @@ namespace indice.Edi.Utilities
 
         public static bool IsGenericTypeDefinition(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsGenericTypeDefinition;
 #else
             return type.GetTypeInfo().IsGenericTypeDefinition;
@@ -151,7 +147,7 @@ namespace indice.Edi.Utilities
 
         public static Type BaseType(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.BaseType;
 #else
             return type.GetTypeInfo().BaseType;
@@ -160,7 +156,7 @@ namespace indice.Edi.Utilities
 
         public static Assembly Assembly(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.Assembly;
 #else
             return type.GetTypeInfo().Assembly;
@@ -169,7 +165,7 @@ namespace indice.Edi.Utilities
 
         public static bool IsEnum(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsEnum;
 #else
             return type.GetTypeInfo().IsEnum;
@@ -178,7 +174,7 @@ namespace indice.Edi.Utilities
 
         public static bool IsClass(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsClass;
 #else
             return type.GetTypeInfo().IsClass;
@@ -187,14 +183,14 @@ namespace indice.Edi.Utilities
 
         public static bool IsSealed(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsSealed;
 #else
             return type.GetTypeInfo().IsSealed;
 #endif
         }
 
-#if (PORTABLE40 || DOTNET || PORTABLE)
+#if (PORTABLE || NETSTANDARD10 || NETSTANDARD13)
         public static PropertyInfo GetProperty(this Type type, string name, BindingFlags bindingFlags, object placeholder1, Type propertyType, IList<Type> indexParameters, object placeholder2)
         {
             IEnumerable<PropertyInfo> propertyInfos = type.GetProperties(bindingFlags);
@@ -225,22 +221,16 @@ namespace indice.Edi.Utilities
                 return true;
             });
         }
-#endif
 
-#if (DOTNET || PORTABLE)
         public static MethodInfo GetBaseDefinition(this MethodInfo method)
         {
             return method.GetRuntimeBaseDefinition();
         }
-#endif
-
-#if (DOTNET || PORTABLE)
         public static bool IsDefined(this Type type, Type attributeType, bool inherit)
         {
             return type.GetTypeInfo().CustomAttributes.Any(a => a.AttributeType == attributeType);
         }
-
-#if !DOTNET
+        
         public static MethodInfo GetMethod(this Type type, string name)
         {
             return type.GetMethod(name, DefaultFlags);
@@ -484,11 +474,10 @@ namespace indice.Edi.Utilities
             return type.GetTypeInfo().DeclaredMethods;
         }
 #endif
-#endif
 
         public static bool IsAbstract(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsAbstract;
 #else
             return type.GetTypeInfo().IsAbstract;
@@ -497,7 +486,7 @@ namespace indice.Edi.Utilities
 
         public static bool IsVisible(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsVisible;
 #else
             return type.GetTypeInfo().IsVisible;
@@ -506,7 +495,7 @@ namespace indice.Edi.Utilities
 
         public static bool IsValueType(this Type type)
         {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             return type.IsValueType;
 #else
             return type.GetTypeInfo().IsValueType;

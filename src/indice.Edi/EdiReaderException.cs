@@ -1,11 +1,14 @@
 using System;
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
+using System.Runtime.Serialization;
+#endif
 
 namespace indice.Edi
 {
     /// <summary>
     /// The exception thrown when an error occurs while reading EDI text.
     /// </summary>
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
     [Serializable]
 #endif
     public class EdiReaderException : EdiException
@@ -55,6 +58,20 @@ namespace indice.Edi
             : base(message, innerException)
         {
         }
+
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EdiReaderException"/> class.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
+        /// <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
+        public EdiReaderException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
 
         internal EdiReaderException(string message, Exception innerException, string path, int lineNumber, int linePosition)
             : base(message, innerException)

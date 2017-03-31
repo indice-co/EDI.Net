@@ -188,9 +188,12 @@ namespace indice.Edi.Tests
                 releaseCharacter: null, 
                 reserved: null, 
                 decimalMark: '.');
+
+            string text = string.Empty;
+            using (var filestream = Helpers.GetResourceStream("204-MGCTLYST-SAMPLE.EDI"))
+            using (var reader = new StreamReader(filestream))
+                text = reader.ReadToEnd();
             
-            var workingDirectory = Directory.GetCurrentDirectory();
-            string text = File.ReadAllText(workingDirectory + @"\Samples\204-MGCTLYST-SAMPLE.EDI");
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text.Replace('\n', '~')));
             
             var segmentCount = 0;
