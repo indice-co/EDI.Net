@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
+  <PropertyGroup Label="Assembly">
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
@@ -10,9 +9,11 @@
     <TargetFrameworks>net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8</TargetFrameworks>
     <AssemblyName>indice.Edi</AssemblyName>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
+  </PropertyGroup>
+  <PropertyGroup Label="Package">
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
-    <PackageReleaseNotes>Minor update. Bug fix in deserialization of the Functional Group Trailer.</PackageReleaseNotes>
+    <PackageReleaseNotes>Allow EdiConditionAttribute to stack that will then be checked with the `OR` logical operator.</PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/indice-co/EDI.Net/blob/master/LICENSE</PackageLicenseUrl>

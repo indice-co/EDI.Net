@@ -451,6 +451,18 @@ namespace indice.Edi.Tests
             Assert.Equal(interchange.Trailer_Field2, "20170119101016");
         }
 
+        [Fact]
+        public void EdiFact_ORDRSP_Test() {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            var interchange = default(Interchange_ORDRSP);
+            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_ORDRSP>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal(interchange.Message.IMD_List.Count, 2);
+            Assert.NotNull(interchange.Message.IMD_Other);
+        }
 
     }
 }
