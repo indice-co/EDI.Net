@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "indice.Edi", "src\indice.Edi\indice.Edi.xproj", "{CC65B600-E714-4C3C-8908-8A8BC0431A7A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65B79EC4-4844-4EF1-8CBC-FD978EB28EBA}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
+		.editorconfig = .editorconfig
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -16,7 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CCDA51C2-7B5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B01DA332-38EF-4AC7-AEF6-B22B33F7D40F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "indice.Edi.Tests", "test\indice.Edi.Tests\indice.Edi.Tests.xproj", "{6C51495A-98D6-423F-B14F-5AF38EE18D38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "indice.Edi", "src\indice.Edi\indice.Edi.csproj", "{CC65B600-E714-4C3C-8908-8A8BC0431A7A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "indice.Edi.Tests", "test\indice.Edi.Tests\indice.Edi.Tests.csproj", "{6C51495A-98D6-423F-B14F-5AF38EE18D38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

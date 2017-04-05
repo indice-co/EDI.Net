@@ -188,9 +188,12 @@ namespace indice.Edi.Tests
                 releaseCharacter: null, 
                 reserved: null, 
                 decimalMark: '.');
+
+            string text = string.Empty;
+            using (var filestream = Helpers.GetResourceStream("204-MGCTLYST-SAMPLE.EDI"))
+            using (var reader = new StreamReader(filestream))
+                text = reader.ReadToEnd();
             
-            var workingDirectory = Directory.GetCurrentDirectory();
-            string text = File.ReadAllText(workingDirectory + @"\Samples\204-MGCTLYST-SAMPLE.EDI");
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text.Replace('\n', '~')));
             
             var segmentCount = 0;
@@ -448,6 +451,18 @@ namespace indice.Edi.Tests
             Assert.Equal(interchange.Trailer_Field2, "20170119101016");
         }
 
+        [Fact]
+        public void EdiFact_ORDRSP_Test() {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            var interchange = default(Interchange_ORDRSP);
+            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_ORDRSP>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal(interchange.Message.IMD_List.Count, 2);
+            Assert.NotNull(interchange.Message.IMD_Other);
+        }
 
     }
 }

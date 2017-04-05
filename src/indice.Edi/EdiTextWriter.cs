@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
 using System.Numerics;
 #endif
 using System.Text;
@@ -76,7 +76,7 @@ namespace indice.Edi
             }
 
             if (CloseOutput && _writer != null) {
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
                 _writer.Close();
 #else
                 _writer.Dispose();
@@ -125,7 +125,7 @@ namespace indice.Edi
         /// </summary>
         /// <param name="value">The <see cref="Object"/> value to write.</param>
         public override void WriteValue(object value) {
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
             if (value is BigInteger) {
                 InternalWriteValue(EdiToken.Integer);
 
@@ -389,7 +389,7 @@ namespace indice.Edi
 
             string text = null;
 
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             text = value.ToString("D", CultureInfo.InvariantCulture);
 #else
             text = value.ToString("D");

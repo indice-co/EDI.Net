@@ -149,7 +149,7 @@ namespace indice.Edi.Utilities
                 if (i > 0 && hasNext && !char.IsUpper(chars[i + 1]))
                     break;
 
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
                 chars[i] = char.ToLower(chars[i], CultureInfo.InvariantCulture);
 #else
                 chars[i] = char.ToLowerInvariant(chars[i]);

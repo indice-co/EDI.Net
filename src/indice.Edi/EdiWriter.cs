@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
 using System.Numerics;
 #endif
 using indice.Edi.Utilities;
@@ -312,7 +312,7 @@ namespace indice.Edi
                     break;
                 case EdiToken.Integer:
                     ValidationUtils.ArgumentNotNull(value, nameof(value));
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
                     if (value is BigInteger) {
                         WriteValue((BigInteger)value);
                     } else
@@ -934,7 +934,7 @@ namespace indice.Edi
             if (value == null) {
                 WriteNull();
             } else {
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
                 // this is here because adding a WriteValue(BigInteger) to EdiWriter will
                 // mean the user has to add a reference to System.Numerics.dll
                 if (value is BigInteger) {
@@ -1067,7 +1067,7 @@ namespace indice.Edi
                 case PrimitiveTypeCode.TimeSpanNullable:
                     writer.WriteValue((value == null) ? (TimeSpan?)null : (TimeSpan)value);
                     break;
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
                 case PrimitiveTypeCode.BigInteger:
                     // this will call to WriteValue(object)
                     writer.WriteValue((BigInteger)value);
@@ -1086,13 +1086,13 @@ namespace indice.Edi
                 case PrimitiveTypeCode.Bytes:
                     writer.WriteValue((byte[])value);
                     break;
-#if !(PORTABLE || DOTNET)
+#if !(PORTABLE || NETSTANDARD10)
                 case PrimitiveTypeCode.DBNull:
                     writer.WriteNull();
                     break;
 #endif
                 default:
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
                     if (value is IConvertible) {
                         // the value is a non-standard IConvertible
                         // convert to the underlying value and retry

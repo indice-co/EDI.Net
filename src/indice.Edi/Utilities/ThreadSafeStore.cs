@@ -74,7 +74,7 @@ namespace indice.Edi.Utilities
                     Dictionary<TKey, TValue> newStore = new Dictionary<TKey, TValue>(_store);
                     newStore[key] = value;
 
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
                     Thread.MemoryBarrier();
 #endif
                     _store = newStore;

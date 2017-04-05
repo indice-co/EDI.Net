@@ -27,15 +27,14 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.ComponentModel;
-#if !PORTABLE
-using System.Numerics;
-#endif
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Reflection;
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10)
+using System.Numerics;
+#endif
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
 using System.Data.SqlTypes;
-
 #endif
 
 namespace indice.Edi.Utilities
@@ -139,14 +138,14 @@ namespace indice.Edi.Utilities
                 { typeof(Guid?), PrimitiveTypeCode.GuidNullable },
                 { typeof(TimeSpan), PrimitiveTypeCode.TimeSpan },
                 { typeof(TimeSpan?), PrimitiveTypeCode.TimeSpanNullable },
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
                 { typeof(BigInteger), PrimitiveTypeCode.BigInteger },
                 { typeof(BigInteger?), PrimitiveTypeCode.BigIntegerNullable },
 #endif
                 { typeof(Uri), PrimitiveTypeCode.Uri },
                 { typeof(string), PrimitiveTypeCode.String },
                 { typeof(byte[]), PrimitiveTypeCode.Bytes },
-#if !(PORTABLE || DOTNET)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
                 { typeof(DBNull), PrimitiveTypeCode.DBNull }
 #endif
             };
@@ -208,7 +207,7 @@ namespace indice.Edi.Utilities
             return PrimitiveTypeCode.Object;
         }
 
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
         public static TypeInformation GetTypeInformation(IConvertible convertable)
         {
             TypeInformation typeInformation = PrimitiveTypeCodes[(int)convertable.GetTypeCode()];
@@ -217,7 +216,7 @@ namespace indice.Edi.Utilities
 #endif
 
         public static bool IsConvertible(Type t) {
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
             return typeof(IConvertible).IsAssignableFrom(t);
 #else
             return (
@@ -284,7 +283,7 @@ namespace indice.Edi.Utilities
             return o => call(null, o);
         }
 
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
         internal static BigInteger ToBigInteger(object value)
         {
             if (value is BigInteger)
@@ -478,13 +477,13 @@ namespace indice.Edi.Utilities
                     value = null;
                     return ConvertResult.NoValidConversion;
                 }
-                if (typeof(Type).IsAssignableFrom(targetType)) {
+                if (typeof(Type).GetTypeInfo().IsAssignableFrom(targetType.GetTypeInfo())) {
                     value = Type.GetType(s, true);
                     return ConvertResult.Success;
                 }
             }
 
-#if !PORTABLE
+#if !(PORTABLE || NETSTANDARD10)
             if (targetType == typeof(BigInteger))
             {
                 value = ToBigInteger(initialValue);
@@ -515,7 +514,7 @@ namespace indice.Edi.Utilities
                 return ConvertResult.Success;
             }
 #endif
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
             // handle DBNull and INullable
             if (initialValue == DBNull.Value)
             {
@@ -529,8 +528,6 @@ namespace indice.Edi.Utilities
                 value = null;
                 return ConvertResult.CannotConvertNull;
             }
-#endif
-#if !(DOTNET || PORTABLE)
             if (initialValue is INullable)
             {
                 value = EnsureTypeAssignable(ToValue((INullable)initialValue), initialType, targetType);
@@ -600,7 +597,7 @@ namespace indice.Edi.Utilities
             throw new ArgumentException("Could not cast or convert from {0} to {1}.".FormatWith(CultureInfo.InvariantCulture, (initialType != null) ? initialType.ToString() : "{null}", targetType));
         }
 
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
         public static object ToValue(INullable nullableValue)
         {
             if (nullableValue == null)

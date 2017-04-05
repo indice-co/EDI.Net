@@ -24,16 +24,16 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
 using System.Runtime.Serialization;
-using System.Text;
+#endif
 
 namespace indice.Edi
 {
     /// <summary>
     /// The exception thrown when an error occurs while reading EDI text.
     /// </summary>
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
     [Serializable]
 #endif
     public class EdiWriterException : EdiException
@@ -72,7 +72,7 @@ namespace indice.Edi
         {
         }
 
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
         /// <summary>
         /// Initializes a new instance of the <see cref="EdiWriterException"/> class.
         /// </summary>

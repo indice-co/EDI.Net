@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Assembly">
+    <Description>Edi.Net Class Library</Description>
+    <Copyright>Copyright (c) 2015 Indice</Copyright>
+    <AssemblyTitle>Edi.Net</AssemblyTitle>
+    <VersionPrefix>1.1.3</VersionPrefix>
+    <VersionSuffix>beta1</VersionSuffix>
+    <Authors>c.leftheris</Authors>
+    <TargetFrameworks>net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8</TargetFrameworks>
+    <AssemblyName>indice.Edi</AssemblyName>
+    <AssemblyTitle>Edi.Net</AssemblyTitle>
+  </PropertyGroup>
+  <PropertyGroup Label="Package">
+    <PackageId>indice.Edi</PackageId>
+    <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
+    <PackageReleaseNotes>Allow EdiConditionAttribute to stack that will then be checked with the `OR` logical operator.</PackageReleaseNotes>
+    <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/indice-co/EDI.Net/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/indice-co/EDI.Net</RepositoryUrl>
+    <Company>Indice</Company>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
+    <AssemblyTitle>Edi.Net .NET Standard 1.0</AssemblyTitle>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <DefineConstants>$(DefineConstants);NETSTANDARD10;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <AssemblyTitle>Edi.Net .NET Standard 1.3</AssemblyTitle>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <DefineConstants>$(DefineConstants);NETSTANDARD13</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8'">
+    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <NugetTargetMoniker>.NETPortable,Version=v0.0,Profile=Profile259</NugetTargetMoniker>
+    <LanguageTargets>$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets</LanguageTargets>
+    <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0' OR '$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="Microsoft.CSharp" Version="4.0.1" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.1.0" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.1.1" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="System.Runtime.Numerics" Version="4.0.1" />
+  </ItemGroup>
+</Project>

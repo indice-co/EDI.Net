@@ -422,7 +422,7 @@ namespace indice.Edi
                 var matches = candidates.Where(p => p.Segment.Equals(reader.Value)).ToArray();
                 if (matches.Length == 0) {
                     property = null;
-                } else if (matches.Length == 1 && matches[0].ConditionInfo == null) {
+                } else if (matches.Length == 1 && matches[0].Conditions == null) {
                     property = matches[0];
                 } else {
                     property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
@@ -441,7 +441,7 @@ namespace indice.Edi
                 var matches = candidates.Where(p => p.PathInfo.PathInternal.ToString("E").Equals(reader.Path)).ToArray();
                 if (matches.Length == 0) {
                     property = null;
-                } else if (matches.Length == 1 && matches[0].ConditionInfo == null) {
+                } else if (matches.Length == 1 && matches[0].Conditions == null) {
                     property = matches[0];
                 } else {
                     property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
@@ -456,7 +456,7 @@ namespace indice.Edi
             if (candidates.Length == 0) {
                 return null;
             }
-            if (candidates.Length == 1 && candidates[0].ConditionInfo == null) {
+            if (candidates.Length == 1 && candidates[0].Conditions == null) {
                 property = candidates[0];
             } else {
                 property = ConditionalMatch(reader, currentStructure, newContainerType, candidates);
@@ -465,7 +465,7 @@ namespace indice.Edi
         }
 
         private static EdiPropertyDescriptor ConditionalMatch(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType, EdiPropertyDescriptor[] matches) {
-            if (!matches.All(p => p.ConditionInfo != null)) {
+            if (!matches.All(p => p.Conditions != null)) {
                 throw new EdiException(
                 "More than one properties on type '{0}' have the '{1}' attribute. Please add a 'Condition' attribute to all properties in order to discriminate where each {2} will go."
                     .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType, newContainerType));
@@ -484,7 +484,7 @@ namespace indice.Edi
             } while (reader.TokenType != EdiToken.SegmentStart && matches[0].Path != path);
 
             var discriminator = reader.ReadAsString();
-            var property = matches.SingleOrDefault(p => p.ConditionInfo.MatchValue == discriminator);
+            var property = matches.SingleOrDefault(p => p.Conditions.Any(c => c.SatisfiedBy(discriminator)));
             readCache.Enqueue(new EdiEntry(path, reader.TokenType, discriminator));
             return property;
         }

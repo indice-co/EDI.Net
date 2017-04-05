@@ -25,20 +25,18 @@
 
 using System;
 using System.Collections.Generic;
-#if !(PORTABLE || PORTABLE40 || NET35 || NET20)
+#if !(NETSTANDARD10 || PORTABLE)
 using System.Numerics;
 #endif
 using System.Reflection;
 using System.Collections;
 using System.Globalization;
-using System.Runtime.Serialization;
-//using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Linq;
 
 namespace indice.Edi.Utilities
 {
-#if (DOTNET || PORTABLE || PORTABLE40)
+#if (PORTABLE || NETSTANDARD10 || NETSTANDARD13)
     internal enum MemberTypes
     {
         Property = 0,
@@ -47,9 +45,6 @@ namespace indice.Edi.Utilities
         Method = 3,
         Other = 4
     }
-#endif
-
-#if PORTABLE
     [Flags]
     internal enum BindingFlags
     {
@@ -81,7 +76,7 @@ namespace indice.Edi.Utilities
         public static readonly Type[] EmptyTypes;
 
         static ReflectionUtils() {
-#if !(PORTABLE40 || PORTABLE)
+#if !(NETSTANDARD10 || PORTABLE)
             EmptyTypes = Type.EmptyTypes;
 #else
             EmptyTypes = new Type[0];
@@ -96,6 +91,7 @@ namespace indice.Edi.Utilities
                 return true;
 
             m = propertyInfo.GetSetMethod();
+
             if (m != null && m.IsVirtual)
                 return true;
 
@@ -573,13 +569,12 @@ namespace indice.Edi.Utilities
             return (attributes != null) ? attributes.FirstOrDefault() : null;
         }
 
-#if !(DOTNET || PORTABLE)
+#if !(PORTABLE || NETSTANDARD10 || NETSTANDARD13)
         public static T[] GetAttributes<T>(object attributeProvider, bool inherit) where T : Attribute
         {
             Attribute[] a = GetAttributes(attributeProvider, typeof(T), inherit);
 
-            T[] attributes = a as T[];
-            if (attributes != null)
+            if (a is T[] attributes)
                 return attributes;
 
             return a.Cast<T>().ToArray();
@@ -762,7 +757,7 @@ namespace indice.Edi.Utilities
             }
         }
 #endif
-
+        
         public static IEnumerable<PropertyInfo> GetProperties(Type targetType, BindingFlags bindingAttr) {
             ValidationUtils.ArgumentNotNull(targetType, "targetType");
 
@@ -842,6 +837,7 @@ namespace indice.Edi.Utilities
             }
         }
 
+#if !NETSTANDARD10
         public static bool IsMethodOverridden(Type currentType, Type methodDeclaringType, string method) {
             bool isMethodOverriden = currentType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Any(info =>
@@ -853,7 +849,7 @@ namespace indice.Edi.Utilities
 
             return isMethodOverriden;
         }
-
+#endif
         public static object GetDefaultValue(Type type) {
             if (!type.IsValueType())
                 return null;
@@ -880,7 +876,7 @@ namespace indice.Edi.Utilities
                     return 0m;
                 case PrimitiveTypeCode.DateTime:
                     return new DateTime();
-#if !(PORTABLE || PORTABLE40 || NET35 || NET20)
+#if !(PORTABLE || NETSTANDARD10)
                 case PrimitiveTypeCode.BigInteger:
                     return new BigInteger();
 #endif

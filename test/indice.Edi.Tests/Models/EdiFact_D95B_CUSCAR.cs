@@ -215,10 +215,6 @@ namespace indice.Edi.Tests.Models
 
     #endregion
 
-
-
-
-
     #region Segments
 
     [EdiSegment, EdiPath("BGM")]

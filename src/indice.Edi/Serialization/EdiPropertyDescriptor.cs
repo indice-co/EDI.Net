@@ -13,7 +13,7 @@ namespace indice.Edi.Serialization
         private readonly PropertyInfo _Info;
         private readonly List<EdiAttribute> _Attributes;
         private readonly EdiPathAttribute _PathInfo;
-        private readonly EdiConditionAttribute _ConditionInfo;
+        private readonly EdiConditionAttribute[] _Conditions;
         private readonly EdiValueAttribute _ValueInfo;
         private readonly EdiSegmentGroupAttribute _SegmentGroupInfo;
 
@@ -30,14 +30,16 @@ namespace indice.Edi.Serialization
                 return _PathInfo?.Path;
             }
         }
+
         public string Segment {
             get {
                 return _PathInfo?.Segment;
             }
         }
-        public EdiConditionAttribute ConditionInfo {
+
+        public EdiConditionAttribute[] Conditions {
             get {
-                return _ConditionInfo;
+                return _Conditions;
             }
         }
         public EdiPathAttribute PathInfo {
@@ -83,7 +85,8 @@ namespace indice.Edi.Serialization
             }
             _Attributes = attributes.ToList();
             _PathInfo = Attributes.OfType<EdiPathAttribute>().FirstOrDefault();
-            _ConditionInfo = Attributes.OfType<EdiConditionAttribute>().FirstOrDefault();
+            var conditions = Attributes.OfType<EdiConditionAttribute>().ToArray();
+            _Conditions = conditions.Length > 0 ? conditions : null;
             _ValueInfo = Attributes.OfType<EdiValueAttribute>().FirstOrDefault();
             _SegmentGroupInfo = Attributes.OfType<EdiSegmentGroupAttribute>().FirstOrDefault();
             if (_ValueInfo != null && _ValueInfo.Path != null && _PathInfo == null) {
