@@ -460,7 +460,7 @@ namespace indice.Edi.Tests
                 interchange = new EdiSerializer().Deserialize<Interchange_ORDRSP>(new StreamReader(stream), grammar);
             }
 
-            Assert.Equal(interchange.Message.IMD_List.Count, 2);
+            Assert.Equal(2, interchange.Message.IMD_List.Count);
             Assert.NotNull(interchange.Message.IMD_Other);
         }
 

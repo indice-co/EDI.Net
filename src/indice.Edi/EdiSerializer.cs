@@ -78,8 +78,8 @@ namespace indice.Edi
         internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
-
-            // set serialization options onto reader
+            
+            // the output value
             object value = null;
 
             var stack = new Stack<EdiStructure>();
