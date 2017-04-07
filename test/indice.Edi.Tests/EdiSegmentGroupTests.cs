@@ -13,13 +13,13 @@ namespace indice.Edi.Tests
     public class EdiSegmentGroupTests
     {
         [Fact]
-        public void ReferenceSegment ()
-        {
+        [Trait(Traits.Tag, "EDIFact")]
+        [Trait(Traits.Issue, "#26")]
+        public void ReferenceSegment() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(ORDRSP);
 
-            using (var stream = Helpers.GetResourceStream("ordrsp.edi"))
-            {
+            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP-(2).edi")) {
                 interchange = new EdiSerializer().Deserialize<ORDRSP>(new StreamReader(stream), grammar);
 
                 Assert.NotNull(interchange.ListNachricht.First().Referenz_der_Anfrage.ReferenzderAnfrage);

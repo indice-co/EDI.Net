@@ -11,6 +11,7 @@ namespace indice.Edi.Tests
     public class EdiTextReaderTests
     {
         [Fact]
+        [Trait(Traits.Tag, "TRADACOMS")]
         public void ReaderTest() {
             var msgCount = 0;
             var grammar = EdiGrammar.NewTradacoms();
@@ -26,6 +27,7 @@ namespace indice.Edi.Tests
         }
         
         [Fact]
+        [Trait(Traits.Tag, "TRADACOMS")]
         public void DeserializeTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
@@ -36,6 +38,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Tag, "TRADACOMS")]
         public void EscapeCharactersTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
@@ -46,6 +49,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Tag, "EDIFact")]
         public void EdiFact_01_Test()
         {
             var grammar = EdiGrammar.NewEdiFact();
@@ -122,6 +126,7 @@ namespace indice.Edi.Tests
         }
         
         [Fact]
+        [Trait(Traits.Tag, "X12")]
         public void X12_Grammar_Test() {
             var grammar = EdiGrammar.NewX12();
             var interchange = default(Models.PurchaseOrder_850);
@@ -135,6 +140,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Tag, "X12")]
         public void X12_850_Issue27_Test() {
             var grammar = EdiGrammar.NewX12();
             var interchange = default(Models.PurchaseOrder_850);
@@ -151,6 +157,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Tag, "X12")]
         public void X12_214_Test() {
             var grammar = EdiGrammar.NewX12();
             var interchange = default(Models.Transportation_214);
@@ -163,6 +170,7 @@ namespace indice.Edi.Tests
         }
         
         [Fact]
+        [Trait(Traits.Tag, "X12")]
         public void X12_214_Trailers_Test() {
             var grammar = EdiGrammar.NewX12();
             var interchange = default(Models.Transportation_214);
@@ -178,6 +186,7 @@ namespace indice.Edi.Tests
             Assert.Equal(82265, group.GroupTrailerControlNumber);
         }
         [Fact]
+        [Trait(Traits.Tag, "X12")]
         public void X12_204_Test() {
             var grammar = EdiGrammar.NewX12();
             grammar.SetAdvice(
@@ -208,6 +217,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Tag, "Parser")]
         public void ReaderStrips_Z_Padding_Test() {
             var grammar = EdiGrammar.NewEdiFact();
             using (var ediReader = new EdiTextReader(new StreamReader(Helpers.StreamFromString("DTM+ZZZ'DTM+ZZ1'")), grammar)) {
@@ -227,6 +237,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Tag, "EDIFact")]
         public void EdiFact_D95B_CUSCAR_Test() {
             var grammar = EdiGrammar.NewEdiFact();
 
@@ -452,6 +463,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Tag, "EDIFact")]
         public void EdiFact_ORDRSP_Test() {
             var grammar = EdiGrammar.NewEdiFact();
 

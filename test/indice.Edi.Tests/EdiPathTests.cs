@@ -8,6 +8,7 @@ namespace indice.Edi.Tests
 {
     public class EdiPathTests
     {
+        [Trait(Traits.Tag, "Parser")]
         [InlineData("DTM[0][0]")]
         [InlineData("DTM/0/0")]
         [InlineData("DTM/0")]
@@ -19,6 +20,7 @@ namespace indice.Edi.Tests
             Assert.True(path.Equals("DTM[0][0]"));  
         }
 
+        [Trait(Traits.Tag, "Parser")]
         [InlineData("GS[0][0]")]
         [InlineData("GS/0/0")]
         [InlineData("GS/0")]
@@ -29,6 +31,7 @@ namespace indice.Edi.Tests
             Assert.Equal("GS[0][0]", path.ToString());
         }
 
+        [Trait(Traits.Tag, "Parser")]
         [InlineData("B10[0][0]")]
         [InlineData("B10/0/0")]
         [InlineData("B10/0")]
@@ -39,6 +42,7 @@ namespace indice.Edi.Tests
             Assert.Equal("B10[0][0]", path.ToString());
         }
 
+        [Trait(Traits.Tag, "Writer")]
         [Fact]
         public void OrderByStructureTest() {
             var grammar = EdiGrammar.NewEdiFact();

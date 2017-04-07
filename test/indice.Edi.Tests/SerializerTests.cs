@@ -11,6 +11,7 @@ namespace indice.Edi.Tests
     public class SerializerTests
     {
         [Fact]
+        [Trait(Traits.Tag, "Writer")]
         public void SerializeTest() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(Models.EdiFact01.Interchange);
