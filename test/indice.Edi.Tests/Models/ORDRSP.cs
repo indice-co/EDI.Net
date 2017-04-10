@@ -25,7 +25,7 @@ namespace indice.Edi.Tests.Models
             [EdiPath("CTA/1/0")]
             public string Kontaktnummer { get; set; }
 
-            [EdiValue("X(0)")]
+            [EdiValue("X(255)")]
             [EdiPath("CTA/1/1")]
             public string Kontakt { get; set; }
 
