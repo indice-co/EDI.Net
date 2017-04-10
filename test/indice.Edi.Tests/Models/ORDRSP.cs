@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using indice.Edi.Serialization;
 
-#endregion
+#endregion Using
 
 namespace indice.Edi.Tests.Models
 {
@@ -12,234 +12,97 @@ namespace indice.Edi.Tests.Models
     {
         private List<Nachricht> _listnachricht;
 
-        #region Properties
+        public List<Nachricht> ListNachricht { get; set; }
 
-        public List<Nachricht> ListNachricht
-        {
-            get { return _listnachricht; }
-            set { _listnachricht = value; }
-        }
-
-        #endregion
-
-        #region Nested type: CTA
-
-        [EdiPath("CTA/0/0")]
-        [EdiSegment]
+        [EdiSegmentGroup("CTA")]
         public class CTA
         {
-            private string _funktion;
-
-            private string _kontakt;
-
-            private string _kontaktnummer;
-
-            #region Properties
-
             [EdiValue("X(3)")]
             [EdiPath("CTA/0/0")]
-            public string Funktion
-            {
-                get { return _funktion; }
-                set { _funktion = value; }
-            }
+            public string Funktion { get; set; }
 
             [EdiValue("X(17)")]
             [EdiPath("CTA/1/0")]
-            public string Kontaktnummer
-            {
-                get { return _kontaktnummer; }
-                set { _kontaktnummer = value; }
-            }
+            public string Kontaktnummer { get; set; }
 
             [EdiValue("X(0)")]
             [EdiPath("CTA/1/1")]
-            public string Kontakt
-            {
-                get { return _kontakt; }
-                set { _kontakt = value; }
-            }
+            public string Kontakt { get; set; }
 
-            #endregion
+            //public List<COM> Com { get; set; }
+
+            [EdiCondition("TE", Path = "COM/0/1")]
+            public COM Telefon { get; set; }
+
+            [EdiCondition("EM", Path = "COM/0/1")]
+            public COM EM { get; set; }
         }
-
-        #endregion
-
-        #region Nested type: DTM
 
         [EdiSegment]
-        [EdiPath("DTM/0/0")]
-        public class DTM
+        [EdiPath("COM")]
+        public class COM
         {
-            private string _code;
+            [EdiValue("X(255)")]
+            [EdiPath("COM/0/0")]
+            public string Kommunikationsverbindung { get; set; }
 
-            private string _datum;
-
-            private string _format;
-
-            #region Properties
-
-            [EdiValue("X(3)", Path = "DTM/0/0")]
-            public string Code
-            {
-                get { return _code; }
-                set { _code = value; }
-            }
-
-            [EdiValue("X(35)", Path = "DTM/0/1")]
-            public string Datum
-            {
-                get { return _datum; }
-                set { _datum = value; }
-            }
-
-            [EdiValue("X(3)", Path = "DTM/0/2")]
-            public string Format
-            {
-                get { return _format; }
-                set { _format = value; }
-            }
-
-            #endregion
+            [EdiValue("X(3)")]
+            [EdiPath("COM/0/1")]
+            public string Art { get; set; }
         }
 
-        #endregion
+        [EdiSegment]
+        [EdiPath("DTM")]
+        public class DTM
+        {
+            [EdiValue("X(3)", Path = "DTM/0/0")]
+            public string Code { get; set; }
 
-        #region Nested type: Nachricht
+            [EdiValue("X(35)", Path = "DTM/0/1")]
+            public string Datum { get; set; }
+
+            [EdiValue("X(3)", Path = "DTM/0/2")]
+            public string Format { get; set; }
+        }
 
         [EdiMessage]
         public class Nachricht
         {
-            private NAD _absender;
-            private NAD _empfaenger;
-
-            #region Properties
-
             [EdiCondition("MR", Path = "NAD/0/0")]
-            public NAD Empfaenger
-            {
-                get { return _empfaenger; }
-                set { _empfaenger = value; }
-            }
+            public NAD Empfaenger { get; set; }
 
-            [EdiCondition("MS", Path="NAD/0/0")]
-            public NAD Absender
-            {
-                get { return _absender; }
-                set { _absender = value; }
-            }
+            [EdiCondition("MS", Path = "NAD/0/0")]
+            public NAD Absender { get; set; }
 
             [EdiCondition("ON", Path = "RFF/0/0")]
-            public SG1 Referenz_der_Anfrage { get; set; }
-
-            #endregion
+            public RFF Referenz_der_Anfrage { get; set; }
         }
 
-        #endregion
-
-        #region Nested type: NAD
-
-        [EdiSegmentGroup("NAD/0/0")]
+        [EdiSegmentGroup("NAD")]
         public class NAD
         {
-            private string _code;
-
-            private CTA _cta;
-
-            private string _id;
-            private string _qualifier;
-
-            #region Properties
-
             [EdiValue("X(3)", Path = "NAD/0/0")]
-            public string Qualifier
-            {
-                get { return _qualifier; }
-                set { _qualifier = value; }
-            }
+            public string Qualifier { get; set; }
 
-            [EdiValue("X(35)", Path="NAD/1/0")]
-            public string ID
-            {
-                get { return _id; }
-                set { _id = value; }
-            }
+            [EdiValue("X(35)", Path = "NAD/1/0")]
+            public string ID { get; set; }
 
-            [EdiValue("X(3)", Path= "NAD/1/2")]
-            public string Code
-            {
-                get { return _code; }
-                set { _code = value; }
-            }
+            [EdiValue("X(3)", Path = "NAD/1/2")]
+            public string Code { get; set; }
 
-            public CTA CTA
-            {
-                get { return _cta; }
-                set { _cta = value; }
-            }
-
-            #endregion
+            public CTA CTA { get; set; }
         }
-
-        #endregion
-
-        #region Nested type: RFF
-
-        [EdiSegment]
-        [EdiPath("RFF/0/0")]
-        public class RFF
-        {
-            private string _code;
-
-            private string _qualifier;
-
-            #region Properties
-
-            [EdiValue("X(70)", Path = "RFF/0/0")]
-            public string Code
-            {
-                get { return _code; }
-                set { _code = value; }
-            }
-
-            [EdiValue("X(3)", Path = "RFF/0/1")]
-            public string Qualifier
-            {
-                get { return _qualifier; }
-                set { _qualifier = value; }
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region Nested type: SG1
 
         [EdiSegmentGroup("RFF")]
-        public class SG1
+        public class RFF
         {
-            private RFF _referenz;
+            [EdiValue("X(70)", Path = "RFF/0/0")]
+            public string Code { get; set; }
 
-            private DTM _referenzDatum;
+            [EdiValue("X(3)", Path = "RFF/0/1")]
+            public string Qualifier { get; set; }
 
-            #region Properties
-
-            public RFF ReferenzderAnfrage
-            {
-                get { return _referenz; }
-                set { _referenz = value; }
-            }
-
-            public DTM Referenz_der_Anfragedatum
-            {
-                get { return _referenzDatum; }
-                set { _referenzDatum = value; }
-            }
-
-            #endregion
+            public DTM Referenz_der_Anfragedatum { get; set; }
         }
-
-        #endregion
     }
 }
