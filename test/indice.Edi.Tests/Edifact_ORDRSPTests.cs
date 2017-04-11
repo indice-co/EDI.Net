@@ -19,7 +19,7 @@ namespace indice.Edi.Tests
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(ORDRSP);
 
-            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP-(2).edi")) {
+            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
                 interchange = new EdiSerializer().Deserialize<ORDRSP>(new StreamReader(stream), grammar);
             }
 
@@ -33,7 +33,7 @@ namespace indice.Edi.Tests
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(ORDRSP);
 
-            using (var stream = Helpers.GetResourceStream("ordrsp.edi")) {
+            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
                 interchange = new EdiSerializer().Deserialize<ORDRSP>(new StreamReader(stream), grammar);
 
                 //interchange.ListNachricht.First().
@@ -49,7 +49,7 @@ namespace indice.Edi.Tests
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(ORDRSP);
 
-            using (var stream = Helpers.GetResourceStream("ordrsp.edi")) {
+            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
                 interchange = new EdiSerializer().Deserialize<ORDRSP>(new StreamReader(stream), grammar);
 
                 //Assert.NotNull(interchange.ListNachricht.First().Absender.CTA.EM);
