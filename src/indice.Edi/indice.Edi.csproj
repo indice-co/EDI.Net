@@ -13,7 +13,16 @@
   <PropertyGroup Label="Package">
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
-    <PackageReleaseNotes>Allow EdiConditionAttribute to stack that will then be checked with the `OR` logical operator.</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      Allow EdiConditionAttribute to stack that will then be checked with the `OR` logical operator. Added new functionality as well as an extensibility point for the condition attribute.
+      new features include
+      
+      1. Condition attribute stacking.
+      2. Condition check for multiple values
+      3. "CheckFor" toggle that switches between equal/Notequal check
+      
+      Also now the condition attribute can be extended.
+    </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/indice-co/EDI.Net/blob/master/LICENSE</PackageLicenseUrl>
