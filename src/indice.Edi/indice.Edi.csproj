@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.2</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8</TargetFrameworks>
