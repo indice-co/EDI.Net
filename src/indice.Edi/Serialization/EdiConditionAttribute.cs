@@ -7,6 +7,15 @@ using System.Threading.Tasks;
 namespace indice.Edi.Serialization
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public enum EdiConditionCheckType
+    {
+        Equal = 1,
+        NotEqual = 2
+    }
+
+    /// <summary>
     /// In case multiple MessageTypes or Segment types with the same name. <see cref="EdiConditionAttribute"/> is used 
     /// to discriminate the classes based on a component value. This class serves as the base implementation. 
     /// You can subclass this and override the SatisfiedBy method in order to implement a custom condition check.
@@ -38,12 +47,32 @@ namespace indice.Edi.Serialization
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
     public sealed class EdiConditionAttribute : EdiConditionBaseAttribute
     {
+        public string[] Options { get; }
+
+        public EdiConditionCheckType CheckFor { get; set; } = EdiConditionCheckType.Equal;
+
         public EdiConditionAttribute(string matchValue)
             : base(matchValue) {
         }
 
+        public EdiConditionAttribute(string optionOne, string optionTwo)
+            : base(null) {
+            Options = new [] { optionOne, optionTwo };
+        }
+        public EdiConditionAttribute(string optionOne, string optionTwo, params string[] options)
+          : base(null) {
+            Options = options.Concat(new[] { optionOne, optionTwo }).ToArray();
+        }
+
         public override bool SatisfiedBy(string value) {
-            return MatchValue == value;
+            switch (CheckFor) {
+                case EdiConditionCheckType.Equal:
+                    return Options == null ? MatchValue == value : Options.Contains(value);
+                case EdiConditionCheckType.NotEqual:
+                    return Options == null ? MatchValue != value : !Options.Contains(value);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(CheckFor), $"Not expected {CheckFor}");
+            }
         }
     }
 }

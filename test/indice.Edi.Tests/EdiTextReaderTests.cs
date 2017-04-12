@@ -464,11 +464,12 @@ namespace indice.Edi.Tests
 
         [Fact]
         [Trait(Traits.Tag, "EDIFact")]
+        [Trait(Traits.Issue, "#35")]
         public void EdiFact_ORDRSP_Test() {
             var grammar = EdiGrammar.NewEdiFact();
 
             var interchange = default(Interchange_ORDRSP);
-            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
+            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP-formatted.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange_ORDRSP>(new StreamReader(stream), grammar);
             }
 

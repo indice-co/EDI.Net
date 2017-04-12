@@ -18,7 +18,7 @@ namespace indice.Edi.Tests.Models
         [EdiCondition("Z10", Path = "IMD/1/0")]
         public List<IMD> IMD_List { get; set; }
 
-        [EdiCondition("", Path = "IMD/1/0")]
+        [EdiCondition("Z01", "Z10", CheckFor = EdiConditionCheckType.NotEqual, Path = "IMD/1/0")]
         public IMD IMD_Other { get; set; }
 
         /// <summary>
