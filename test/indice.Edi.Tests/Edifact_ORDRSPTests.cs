@@ -24,8 +24,8 @@ namespace indice.Edi.Tests
             }
 
 
-            Assert.NotNull(interchange.ListNachricht[0].Referenz_der_Anfrage.ReferenzderAnfrage);
-            //Assert.NotNull(interchange.ListNachricht[0].Referenz_der_Anfrage.Code);
+            Assert.NotNull(interchange.ListNachricht[0].Referenz_der_Anfrage.Code);
+            Assert.NotNull(interchange.ListNachricht[0].Referenz_der_Anfrage.Referenz_der_Anfragedatum);
         }
 
         [Fact]

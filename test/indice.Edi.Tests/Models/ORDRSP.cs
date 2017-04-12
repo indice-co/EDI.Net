@@ -216,19 +216,27 @@ namespace indice.Edi.Tests.Models
 
         #region Nested type: SG1
 
-        [EdiSegmentGroup("RFF")]
+        [EdiSegmentGroup("RFF", SequenceEnd = "AJT")]
         public class SG1
         {
-            private RFF _referenz;
-
             private DTM _referenzDatum;
+
+            private string _code;
+
+            private string _qualifier;
 
             #region Properties
 
-            public RFF ReferenzderAnfrage
-            {
-                get { return _referenz; }
-                set { _referenz = value; }
+            [EdiValue("X(70)", Path = "RFF/0/0")]
+            public string Code {
+                get { return _code; }
+                set { _code = value; }
+            }
+
+            [EdiValue("X(3)", Path = "RFF/0/1")]
+            public string Qualifier {
+                get { return _qualifier; }
+                set { _qualifier = value; }
             }
 
             public DTM Referenz_der_Anfragedatum
