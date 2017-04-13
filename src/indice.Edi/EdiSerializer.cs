@@ -83,7 +83,7 @@ namespace indice.Edi
             object value = null;
 
             var stack = new Stack<EdiStructure>();
-
+            var structuralComparer = default(EdiPathComparer);
             // If this is not a collection type asume this type is the interchange.
             if (!objectType.IsCollectionType()) {
 
@@ -111,8 +111,8 @@ namespace indice.Edi
                     } else if (reader.TokenType == EdiToken.ElementStart) {
                         TryCreateContainer(reader, stack, EdiStructureType.Element);
                     }
-                    if (reader.TokenType == EdiToken.ComponentStart) {
-                        PopulateValue(reader, stack);
+                    if (reader.TokenType == EdiToken.ComponentStart || (stack.Count > 0 && stack.Peek().CachedReads.Count > 0 && reader.TokenType.IsPrimitiveToken())) {
+                        PopulateValue(reader, stack, ref structuralComparer);
                     }
                 }
             }
@@ -124,7 +124,8 @@ namespace indice.Edi
             return value;
         }
 
-        internal void PopulateValue(EdiReader reader, Stack<EdiStructure> stack) {
+        internal void PopulateValue(EdiReader reader, Stack<EdiStructure> stack, ref EdiPathComparer structuralComparer) {
+            structuralComparer = new EdiPathComparer(reader.Grammar);
             var current = stack.Peek();
             var maxLevelsUp = 0;
             var level = 0;
@@ -138,7 +139,7 @@ namespace indice.Edi
                 var valueProps = typeDescriptor.Properties
                                                .Where(p => p.ValueInfo != null &&
                                                             (reader.Path == p.Path || structure.CachedReads.ContainsPath(p.Path))
-                                                           ).OrderByDescending(p => reader.Path == p.Path).ToArray();
+                                                           ).OrderBy(p => (EdiPath)p.Path, structuralComparer).ToArray();
 
                 for (var i = 0; i < valueProps.Length; i++) {
                     var descriptor = valueProps[i];
@@ -146,19 +147,19 @@ namespace indice.Edi
                     // Values must be read only once on first pass! 
                     // Otherwise the reader position moves forward 
                     // and the serializer gets out of sync.
-                    var read = current == structure && reader.Path == descriptor.Path && i == 0;
+                    var useTheReader = current == structure && reader.TokenType == EdiToken.ComponentStart && reader.Path == descriptor.Path && i == 0;
                     switch (ConvertUtils.GetTypeCode(descriptor.Info.PropertyType)) {
                         case PrimitiveTypeCode.Empty: break;
                         case PrimitiveTypeCode.Object:
-                            PopulateObjectValue(reader, structure, descriptor, read);
+                            PopulateObjectValue(reader, structure, descriptor, useTheReader);
                             break;
                         case PrimitiveTypeCode.Char:
                         case PrimitiveTypeCode.CharNullable:
-                            PopulateCharValue(reader, structure, descriptor, read);
+                            PopulateCharValue(reader, structure, descriptor, useTheReader);
                             break;
                         case PrimitiveTypeCode.Boolean:
                         case PrimitiveTypeCode.BooleanNullable:
-                            PopulateBooleanValue(reader, structure, descriptor, read);
+                            PopulateBooleanValue(reader, structure, descriptor, useTheReader);
                             break;
                         case PrimitiveTypeCode.SByte: break;
                         case PrimitiveTypeCode.SByteNullable: break;
@@ -168,7 +169,7 @@ namespace indice.Edi
                         case PrimitiveTypeCode.UInt16Nullable: break;
                         case PrimitiveTypeCode.Int32:
                         case PrimitiveTypeCode.Int32Nullable:
-                            PopulateInt32Value(reader, structure, descriptor, read);
+                            PopulateInt32Value(reader, structure, descriptor, useTheReader);
                             break;
                         case PrimitiveTypeCode.Byte: break;
                         case PrimitiveTypeCode.ByteNullable: break;
@@ -184,11 +185,11 @@ namespace indice.Edi
                         case PrimitiveTypeCode.DoubleNullable:
                         case PrimitiveTypeCode.Decimal:
                         case PrimitiveTypeCode.DecimalNullable:
-                            PopulateDecimalValue(reader, structure, descriptor, read);
+                            PopulateDecimalValue(reader, structure, descriptor, useTheReader);
                             break;
                         case PrimitiveTypeCode.DateTime:
                         case PrimitiveTypeCode.DateTimeNullable:
-                            PopulateDateTimeValue(reader, structure, descriptor, read);
+                            PopulateDateTimeValue(reader, structure, descriptor, useTheReader);
                             break;
                         case PrimitiveTypeCode.DateTimeOffset: break;
                         case PrimitiveTypeCode.DateTimeOffsetNullable: break;
@@ -200,7 +201,7 @@ namespace indice.Edi
                         case PrimitiveTypeCode.BigIntegerNullable: break;
                         case PrimitiveTypeCode.Uri: break;
                         case PrimitiveTypeCode.String:
-                            PopulateStringValue(reader, structure, descriptor, read);
+                            PopulateStringValue(reader, structure, descriptor, useTheReader);
                             break;
                         case PrimitiveTypeCode.Bytes: break;
                         case PrimitiveTypeCode.DBNull: break;
