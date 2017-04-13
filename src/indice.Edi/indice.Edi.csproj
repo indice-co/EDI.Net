@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.2.0</VersionPrefix>
+    <VersionPrefix>1.2.1</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8</TargetFrameworks>
@@ -16,12 +16,13 @@
     <PackageReleaseNotes>
       Allow EdiConditionAttribute to stack that will then be checked with the `OR` logical operator. Added new functionality as well as an extensibility point for the condition attribute.
       new features include
-      
+
       1. Condition attribute stacking.
       2. Condition check for multiple values
       3. "CheckFor" toggle that switches between equal/Notequal check
-      
+
       Also now the condition attribute can be extended.
+      This version also fixes ReaderCache &amp; the value binding bug.
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>

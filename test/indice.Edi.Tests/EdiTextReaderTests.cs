@@ -465,6 +465,7 @@ namespace indice.Edi.Tests
         [Fact]
         [Trait(Traits.Tag, "EDIFact")]
         [Trait(Traits.Issue, "#35")]
+        [Trait(Traits.Issue, "#42")]
         public void EdiFact_ORDRSP_Test() {
             var grammar = EdiGrammar.NewEdiFact();
 
@@ -475,6 +476,18 @@ namespace indice.Edi.Tests
 
             Assert.Equal(2, interchange.Message.IMD_List.Count);
             Assert.NotNull(interchange.Message.IMD_Other);
+
+            Assert.Null(interchange.Message.IMD_List[0].FieldA);
+            Assert.Equal("Z01", interchange.Message.IMD_List[0].FieldB);
+            Assert.Null(interchange.Message.IMD_List[0].FieldC);
+
+            Assert.Null(interchange.Message.IMD_List[1].FieldA);
+            Assert.Equal("Z10", interchange.Message.IMD_List[1].FieldB);
+            Assert.Null(interchange.Message.IMD_List[1].FieldC);
+
+            Assert.Null(interchange.Message.IMD_Other.FieldA);
+            Assert.Equal("Z14", interchange.Message.IMD_Other.FieldB);
+            Assert.Equal("Z07", interchange.Message.IMD_Other.FieldC);
         }
 
     }
