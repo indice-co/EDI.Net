@@ -130,6 +130,7 @@ namespace indice.Edi.Tests
 
         [Fact]
         [Trait(Traits.Tag, "EDIFact")]
+        [Trait(Traits.Issue, "#45")]
         public void EdiFact_01_Segmenents_Only_Test() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(Models.EdiFact01_Segments.Quote);
