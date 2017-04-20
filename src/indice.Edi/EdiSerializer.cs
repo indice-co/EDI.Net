@@ -91,26 +91,32 @@ namespace indice.Edi
                     if (reader.IsStartInterchange) {
                         stack.Push(new EdiStructure(EdiStructureType.Interchange, Activator.CreateInstance(objectType)));
                     }
+
                     if (reader.IsEndInterchange) {
                         while (stack.Peek().Container != EdiStructureType.Interchange) {
                             stack.Pop();
                         }
                         value = stack.Peek().Instance;
-                    } else if (reader.IsStartGroup) {
+                    }
+
+                    if (reader.IsStartGroup) {
                         TryCreateContainer(reader, stack, EdiStructureType.Group);
                     } else if (reader.IsEndGroup) {
                         while (stack.Peek().Container != EdiStructureType.Group) {
                             stack.Pop();
                         }
                         value = stack.Peek().Instance;
-                    } else if (reader.IsStartMessage) {
-                        TryCreateContainer(reader, stack, EdiStructureType.Message);
                     } else if (reader.TokenType == EdiToken.SegmentName) {
-                        if (!TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup))
-                            TryCreateContainer(reader, stack, EdiStructureType.Segment);
-                    } else if (reader.TokenType == EdiToken.ElementStart) {
+                        if (!reader.IsStartMessage || !TryCreateContainer(reader, stack, EdiStructureType.Message)) {
+                            if (!TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)) {
+                                TryCreateContainer(reader, stack, EdiStructureType.Segment);
+                            }
+                        }
+                    }
+                    else if (reader.TokenType == EdiToken.ElementStart) {
                         TryCreateContainer(reader, stack, EdiStructureType.Element);
                     }
+
                     if (reader.TokenType == EdiToken.ComponentStart || (stack.Count > 0 && stack.Peek().CachedReads.Count > 0 && reader.TokenType.IsPrimitiveToken())) {
                         PopulateValue(reader, stack, ref structuralComparer);
                     }
