@@ -14,6 +14,13 @@ namespace indice.Edi.Tests.Models
             public Quote2 Message { get; set; }
         }
 
+        public class Interchange_Multi_Message
+        {
+            public UNB Header { get; set; }
+            public UNZ Footer { get; set; }
+            public List<Quote2> Message { get; set; }
+        }
+
         [EdiMessage]
         public class Quote2
         {
