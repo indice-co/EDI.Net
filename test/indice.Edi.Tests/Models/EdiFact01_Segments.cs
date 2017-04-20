@@ -7,6 +7,34 @@ namespace indice.Edi.Tests.Models
 {
     class EdiFact01_Segments
     {
+        public class Interchange
+        {
+            public UNB Header { get; set; }
+            public UNZ Footer { get; set; }
+            public Quote2 Message { get; set; }
+        }
+
+        [EdiMessage]
+        public class Quote2
+        {
+            public UNH_Segment Header { get; set; }
+
+            public BGM_Segment BGM { get; set; }
+
+            public DTM_Segment DTM { get; set; }
+
+            public CUX_Segment CUX { get; set; }
+
+            public List<EdiFact01.NAD> NAD { get; set; }
+
+            public LOC_Segment LOC { get; set; }
+
+            public List<LineItem> Lines { get; set; }
+
+            public UNS_Segment UNS { get; set; }
+
+            public UNT_Segment Trailer { get; set; }
+        }
 
         public class Interchange_Segments_Only
         {

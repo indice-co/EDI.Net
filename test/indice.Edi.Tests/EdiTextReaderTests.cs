@@ -131,7 +131,7 @@ namespace indice.Edi.Tests
         [Fact]
         [Trait(Traits.Tag, "EDIFact")]
         [Trait(Traits.Issue, "#45")]
-        public void EdiFact_01_Segmenents_Only_Test() {
+        public void EdiFact_01_Segmenents_Only_Funcky_Test() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(Models.EdiFact01_Segments.Quote);
             using (var stream = Helpers.GetResourceStream("edifact.01.edi")) {
@@ -212,10 +212,110 @@ namespace indice.Edi.Tests
             Assert.Equal(new DateTime(2010, 10, 20, 01, 00, 00), linArray[2].Period.Date.From);
             Assert.All(interchange.Lines, i => Assert.Equal(2, i.Prices.Count));
 
+            var unt = interchange.UNT;
+
+            Assert.Equal("1", unt.TrailerMessageReference);
+            Assert.Equal(158, unt.TrailerMessageSegmentsCount);
+
             var unz = interchange.UNZ;
             Assert.Equal(1, unz.TrailerControlCount);
             Assert.Equal("20101000064507", unz.TrailerControlReference);
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "EDIFact")]
+        [Trait(Traits.Issue, "#45")]
+        public void EdiFact_01_Segmenents_Only_Standard_Test() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(Models.EdiFact01_Segments.Interchange);
+            using (var stream = Helpers.GetResourceStream("edifact.01.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.EdiFact01_Segments.Interchange>(new StreamReader(stream), grammar);
+            }
+
+            var unbSegment = interchange.Header;
+
+            //Test Interchange de-serialization
+            Assert.Equal("UNOC", unbSegment.SyntaxIdentifier);
+            Assert.Equal(3, unbSegment.SyntaxVersion);
+            Assert.Equal("1234567891123", unbSegment.SenderId);
+            Assert.Equal("14", unbSegment.PartnerIDCodeQualifier);
+            Assert.Equal("7080005059275", unbSegment.RecipientId);
+            Assert.Equal("14", unbSegment.ParterIDCode);
+            Assert.Equal("SPOTMARKED", unbSegment.RoutingAddress);
+            Assert.Equal(new DateTime(2012, 10, 10, 11, 4, 0), unbSegment.DateOfPreparation);
+            Assert.Equal("HBQ001", unbSegment.ControlRef);
+
+            var unh = interchange.Message.Header;
+
+            //Test Quote Message Header
+            Assert.Equal("1", unh.MessageRef);
+            Assert.Equal("QUOTES", unh.MessageType);
+            Assert.Equal("D", unh.Version);
+            Assert.Equal("96A", unh.ReleaseNumber);
+            Assert.Equal("UN", unh.ControllingAgency);
+            Assert.Equal("EDIEL2", unh.AssociationAssignedCode);
+            Assert.Equal("S", unh.CommonAccessRef);
+
+            var bgm = interchange.Message.BGM;
+
+            Assert.Equal("310", bgm.MessageName);
+            Assert.Equal("2010101900026812", bgm.DocumentNumber);
+            Assert.Equal("9", bgm.MessageFunction);
+            Assert.Equal("AB", bgm.ResponseType);
+
+            var dtm = interchange.Message.DTM;
+            Assert.NotNull(dtm.MessageDate.ID);
+            Assert.NotNull(dtm.ProcessingStartDate.ID);
+            Assert.NotNull(dtm.ProcessingEndDate.ID);
+
+
+            Assert.Equal(new DateTime(2010, 10, 19, 11, 04, 00), dtm.MessageDate.DateTime);
+            Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), dtm.ProcessingStartDate.DateTime);
+            Assert.Equal(new DateTime(2010, 10, 20, 23, 00, 00), dtm.ProcessingEndDate.DateTime);
+
+            Assert.Equal(1, dtm.UTCOffset.Hours);
+
+            var cux = interchange.Message.CUX;
+
+            Assert.Equal("2", cux.CurrencyQualifier);
+            Assert.Equal("SEK", cux.ISOCurrency);
+
+            var nad = interchange.Message.NAD;
+
+            Assert.Equal(2, nad.Count);
+            Assert.Equal("FR", nad[0].PartyQualifier);
+            Assert.Equal("1234567891123", nad[0].PartyId);
+            Assert.Equal("9", nad[0].ResponsibleAgency);
+
+            Assert.Equal("DO", nad[1].PartyQualifier);
+            Assert.Equal("7080005059275", nad[1].PartyId);
+            Assert.Equal("9", nad[1].ResponsibleAgency);
+
+            var loc = interchange.Message.LOC;
+
+            Assert.Equal("105", loc.LocationQualifier);
+            Assert.Equal("SE1", loc.LocationId);
+            Assert.Equal("SM", loc.LocationResponsibleAgency);
+
+            Assert.Equal("SE1", loc.LocationId);
+            Assert.Equal("SM", loc.LocationResponsibleAgency);
+
+            var linArray = interchange.Message.Lines;
+            Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), linArray[0].Period.Date.From);
+            Assert.Equal(new DateTime(2010, 10, 20, 00, 00, 00), linArray[1].Period.Date.From);
+            Assert.Equal(new DateTime(2010, 10, 20, 01, 00, 00), linArray[2].Period.Date.From);
+            Assert.All(interchange.Message.Lines, i => Assert.Equal(2, i.Prices.Count));
+
+            var unt = interchange.Message.Trailer;
+
+            Assert.Equal("1", unt.TrailerMessageReference);
+            Assert.Equal(158, unt.TrailerMessageSegmentsCount);
+
+            var unz = interchange.Footer;
+            Assert.Equal(1, unz.TrailerControlCount);
+            Assert.Equal("20101000064507", unz.TrailerControlReference);
+        }
+
 
         [Fact]
         [Trait(Traits.Tag, "X12")]
