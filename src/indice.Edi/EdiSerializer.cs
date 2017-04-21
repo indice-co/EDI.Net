@@ -92,6 +92,10 @@ namespace indice.Edi
                         stack.Push(new EdiStructure(EdiStructureType.Interchange, Activator.CreateInstance(objectType)));
                     }
 
+                    if (reader.IsStartMessage) {
+                        TryCreateContainer(reader, stack, EdiStructureType.Message);
+                    }
+
                     if (reader.IsEndInterchange) {
                         while (stack.Peek().Container != EdiStructureType.Interchange) {
                             stack.Pop();
@@ -107,10 +111,9 @@ namespace indice.Edi
                         }
                         value = stack.Peek().Instance;
                     } else if (reader.TokenType == EdiToken.SegmentName) {
-                        if (!reader.IsStartMessage || !TryCreateContainer(reader, stack, EdiStructureType.Message)) {
-                            if (!TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)) {
+
+                        if (!TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)) {
                                 TryCreateContainer(reader, stack, EdiStructureType.Segment);
-                            }
                         }
                     }
                     else if (reader.TokenType == EdiToken.ElementStart) {
