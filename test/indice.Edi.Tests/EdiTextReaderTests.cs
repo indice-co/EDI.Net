@@ -368,6 +368,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
+        [Trait(Traits.Issue, "#27")]
         [Trait(Traits.Tag, "X12")]
         public void X12_850_Issue27_Test() {
             var grammar = EdiGrammar.NewX12();
