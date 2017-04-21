@@ -22,40 +22,16 @@ namespace indice.Edi.Tests
             using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
                 interchange = new EdiSerializer().Deserialize<ORDRSP>(new StreamReader(stream), grammar);
             }
-
-
-            Assert.NotNull(interchange.ListNachricht[0].Referenz_der_Anfrage.Code);
-            Assert.NotNull(interchange.ListNachricht[0].Referenz_der_Anfrage.Referenz_der_Anfragedatum);
+            var nachricht = interchange.ListNachricht[0];
+            Assert.Equal("ON", nachricht.Referenz_der_Anfrage.Code);
+            Assert.NotNull(nachricht.Referenz_der_Anfrage.Referenz_der_Anfragedatum);
+            Assert.NotNull(nachricht.Absender.CTA);
+            Assert.Equal("Spiderman, Clack", nachricht.Absender.CTA.Kontakt);
+            Assert.Equal("IC", nachricht.Absender.CTA.Funktion);
+            Assert.Null(nachricht.Empfaenger.CTA);
+            Assert.Equal("293", nachricht.Empfaenger.Code);
+            Assert.Equal("990000000000X", nachricht.Empfaenger.ID);
+            Assert.Equal("MR", nachricht.Empfaenger.Qualifier);
         }
-
-        [Fact]
-        public void IMDSegmentsWithConditions() {
-            var grammar = EdiGrammar.NewEdiFact();
-            var interchange = default(ORDRSP);
-
-            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
-                interchange = new EdiSerializer().Deserialize<ORDRSP>(new StreamReader(stream), grammar);
-
-                //interchange.ListNachricht.First().
-                //Assert.NotNull(interchange.ListNachricht.First().Absender.CTA.EM);
-                //Assert.NotNull(interchange.ListNachricht.First().Absender.CTA.EM.Art);
-            }
-        }
-
-        [Fact]
-        public void COMSegments() {
-            if (EdiStructureType.None < EdiStructureType.Segment) {
-            }
-            var grammar = EdiGrammar.NewEdiFact();
-            var interchange = default(ORDRSP);
-
-            using (var stream = Helpers.GetResourceStream("edifact.ORDRSP.edi")) {
-                interchange = new EdiSerializer().Deserialize<ORDRSP>(new StreamReader(stream), grammar);
-
-                //Assert.NotNull(interchange.ListNachricht.First().Absender.CTA.EM);
-                //Assert.NotNull(interchange.ListNachricht.First().Absender.CTA.EM.Art);
-            }
-        }
-
     }
 }
