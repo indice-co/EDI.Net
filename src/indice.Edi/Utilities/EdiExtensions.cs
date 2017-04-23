@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using indice.Edi.FormatSpec;
 
 namespace indice.Edi.Utilities
 {
@@ -93,10 +94,10 @@ namespace indice.Edi.Utilities
             return structureType;
         }
 
-        public static bool TryParse(this string value, Picture? picture, char? decimalMark, out decimal number) {
+        public static bool TryParse(this string value, IFormatSpec formatSpec, char? decimalMark, out decimal number) {
             number = 0.0M;
             try {
-                var result = Parse(value, picture, decimalMark);
+                var result = Parse(value, formatSpec, decimalMark);
                 if (result.HasValue)
                     number = result.Value;
                 return true;
@@ -136,7 +137,7 @@ namespace indice.Edi.Utilities
             return null;
         }
 
-        public static decimal? Parse(this string value, Picture? picture, char? decimalMark) {
+        public static decimal? Parse(this string value, IFormatSpec formatSpec, char? decimalMark) {
             if (value != null)
                 value = value.TrimStart('Z'); // Z suppresses leading zeros
             if (string.IsNullOrEmpty(value))
@@ -152,38 +153,38 @@ namespace indice.Edi.Utilities
                     return d;
                 }
             }
-            else if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && decimal.TryParse(value, NumberStyles.Integer, provider, out d)) {
-                d = d * (decimal)Math.Pow(0.1, picture.Value.Precision);
+            else if (formatSpec != null && formatSpec.Kind == FormatKind.Numeric && decimal.TryParse(value, NumberStyles.Integer, provider, out d)) {
+                d = d * (decimal)Math.Pow(0.1, formatSpec.Precision);
                 return d;
             }
             throw new EdiException("Could not convert string to decimal: {0}.".FormatWith(CultureInfo.InvariantCulture, value));
         }
 
-        public static string ToEdiString(this float value, Picture? picture, char? decimalMark) =>
-            ToEdiString((decimal?)value, picture, decimalMark);
+        public static string ToEdiString(this float value, IFormatSpec formatSpec, char? decimalMark) =>
+            ToEdiString((decimal?)value, formatSpec, decimalMark);
 
-        public static string ToEdiString(this double value, Picture? picture, char? decimalMark) =>
-            ToEdiString((decimal?)value, picture, decimalMark);
+        public static string ToEdiString(this double value, IFormatSpec formatSpec, char? decimalMark) =>
+            ToEdiString((decimal?)value, formatSpec, decimalMark);
 
-        public static string ToEdiString(this decimal value, Picture? picture, char? decimalMark) =>
-            ToEdiString((decimal?)value, picture, decimalMark);
+        public static string ToEdiString(this decimal value, IFormatSpec formatSpec, char? decimalMark) =>
+            ToEdiString((decimal?)value, formatSpec, decimalMark);
         
-        public static string ToEdiString(this float? value, Picture? picture, char? decimalMark) =>
-            ToEdiString((decimal?)value, picture, decimalMark);
+        public static string ToEdiString(this float? value, IFormatSpec formatSpec, char? decimalMark) =>
+            ToEdiString((decimal?)value, formatSpec, decimalMark);
 
-        public static string ToEdiString(this double? value, Picture? picture, char? decimalMark) =>
-            ToEdiString((decimal?)value, picture, decimalMark);
+        public static string ToEdiString(this double? value, IFormatSpec formatSpec, char? decimalMark) =>
+            ToEdiString((decimal?)value, formatSpec, decimalMark);
 
-        public static string ToEdiString(this int? value, Picture? picture) =>
-            ToEdiString((long?)value, picture);
+        public static string ToEdiString(this int? value, IFormatSpec formatSpec) =>
+            ToEdiString((long?)value, formatSpec);
 
-        public static string ToEdiString(this int value, Picture? picture) =>
-            ToEdiString((long?)value, picture);
+        public static string ToEdiString(this int value, IFormatSpec formatSpec) =>
+            ToEdiString((long?)value, formatSpec);
 
-        public static string ToEdiString(this long value, Picture? picture) =>
-            ToEdiString((long?)value, picture);
+        public static string ToEdiString(this long value, IFormatSpec formatSpec) =>
+            ToEdiString((long?)value, formatSpec);
         
-        public static string ToEdiString(this decimal? value, Picture? picture, char? decimalMark) {
+        public static string ToEdiString(this decimal? value, IFormatSpec formatSpec, char? decimalMark) {
             if (!value.HasValue)
                 return null;
             var provider = NumberFormatInfo.InvariantInfo;
@@ -193,32 +194,53 @@ namespace indice.Edi.Utilities
                     provider.NumberDecimalSeparator = decimalMark.Value.ToString();
                 }
                 return value.Value.ToString(provider);
-            } else if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric) {
-                var pic = picture.Value;
+            } else if (formatSpec != null && formatSpec.Kind == FormatKind.Numeric) {
+                var pic = formatSpec;
                 var number = value.Value;
                 var integer = (int)number * pic.Precision;
-                var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
-                var result = integer.ToString(padding);
-                return result;
+                if (pic.VariableLength)
+                {
+                    return integer.ToString();
+                }
+                else
+                {
+                    var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
+                    var result = integer.ToString(padding);
+                    return result;
+                }
             }
             return string.Format(NumberFormatInfo.InvariantInfo, "{0}", value);
         }
 
-        public static string ToEdiString(this long? value, Picture? picture) {
-            if (!value.HasValue && !picture.HasValue)
+        public static string ToEdiString(this long? value, IFormatSpec formatSpec) {
+            if (!value.HasValue && (formatSpec == null))
                 return null;
-            if (picture.HasValue) {
-                var pic = picture.Value;
-                if (pic.Kind == PictureKind.Alphanumeric) {
-                    var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => ' ').ToArray());
-                    var result = value.HasValue ? (padding + value.Value) : padding;
-                    if (result.Length > pic.Scale * 2) {
-                        return value.Value.ToString();
+            if (formatSpec != null) {
+                var pic = formatSpec;
+                if (pic.Kind == FormatKind.Alphanumeric) {
+                    if (pic.VariableLength)
+                    {
+                        return value.HasValue ? value.Value.ToString() : String.Empty;
                     }
-                    return result.Substring(result.Length - pic.Scale, pic.Scale);
-                } else if (pic.Kind == PictureKind.Numeric) {
-                    var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
-                    return string.Format(CultureInfo.InvariantCulture, "{0:" + padding + "}", value ?? 0);
+                    else
+                    {
+                        var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => ' ').ToArray());
+                        var result = value.HasValue ? (padding + value.Value) : padding;
+                        if (result.Length > pic.Scale * 2) {
+                            return value.Value.ToString();
+                        }
+                        return result.Substring(result.Length - pic.Scale, pic.Scale);
+                    }
+                } else if (pic.Kind == FormatKind.Numeric) {
+                    if (pic.VariableLength)
+                    {
+                        return value.ToString();
+                    }
+                    else
+                    {
+                        var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
+                        return string.Format(CultureInfo.InvariantCulture, "{0:" + padding + "}", value ?? 0);
+                    }
                 }
             }
             return string.Format(NumberFormatInfo.InvariantInfo, "{0}", value);

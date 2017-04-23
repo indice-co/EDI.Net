@@ -1,4 +1,5 @@
 ﻿using System;
+using indice.Edi.FormatSpec;
 
 namespace indice.Edi.Serialization
 {
@@ -8,7 +9,7 @@ namespace indice.Edi.Serialization
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
     public sealed class EdiValueAttribute : EdiAttribute
     {
-        private Picture _picture;
+        private IFormatSpec _formatSpec;
         private bool _Mandatory;
         private string _Description;
         private string _Format;
@@ -34,21 +35,18 @@ namespace indice.Edi.Serialization
             set { _Path = value; }
         }
 
-        public Picture Picture {
-            get { return _picture; }
+        public IFormatSpec FormatSpec {
+            get { return _formatSpec; }
         }
 
-        public EdiValueAttribute()
-           : this(default(Picture)) {
+        public EdiValueAttribute() { 
+            _formatSpec = default(PictureSpec);
+
         }
 
-        public EdiValueAttribute(string picture)
-            : this((Picture)picture) {
+        public EdiValueAttribute(string spec, FormatterType formatterType)
+        {
+            _formatSpec = FormatSpecFactory.Create(formatterType, spec);
         }
-
-        public EdiValueAttribute(Picture picture) {
-            _picture = picture;
-        }
-        
     }
 }

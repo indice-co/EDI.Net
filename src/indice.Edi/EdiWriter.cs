@@ -7,6 +7,7 @@ using System.Numerics;
 using indice.Edi.Utilities;
 using System.Globalization;
 using System.Linq;
+using indice.Edi.FormatSpec;
 
 namespace indice.Edi
 {
@@ -553,7 +554,7 @@ namespace indice.Edi
         /// Writes a <see cref="String"/> value.
         /// </summary>
         /// <param name="value">The <see cref="String"/> value to write.</param>
-        public virtual void WriteValue(string value, Picture? picture) {
+        public virtual void WriteValue(string value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.String);
         }
 
@@ -561,7 +562,7 @@ namespace indice.Edi
         /// Writes a <see cref="Int32"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int32"/> value to write.</param>
-        public virtual void WriteValue(int value, Picture? picture) {
+        public virtual void WriteValue(int value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -569,7 +570,7 @@ namespace indice.Edi
         /// Writes a <see cref="UInt32"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt32"/> value to write.</param>
-        public virtual void WriteValue(uint value, Picture? picture) {
+        public virtual void WriteValue(uint value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -577,7 +578,7 @@ namespace indice.Edi
         /// Writes a <see cref="Int64"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int64"/> value to write.</param>
-        public virtual void WriteValue(long value, Picture? picture) {
+        public virtual void WriteValue(long value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -585,7 +586,7 @@ namespace indice.Edi
         /// Writes a <see cref="UInt64"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt64"/> value to write.</param>
-        public virtual void WriteValue(ulong value, Picture? picture) {
+        public virtual void WriteValue(ulong value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -593,7 +594,7 @@ namespace indice.Edi
         /// Writes a <see cref="Single"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Single"/> value to write.</param>
-        public virtual void WriteValue(float value, Picture? picture) {
+        public virtual void WriteValue(float value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Float);
         }
 
@@ -601,7 +602,7 @@ namespace indice.Edi
         /// Writes a <see cref="Double"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Double"/> value to write.</param>
-        public virtual void WriteValue(double value, Picture? picture) {
+        public virtual void WriteValue(double value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Float);
         }
 
@@ -617,7 +618,7 @@ namespace indice.Edi
         /// Writes a <see cref="Int16"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int16"/> value to write.</param>
-        public virtual void WriteValue(short value, Picture? picture) {
+        public virtual void WriteValue(short value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -625,7 +626,7 @@ namespace indice.Edi
         /// Writes a <see cref="UInt16"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt16"/> value to write.</param>
-        public virtual void WriteValue(ushort value, Picture? picture) {
+        public virtual void WriteValue(ushort value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -649,7 +650,7 @@ namespace indice.Edi
         /// Writes a <see cref="SByte"/> value.
         /// </summary>
         /// <param name="value">The <see cref="SByte"/> value to write.</param>
-        public virtual void WriteValue(sbyte value, Picture? picture) {
+        public virtual void WriteValue(sbyte value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
         }
 
@@ -657,7 +658,7 @@ namespace indice.Edi
         /// Writes a <see cref="Decimal"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Decimal"/> value to write.</param>
-        public virtual void WriteValue(decimal value, Picture? picture) {
+        public virtual void WriteValue(decimal value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Float);
         }
 
@@ -697,11 +698,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Int32}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Int32}"/> value to write.</param>
-        public virtual void WriteValue(int? value, Picture? picture = null) {
+        public virtual void WriteValue(int? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -709,11 +710,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{UInt32}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt32}"/> value to write.</param>
-        public virtual void WriteValue(uint? value, Picture? picture = null) {
+        public virtual void WriteValue(uint? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -721,11 +722,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Int64}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Int64}"/> value to write.</param>
-        public virtual void WriteValue(long? value, Picture? picture = null) {
+        public virtual void WriteValue(long? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -733,11 +734,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{UInt64}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt64}"/> value to write.</param>
-        public virtual void WriteValue(ulong? value, Picture? picture = null) {
+        public virtual void WriteValue(ulong? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -745,11 +746,11 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Single}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Single}"/> value to write.</param>
-        public virtual void WriteValue(float? value, Picture? picture = null) {
+        public virtual void WriteValue(float? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -757,12 +758,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Double}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Double}"/> value to write.</param>
-        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
-        public virtual void WriteValue(double? value, Picture? picture = null) {
+        /// <param name="formatSpec">The <see cref="Nullable{IFormatSpec}"/> format spec that discribes the value.</param>
+        public virtual void WriteValue(double? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -782,12 +783,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Int16}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Int16}"/> value to write.</param>
-        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
-        public virtual void WriteValue(short? value, Picture? picture = null) {
+        /// <param name="formatSpec">The <see cref="Nullable{IFormatSpec}"/> format spec that discribes the value.</param>
+        public virtual void WriteValue(short? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -795,12 +796,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{UInt16}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{UInt16}"/> value to write.</param>
-        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
-        public virtual void WriteValue(ushort? value, Picture? picture = null) {
+        /// <param name="formatSpec">The <see cref="Nullable{IFormatSpec}"/> format spec that discribes the value.</param>
+        public virtual void WriteValue(ushort? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -832,12 +833,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{SByte}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{SByte}"/> value to write.</param>
-        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
-        public virtual void WriteValue(sbyte? value, Picture? picture = null) {
+        /// <param name="formatSpec">The <see cref="Nullable{IFormatSpec}"/> format spec that discribes the value.</param>
+        public virtual void WriteValue(sbyte? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -845,12 +846,12 @@ namespace indice.Edi
         /// Writes a <see cref="Nullable{Decimal}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Decimal}"/> value to write.</param>
-        /// <param name="picture">The <see cref="Nullable{Picture}"/> picture that discribes the value.</param>
-        public virtual void WriteValue(decimal? value, Picture? picture = null) {
+        /// <param name="formatSpec">The <see cref="Nullable{IFormatSpec}"/> format spec that discribes the value.</param>
+        public virtual void WriteValue(decimal? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
-                WriteValue(value.GetValueOrDefault(), picture);
+                WriteValue(value.GetValueOrDefault(), formatSpec);
             }
         }
 
@@ -928,9 +929,9 @@ namespace indice.Edi
         /// An error will raised if the value cannot be written as a single Edi token.
         /// </summary>
         /// <param name="value">The <see cref="Object"/> value to write.</param>
-        /// <param name="picture"></param>
+        /// <param name="formatSpec"></param>
         /// <param name="format">traditional string format mask</param>
-        public virtual void WriteValue(object value, Picture? picture, string format) {
+        public virtual void WriteValue(object value, IFormatSpec formatSpec, string format) {
             if (value == null) {
                 WriteNull();
             } else {
@@ -942,7 +943,7 @@ namespace indice.Edi
                 }
 #endif
 
-                WriteValue(this, ConvertUtils.GetTypeCode(value.GetType()), value, picture, format);
+                WriteValue(this, ConvertUtils.GetTypeCode(value.GetType()), value, formatSpec, format);
             }
         }
         #endregion
@@ -963,7 +964,7 @@ namespace indice.Edi
             }
         }
 
-        internal static void WriteValue(EdiWriter writer, PrimitiveTypeCode typeCode, object value, Picture? picture, string format) {
+        internal static void WriteValue(EdiWriter writer, PrimitiveTypeCode typeCode, object value, IFormatSpec formatSpec, string format) {
             switch (typeCode) {
                 case PrimitiveTypeCode.Char:
                     writer.WriteValue((char)value);
@@ -978,64 +979,64 @@ namespace indice.Edi
                     writer.WriteValue((value == null) ? (bool?)null : (bool)value);
                     break;
                 case PrimitiveTypeCode.SByte:
-                    writer.WriteValue((sbyte)value, picture);
+                    writer.WriteValue((sbyte)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.SByteNullable:
-                    writer.WriteValue((value == null) ? (sbyte?)null : (sbyte)value, picture);
+                    writer.WriteValue((value == null) ? (sbyte?)null : (sbyte)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Int16:
-                    writer.WriteValue((short)value, picture);
+                    writer.WriteValue((short)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Int16Nullable:
-                    writer.WriteValue((value == null) ? (short?)null : (short)value, picture);
+                    writer.WriteValue((value == null) ? (short?)null : (short)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.UInt16:
-                    writer.WriteValue((ushort)value, picture);
+                    writer.WriteValue((ushort)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.UInt16Nullable:
-                    writer.WriteValue((value == null) ? (ushort?)null : (ushort)value, picture);
+                    writer.WriteValue((value == null) ? (ushort?)null : (ushort)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Int32:
-                    writer.WriteValue((int)value, picture);
+                    writer.WriteValue((int)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Int32Nullable:
-                    writer.WriteValue((value == null) ? (int?)null : (int)value, picture);
+                    writer.WriteValue((value == null) ? (int?)null : (int)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Byte:
-                    writer.WriteValue((byte)value, picture);
+                    writer.WriteValue((byte)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.ByteNullable:
-                    writer.WriteValue((value == null) ? (byte?)null : (byte)value, picture);
+                    writer.WriteValue((value == null) ? (byte?)null : (byte)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.UInt32:
-                    writer.WriteValue((uint)value, picture);
+                    writer.WriteValue((uint)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.UInt32Nullable:
                     writer.WriteValue((value == null) ? (uint?)null : (uint)value);
                     break;
                 case PrimitiveTypeCode.Int64:
-                    writer.WriteValue((long)value, picture);
+                    writer.WriteValue((long)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Int64Nullable:
-                    writer.WriteValue((value == null) ? (long?)null : (long)value, picture);
+                    writer.WriteValue((value == null) ? (long?)null : (long)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.UInt64:
-                    writer.WriteValue((ulong)value, picture);
+                    writer.WriteValue((ulong)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.UInt64Nullable:
-                    writer.WriteValue((value == null) ? (ulong?)null : (ulong)value, picture);
+                    writer.WriteValue((value == null) ? (ulong?)null : (ulong)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Single:
-                    writer.WriteValue((float)value, picture);
+                    writer.WriteValue((float)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.SingleNullable:
                     writer.WriteValue((value == null) ? (float?)null : (float)value);
                     break;
                 case PrimitiveTypeCode.Double:
-                    writer.WriteValue((double)value, picture);
+                    writer.WriteValue((double)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.DoubleNullable:
-                    writer.WriteValue((value == null) ? (double?)null : (double)value, picture);
+                    writer.WriteValue((value == null) ? (double?)null : (double)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.DateTime:
                     writer.WriteValue((DateTime)value, format);
@@ -1050,10 +1051,10 @@ namespace indice.Edi
                     writer.WriteValue((value == null) ? (DateTimeOffset?)null : (DateTimeOffset)value, format);
                     break;
                 case PrimitiveTypeCode.Decimal:
-                    writer.WriteValue((decimal)value, picture);
+                    writer.WriteValue((decimal)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.DecimalNullable:
-                    writer.WriteValue((value == null) ? (decimal?)null : (decimal)value, picture);
+                    writer.WriteValue((value == null) ? (decimal?)null : (decimal)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Guid:
                     writer.WriteValue((Guid)value);
@@ -1081,7 +1082,7 @@ namespace indice.Edi
                     writer.WriteValue((Uri)value);
                     break;
                 case PrimitiveTypeCode.String:
-                    writer.WriteValue((string)value, picture);
+                    writer.WriteValue((string)value, formatSpec);
                     break;
                 case PrimitiveTypeCode.Bytes:
                     writer.WriteValue((byte[])value);
@@ -1106,12 +1107,12 @@ namespace indice.Edi
 
                         object convertedValue = convertable.ToType(resolvedType, CultureInfo.InvariantCulture);
 
-                        WriteValue(writer, resolvedTypeCode, convertedValue, picture, format);
+                        WriteValue(writer, resolvedTypeCode, convertedValue, formatSpec, format);
                         break;
                     } else
 #endif
                     {
-                        WriteValue(writer, PrimitiveTypeCode.String, $"{value}", picture, format);
+                        WriteValue(writer, PrimitiveTypeCode.String, $"{value}", formatSpec, format);
                         break;
                         // consider throwing some times...
                         //throw CreateUnsupportedTypeException(writer, value);
