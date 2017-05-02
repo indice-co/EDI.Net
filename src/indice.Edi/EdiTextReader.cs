@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using indice.Edi.FormatSpec;
 
 namespace indice.Edi
 {
@@ -51,8 +52,8 @@ namespace indice.Edi
         /// Reads the next EDI token from the stream as a <see cref="Nullable{Decimal}"/>.
         /// </summary>
         /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override decimal? ReadAsDecimal(Picture? picture = null) {
-            return ReadAsDecimalInternal(picture);
+        public override decimal? ReadAsDecimal(IFormatSpec formatSpec = null) {
+            return ReadAsDecimalInternal(formatSpec);
         }
 
         /// <summary>

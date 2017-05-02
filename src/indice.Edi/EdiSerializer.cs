@@ -233,7 +233,7 @@ namespace indice.Edi
             var dateString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
                                                            read ? reader.ReadAsString() : (string)reader.Value;
             if (dateString != null) {
-                dateString = dateString.Substring(0, valueInfo.Picture.Scale);
+                dateString = dateString.Substring(0, valueInfo.FormatSpec.Scale);
                 var date = default(DateTime);
                 if (dateString.TryParseEdiDate(valueInfo.Format, CultureInfo.InvariantCulture, out date)) {
                     var existingDateObject = descriptor.Info.GetValue(structure.Instance);
@@ -258,8 +258,8 @@ namespace indice.Edi
         internal static void PopulateDecimalValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
             var cache = structure.CachedReads;
             var valueInfo = descriptor.ValueInfo;
-            var numberFloat = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsDecimal(valueInfo.Path, descriptor.ValueInfo.Picture, reader.Grammar.DecimalMark) :
-                                                            read ? reader.ReadAsDecimal(descriptor.ValueInfo.Picture) : (decimal?)reader.Value;
+            var numberFloat = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsDecimal(valueInfo.Path, descriptor.ValueInfo.FormatSpec, reader.Grammar.DecimalMark) :
+                                                            read ? reader.ReadAsDecimal(descriptor.ValueInfo.FormatSpec) : (decimal?)reader.Value;
             if (numberFloat != null) {
                 descriptor.Info.SetValue(structure.Instance, numberFloat);
             }
@@ -618,7 +618,7 @@ namespace indice.Edi
                         else if (path.ComponentIndex != property.PathInfo.ComponentIndex)
                             writer.WriteToken(EdiToken.ComponentStart);
                     }
-                    writer.WriteValue(value, property.ValueInfo.Picture, property.ValueInfo.Format);
+                    writer.WriteValue(value, property.ValueInfo.FormatSpec, property.ValueInfo.Format);
                 } else {
                     // this is somekind of structure. Group/Message/Segment/SegmentGroup/Element
                     // is it a collection of some kind?

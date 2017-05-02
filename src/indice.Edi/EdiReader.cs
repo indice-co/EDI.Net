@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using indice.Edi.FormatSpec;
 
 namespace indice.Edi
 {
@@ -332,9 +333,9 @@ namespace indice.Edi
         /// <summary>
         /// Reads the next EDI token from the stream as a <see cref="Nullable{Decimal}"/>.
         /// </summary>
-        /// <param name="picture">The <see cref="Nullable{Picture}"/> is the format information needed to parse this into a float</param>
+        /// <param name="formatSpec">The <see cref="Nullable{IFormatSpec}"/> is the format information needed to parse this into a float</param>
         /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public abstract decimal? ReadAsDecimal(Picture? picture);
+        public abstract decimal? ReadAsDecimal(IFormatSpec formatSpec);
 
         /// <summary>
         /// Reads the next EDI token from the stream as a <see cref="Nullable{DateTime}"/>.
@@ -348,7 +349,7 @@ namespace indice.Edi
             throw new NotImplementedException();
         }
         
-        internal decimal? ReadAsDecimalInternal(Picture? picture) {
+        internal decimal? ReadAsDecimalInternal(IFormatSpec formatSpec) {
             EdiToken t;
             if (!ReadInternal()) {
                 SetToken(EdiToken.None);
@@ -368,7 +369,7 @@ namespace indice.Edi
                     return null;
                 }
                 decimal d;
-                if (s.TryParse(picture, Grammar.DecimalMark, out d)) {
+                if (s.TryParse(formatSpec, Grammar.DecimalMark, out d)) {
                     SetToken(EdiToken.Float, d, false);
                     return d;
                 }

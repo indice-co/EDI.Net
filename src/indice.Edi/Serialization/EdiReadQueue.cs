@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using indice.Edi.Utilities;
 using System.Globalization;
+using indice.Edi.FormatSpec;
 
 namespace indice.Edi.Serialization
 {
@@ -43,12 +44,12 @@ namespace indice.Edi.Serialization
             return integer;
         }
 
-        public static decimal? ReadAsDecimal(this Queue<EdiEntry> queue, string path, Picture? picture, char? decimalMark) {
+        public static decimal? ReadAsDecimal(this Queue<EdiEntry> queue, string path, IFormatSpec formatSpec, char? decimalMark) {
             var text = ReadAsString(queue, path);
             if (string.IsNullOrEmpty(text))
                 return null;
             
-            return text.Parse(picture, decimalMark);
+            return text.Parse(formatSpec, decimalMark);
         }
     }
 

@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Text;
 using System.IO;
 using System.Xml;
+using indice.Edi.FormatSpec;
 using indice.Edi.Utilities;
 
 namespace indice.Edi
@@ -149,7 +150,7 @@ namespace indice.Edi
         /// Writes a <see cref="String"/> value.
         /// </summary>
         /// <param name="value">The <see cref="String"/> value to write.</param>
-        public override void WriteValue(string value, Picture? picture) {
+        public override void WriteValue(string value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.String);
             WriteEscapedString(value);
         }
@@ -224,9 +225,9 @@ namespace indice.Edi
         /// Writes a <see cref="Int32"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int32"/> value to write.</param>
-        public override void WriteValue(int value, Picture? picture = null) {
+        public override void WriteValue(int value, IFormatSpec formatSpec = null) {
             InternalWriteValue(EdiToken.Integer);
-            _writer.Write(((int?)value).ToEdiString(picture));
+            _writer.Write(((int?)value).ToEdiString(formatSpec));
             //WriteIntegerValue(value, picture);
         }
 
@@ -234,9 +235,9 @@ namespace indice.Edi
         /// Writes a <see cref="UInt32"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt32"/> value to write.</param>
-        public override void WriteValue(uint value, Picture? picture = null) {
+        public override void WriteValue(uint value, IFormatSpec formatSpec = null) {
             InternalWriteValue(EdiToken.Integer);
-            _writer.Write(((int?)value).ToEdiString(picture));
+            _writer.Write(((int?)value).ToEdiString(formatSpec));
             //WriteIntegerValue(value, picture);
         }
 
@@ -244,9 +245,9 @@ namespace indice.Edi
         /// Writes a <see cref="Int64"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int64"/> value to write.</param>
-        public override void WriteValue(long value, Picture? picture = null) {
+        public override void WriteValue(long value, IFormatSpec formatSpec = null) {
             InternalWriteValue(EdiToken.Float);
-            _writer.Write(value.ToEdiString(picture));
+            _writer.Write(value.ToEdiString(formatSpec));
             //WriteIntegerValue(value, picture);
         }
 
@@ -254,9 +255,9 @@ namespace indice.Edi
         /// Writes a <see cref="UInt64"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt64"/> value to write.</param>
-        public override void WriteValue(ulong value, Picture? picture = null) {
+        public override void WriteValue(ulong value, IFormatSpec formatSpec = null) {
             InternalWriteValue(EdiToken.Integer);
-            _writer.Write(((int?)value).ToEdiString(picture));
+            _writer.Write(((int?)value).ToEdiString(formatSpec));
             //WriteIntegerValue(value, picture);
         }
 
@@ -264,21 +265,21 @@ namespace indice.Edi
         /// Writes a <see cref="Single"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Single"/> value to write.</param>
-        public override void WriteValue(float value, Picture? picture) {
+        public override void WriteValue(float value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Float);
-            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
+            _writer.Write(value.ToEdiString(formatSpec, Grammar.DecimalMark));
         }
 
         /// <summary>
         /// Writes a <see cref="Nullable{Single}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Single}"/> value to write.</param>
-        public override void WriteValue(float? value, Picture? picture = null) {
+        public override void WriteValue(float? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
                 InternalWriteValue(EdiToken.Float);
-                _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
+                _writer.Write(value.ToEdiString(formatSpec, Grammar.DecimalMark));
             }
         }
 
@@ -286,21 +287,21 @@ namespace indice.Edi
         /// Writes a <see cref="Double"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Double"/> value to write.</param>
-        public override void WriteValue(double value, Picture? picture = null) {
+        public override void WriteValue(double value, IFormatSpec formatSpec = null) {
             InternalWriteValue(EdiToken.Float);
-            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
+            _writer.Write(value.ToEdiString(formatSpec, Grammar.DecimalMark));
         }
 
         /// <summary>
         /// Writes a <see cref="Nullable{Double}"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Nullable{Double}"/> value to write.</param>
-        public override void WriteValue(double? value, Picture? picture = null) {
+        public override void WriteValue(double? value, IFormatSpec formatSpec = null) {
             if (value == null) {
                 WriteNull();
             } else {
                 InternalWriteValue(EdiToken.Float);
-                _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
+                _writer.Write(value.ToEdiString(formatSpec, Grammar.DecimalMark));
             }
         }
 
@@ -317,9 +318,9 @@ namespace indice.Edi
         /// Writes a <see cref="Int16"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Int16"/> value to write.</param>
-        public override void WriteValue(short value, Picture? picture) {
+        public override void WriteValue(short value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
-            _writer.Write(((int?)value).ToEdiString(picture));
+            _writer.Write(((int?)value).ToEdiString(formatSpec));
             //WriteIntegerValue(value, picture);
         }
 
@@ -327,9 +328,9 @@ namespace indice.Edi
         /// Writes a <see cref="UInt16"/> value.
         /// </summary>
         /// <param name="value">The <see cref="UInt16"/> value to write.</param>
-        public override void WriteValue(ushort value, Picture? picture) {
+        public override void WriteValue(ushort value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
-            _writer.Write(((int?)value).ToEdiString(picture));
+            _writer.Write(((int?)value).ToEdiString(formatSpec));
             //WriteIntegerValue(value, picture);
         }
 
@@ -347,9 +348,9 @@ namespace indice.Edi
         /// Writes a <see cref="SByte"/> value.
         /// </summary>
         /// <param name="value">The <see cref="SByte"/> value to write.</param>
-        public override void WriteValue(sbyte value, Picture? picture) {
+        public override void WriteValue(sbyte value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Integer);
-            _writer.Write(((int?)value).ToEdiString(picture));
+            _writer.Write(((int?)value).ToEdiString(formatSpec));
             //WriteIntegerValue(value, picture);
         }
 
@@ -357,9 +358,9 @@ namespace indice.Edi
         /// Writes a <see cref="Decimal"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Decimal"/> value to write.</param>
-        public override void WriteValue(decimal value, Picture? picture) {
+        public override void WriteValue(decimal value, IFormatSpec formatSpec) {
             InternalWriteValue(EdiToken.Float);
-            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
+            _writer.Write(value.ToEdiString(formatSpec, Grammar.DecimalMark));
         }
 
         /// <summary>
@@ -428,7 +429,7 @@ namespace indice.Edi
             }
         }
 
-        private void WriteIntegerValue(long value, Picture? picture) {
+        private void WriteIntegerValue(long value, IFormatSpec formatSpec) {
             if (value >= 0 && value <= 9) {
                 _writer.Write((char)('0' + value));
             } else {
@@ -438,11 +439,11 @@ namespace indice.Edi
                     _writer.Write('-');
                 }
 
-                WriteIntegerValue(uvalue, picture);
+                WriteIntegerValue(uvalue, formatSpec);
             }
         }
 
-        private void WriteIntegerValue(ulong uvalue, Picture? picture) {
+        private void WriteIntegerValue(ulong uvalue, IFormatSpec formatSpec) {
             if (uvalue <= 9) {
                 _writer.Write((char)('0' + uvalue));
             } else {

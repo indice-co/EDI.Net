@@ -1,7 +1,7 @@
 ﻿#region Using
 
 using System.Collections.Generic;
-
+using indice.Edi.FormatSpec;
 using indice.Edi.Serialization;
 
 #endregion
@@ -36,7 +36,7 @@ namespace indice.Edi.Tests.Models
 
             #region Properties
 
-            [EdiValue("X(3)")]
+            [EdiValue("X(3)", FormatterType.PictureSpec)]
             [EdiPath("CTA/0/0")]
             public string Funktion
             {
@@ -44,7 +44,7 @@ namespace indice.Edi.Tests.Models
                 set { _funktion = value; }
             }
 
-            [EdiValue("X(17)")]
+            [EdiValue("X(17)", FormatterType.PictureSpec)]
             [EdiPath("CTA/1/0")]
             public string Kontaktnummer
             {
@@ -52,7 +52,7 @@ namespace indice.Edi.Tests.Models
                 set { _kontaktnummer = value; }
             }
 
-            [EdiValue("X(0)")]
+            [EdiValue("X(0)", FormatterType.PictureSpec)]
             [EdiPath("CTA/1/1")]
             public string Kontakt
             {
@@ -79,21 +79,21 @@ namespace indice.Edi.Tests.Models
 
             #region Properties
 
-            [EdiValue("X(3)", Path = "DTM/0/0")]
+            [EdiValue("X(3)", FormatterType.PictureSpec, Path = "DTM/0/0")]
             public string Code
             {
                 get { return _code; }
                 set { _code = value; }
             }
 
-            [EdiValue("X(35)", Path = "DTM/0/1")]
+            [EdiValue("X(35)", FormatterType.PictureSpec, Path = "DTM/0/1")]
             public string Datum
             {
                 get { return _datum; }
                 set { _datum = value; }
             }
 
-            [EdiValue("X(3)", Path = "DTM/0/2")]
+            [EdiValue("X(3)", FormatterType.PictureSpec, Path = "DTM/0/2")]
             public string Format
             {
                 get { return _format; }
@@ -151,21 +151,21 @@ namespace indice.Edi.Tests.Models
 
             #region Properties
 
-            [EdiValue("X(3)", Path = "NAD/0/0")]
+            [EdiValue("X(3)", FormatterType.PictureSpec, Path = "NAD/0/0")]
             public string Qualifier
             {
                 get { return _qualifier; }
                 set { _qualifier = value; }
             }
 
-            [EdiValue("X(35)", Path="NAD/1/0")]
+            [EdiValue("X(35)", FormatterType.PictureSpec, Path="NAD/1/0")]
             public string ID
             {
                 get { return _id; }
                 set { _id = value; }
             }
 
-            [EdiValue("X(3)", Path= "NAD/1/2")]
+            [EdiValue("X(3)", FormatterType.PictureSpec, Path= "NAD/1/2")]
             public string Code
             {
                 get { return _code; }
@@ -195,14 +195,14 @@ namespace indice.Edi.Tests.Models
 
             #region Properties
 
-            [EdiValue("X(70)", Path = "RFF/0/0")]
+            [EdiValue("X(70)", FormatterType.PictureSpec, Path = "RFF/0/0")]
             public string Code
             {
                 get { return _code; }
                 set { _code = value; }
             }
 
-            [EdiValue("X(3)", Path = "RFF/0/1")]
+            [EdiValue("X(3)", FormatterType.PictureSpec, Path = "RFF/0/1")]
             public string Qualifier
             {
                 get { return _qualifier; }
@@ -227,13 +227,13 @@ namespace indice.Edi.Tests.Models
 
             #region Properties
 
-            [EdiValue("X(70)", Path = "RFF/0/0")]
+            [EdiValue("X(70)", FormatterType.PictureSpec, Path = "RFF/0/0")]
             public string Code {
                 get { return _code; }
                 set { _code = value; }
             }
 
-            [EdiValue("X(3)", Path = "RFF/0/1")]
+            [EdiValue("X(3)", FormatterType.PictureSpec, Path = "RFF/0/1")]
             public string Qualifier {
                 get { return _qualifier; }
                 set { _qualifier = value; }

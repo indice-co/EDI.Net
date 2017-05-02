@@ -3,19 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using indice.Edi.FormatSpec;
 
 namespace indice.Edi.Tests.Models
 {
     public class Interchange
     {
-        [EdiValue("X(14)", Path = "STX/1/0")]
+        [EdiValue("X(14)", FormatterType.PictureSpec, Path = "STX/1/0")]
         public string SenderCode { get; set; }
 
-        [EdiValue("X(35)", Path = "STX/1/1")]
+        [EdiValue("X(35)", FormatterType.PictureSpec, Path = "STX/1/1")]
         public string SenderName { get; set; }
 
-        [EdiValue("9(6)", Path = "STX/3/0", Format = "yyMMdd", Description = "TRDT - Date")]
-        [EdiValue("9(6)", Path = "STX/3/1", Format = "HHmmss", Description = "TRDT - Time")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "STX/3/0", Format = "yyMMdd", Description = "TRDT - Date")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "STX/3/1", Format = "HHmmss", Description = "TRDT - Time")]
         public DateTime TransmissionStamp { get; set; }
 
         public InterchangeHeader Head { get; set; }
@@ -31,13 +32,13 @@ namespace indice.Edi.Tests.Models
     [EdiMessage, EdiCondition("UTLHDR", Path = "MHD/1")]
     public class InterchangeHeader
     {
-        [EdiValue("9(4)"), EdiPath("TYP")]
+        [EdiValue("9(4)", FormatterType.PictureSpec), EdiPath("TYP")]
         public string TransactionCode { get; set; }
 
-        [EdiValue("9(1)", Path = "MHD/1/1")]
+        [EdiValue("9(1)", FormatterType.PictureSpec, Path = "MHD/1/1")]
         public int Version { get; set; }
 
-        [EdiValue("X(40)", Path = "CDT/1")]
+        [EdiValue("X(40)", FormatterType.PictureSpec, Path = "CDT/1")]
         public string ClientName { get; set; }
     }
 
@@ -45,17 +46,17 @@ namespace indice.Edi.Tests.Models
     public class InterchangeTrailer
     {
 
-        [EdiValue("9(1)", Path = "MHD/1/1")]
+        [EdiValue("9(1)", FormatterType.PictureSpec, Path = "MHD/1/1")]
         public int Version { get; set; }
     }
 
     [EdiMessage, EdiCondition("UVATLR", Path = "MHD/1")]
     public class InterchangeVatSummary
     {
-        [EdiValue("9(4)"), EdiPath("TYP")]
+        [EdiValue("9(4)", FormatterType.PictureSpec), EdiPath("TYP")]
         public string TransactionCode { get; set; }
 
-        [EdiValue("9(1)", Path = "MHD/1/1")]
+        [EdiValue("9(1)", FormatterType.PictureSpec, Path = "MHD/1/1")]
         public int Version { get; set; }
     }
 
@@ -64,25 +65,25 @@ namespace indice.Edi.Tests.Models
     [EdiMessage, EdiCondition("UTLBIL", Path = "MHD/1")]
     public class UtilityBill
     {
-        [EdiValue("9(1)", Path = "MHD/1/1")]
+        [EdiValue("9(1)", FormatterType.PictureSpec, Path = "MHD/1/1")]
         public int Version { get; set; }
 
-        [EdiValue("X(17)", Path = "BCD/2/0", Description = "INVN - Date")]
+        [EdiValue("X(17)", FormatterType.PictureSpec, Path = "BCD/2/0", Description = "INVN - Date")]
         public string InvoiceNumber { get; set; }
 
         public MetetAdminNumber Meter { get; set; }
         public ContractData SupplyContract { get; set; }
 
-        [EdiValue("X(3)", Path = "BCD/5/0", Description = "BTCD - Date")]
+        [EdiValue("X(3)", FormatterType.PictureSpec, Path = "BCD/5/0", Description = "BTCD - Date")]
         public BillTypeCode BillTypeCode { get; set; }
 
-        [EdiValue("9(6)", Path = "BCD/1/0", Format = "yyMMdd", Description = "TXDT - Date")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "BCD/1/0", Format = "yyMMdd", Description = "TXDT - Date")]
         public DateTime IssueDate { get; set; }
 
-        [EdiValue("9(6)", Path = "BCD/7/0", Format = "yyMMdd", Description = "SUMO - Date")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "BCD/7/0", Format = "yyMMdd", Description = "SUMO - Date")]
         public DateTime StartDate { get; set; }
 
-        [EdiValue("9(6)", Path = "BCD/7/1", Format = "yyMMdd", Description = "SUMO - Date")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "BCD/7/1", Format = "yyMMdd", Description = "SUMO - Date")]
         public DateTime EndDate { get; set; }
 
         public UtilityBillTrailer Totals { get; set; }
@@ -98,76 +99,76 @@ namespace indice.Edi.Tests.Models
     public class ConsumptionChargeCharge
     {
         
-        [EdiValue("9(10)", Path = "CCD/0")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "CCD/0")]
         public int SequenceNumber { get; set; }
 
-        [EdiValue("X(3)", Path = "CCD/1")]
+        [EdiValue("X(3)", FormatterType.PictureSpec, Path = "CCD/1")]
         public ChargeIndicator? ChargeIndicator { get; set; }
 
-        [EdiValue("9(13)", Path = "CCD/1/1")]
+        [EdiValue("9(13)", FormatterType.PictureSpec, Path = "CCD/1/1")]
         public int? ArticleNumber { get; set; }
 
-        [EdiValue("X(3)", Path = "CCD/1/2")]
+        [EdiValue("X(3)", FormatterType.PictureSpec, Path = "CCD/1/2")]
         public string SupplierCode { get; set; }
 
 
-        [EdiValue("X(6)", Path = "CCD/2/0", Description = "TCOD")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/2/0", Description = "TCOD")]
         public string TariffCode { get; set; }
 
-        [EdiValue("X(40)", Path = "CCD/2/1", Description = "TCOD")]
+        [EdiValue("X(40)", FormatterType.PictureSpec, Path = "CCD/2/1", Description = "TCOD")]
         public string TariffDescription { get; set; }
 
 
-        [EdiValue("X(6)", Path = "CCD/3/0", Description = "TMOD")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/3/0", Description = "TMOD")]
         public string TariffCodeModifier1 { get; set; }
 
-        [EdiValue("X(6)", Path = "CCD/3/1", Description = "TMOD")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/3/1", Description = "TMOD")]
         public string TariffCodeModifier2 { get; set; }
 
-        [EdiValue("X(6)", Path = "CCD/3/2", Description = "TMOD")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/3/2", Description = "TMOD")]
         public string TariffCodeModifier3 { get; set; }
 
-        [EdiValue("X(6)", Path = "CCD/3/3", Description = "TMOD")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/3/3", Description = "TMOD")]
         public string TariffCodeModifier4 { get; set; }
 
 
-        [EdiValue("X(35)", Path = "CCD/4", Description = "MTNR")]
+        [EdiValue("X(35)", FormatterType.PictureSpec, Path = "CCD/4", Description = "MTNR")]
         public string MeterNumber { get; set; }
 
-        [EdiValue("X(40)", Path = "CCD/5", Description = "MLOC")]
+        [EdiValue("X(40)", FormatterType.PictureSpec, Path = "CCD/5", Description = "MLOC")]
         public string MeterLocation { get; set; }
 
-        [EdiValue("9(6)", Path = "CCD/6", Format = "yyMMdd", Description = "PRDT")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "CCD/6", Format = "yyMMdd", Description = "PRDT")]
         public DateTime? PresentReadDate { get; set; }
 
-        [EdiValue("9(6)", Path = "CCD/7", Format = "yyMMdd", Description = "PVDT")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "CCD/7", Format = "yyMMdd", Description = "PVDT")]
         public DateTime? PreviousReadDate { get; set; }
 
-        [EdiValue("9(3)", Path = "CCD/8", Description = "NDRP")]
+        [EdiValue("9(3)", FormatterType.PictureSpec, Path = "CCD/8", Description = "NDRP")]
         public int? ReadingPeriod { get; set; }
 
 
-        [EdiValue("9(15)", Path = "CCD/9/0", Description = "PRRD")]
+        [EdiValue("9(15)", FormatterType.PictureSpec, Path = "CCD/9/0", Description = "PRRD")]
         public decimal PresentReading { get; set; }
 
-        [EdiValue("X(4)", Path = "CCD/9/1", Description = "PRRD")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/9/1", Description = "PRRD")]
         public ReadingDataType? PresentReadingType { get; set; }
 
-        [EdiValue("9(15)", Path = "CCD/9/2", Description = "PRRD")]
+        [EdiValue("9(15)", FormatterType.PictureSpec, Path = "CCD/9/2", Description = "PRRD")]
         public decimal PreviousReading { get; set; }
 
-        [EdiValue("X(4)", Path = "CCD/9/3", Description = "PRRD")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/9/3", Description = "PRRD")]
         public ReadingDataType? PreviousReadingType { get; set; }
 
 
-        [EdiValue("9(10)V9(3)", Path = "CCD/10/0", Description = "CONS")]
+        [EdiValue("9(10)V9(3)", FormatterType.PictureSpec, Path = "CCD/10/0", Description = "CONS")]
         public decimal? UnitsConsumedBilling { get; set; }
 
-        [EdiValue("X(6)", Path = "CCD/10/1", Description = "CONS")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/10/1", Description = "CONS")]
         public string UnitOfMeasureBilling { get; set; }
         
         private string _UnitsNegativeBilling;
-        [EdiValue("X(4)", Path = "CCD/10/2", Description = "CONS")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/10/2", Description = "CONS")]
         public string UnitsNegativeBilling {
             get { return _UnitsNegativeBilling; }
             set {
@@ -179,14 +180,14 @@ namespace indice.Edi.Tests.Models
         }
 
 
-        [EdiValue("9(10)V9(3)", Path = "CCD/11/0", Description = "CONB")]
+        [EdiValue("9(10)V9(3)", FormatterType.PictureSpec, Path = "CCD/11/0", Description = "CONB")]
         public decimal? UnitsConsumedBase { get; set; }
 
-        [EdiValue("X(6)", Path = "CCD/11/1", Description = "CONB")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/11/1", Description = "CONB")]
         public string UnitOfMeasureBase { get; set; }
         
         private string _UnitsNegativeBase;
-        [EdiValue("X(4)", Path = "CCD/11/2", Description = "CONB")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/11/2", Description = "CONB")]
         public string UnitsNegativeBase {
             get { return _UnitsNegativeBase; }
             set {
@@ -198,70 +199,70 @@ namespace indice.Edi.Tests.Models
         }
 
 
-        [EdiValue("X(3)", Path = "CCD/12/0", Description = "ADJF")]
+        [EdiValue("X(3)", FormatterType.PictureSpec, Path = "CCD/12/0", Description = "ADJF")]
         public string AdjustmentFactorCode { get; set; }
 
-        [EdiValue("9(10)V9(5)", Path = "CCD/12/1", Description = "ADJF")]
+        [EdiValue("9(10)V9(5)", FormatterType.PictureSpec, Path = "CCD/12/1", Description = "ADJF")]
         public decimal AdjustmentFactorValue { get; set; }
 
-        [EdiValue("X(4)", Path = "CCD/12/2", Description = "ADJF")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/12/2", Description = "ADJF")]
         public string AdjustmentFactorNegativeIndicator { get; set; }
 
 
-        [EdiValue("9(10)V9(3)", Path = "CCD/13/0", Description = "CONA")]
+        [EdiValue("9(10)V9(3)", FormatterType.PictureSpec, Path = "CCD/13/0", Description = "CONA")]
         public decimal UnitsConsumedAdjusted { get; set; }
 
-        [EdiValue("X(6)", Path = "CCD/13/1", Description = "CONA")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/13/1", Description = "CONA")]
         public string UnitOfMeasureAdjusted { get; set; }
         
-        [EdiValue("X(4)", Path = "CCD/13/2", Description = "CONA")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/13/2", Description = "CONA")]
         public string NegativeIndicatorAdjusted { get; set; }
 
 
-        [EdiValue("9(10)V9(5)", Path = "CCD/14", Description = "BPRI")]
+        [EdiValue("9(10)V9(5)", FormatterType.PictureSpec, Path = "CCD/14", Description = "BPRI")]
         public decimal? BasePriceUnit { get; set; }
 
 
-        [EdiValue("9(10)V9(3)", Path = "CCD/15/0", Description = "NUCT")]
+        [EdiValue("9(10)V9(3)", FormatterType.PictureSpec, Path = "CCD/15/0", Description = "NUCT")]
         public decimal UnitsBilled { get; set; }
 
-        [EdiValue("X(6)", Path = "CCD/15/1", Description = "NUCT")]
+        [EdiValue("X(6)", FormatterType.PictureSpec, Path = "CCD/15/1", Description = "NUCT")]
         public string UnitOfMeasureBilled { get; set; }
        
-        [EdiValue("X(4)", Path = "CCD/15/2", Description = "NUCT")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/15/2", Description = "NUCT")]
         public string NegativeIndicatorBilled { get; set; }
 
 
-        [EdiValue("9(6)", Path = "CCD/16", Format = "yyMMdd", Description = "CSDT")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "CCD/16", Format = "yyMMdd", Description = "CSDT")]
         public DateTime ChargeStartDate { get; set; }
 
-        [EdiValue("9(6)", Path = "CCD/17", Format = "yyMMdd", Description = "CEDT")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "CCD/17", Format = "yyMMdd", Description = "CEDT")]
         public DateTime ChargeEndDate { get; set; }
 
-        [EdiValue("9(10)V9(5)", Path = "CCD/18", Description = "CPPU")]
+        [EdiValue("9(10)V9(5)", FormatterType.PictureSpec, Path = "CCD/18", Description = "CPPU")]
         public decimal? PricePerUnit { get; set; }
 
 
-        [EdiValue("9(10)V9(2)", Path = "CCD/18/0", Description = "CTOT")]
+        [EdiValue("9(10)V9(2)", FormatterType.PictureSpec, Path = "CCD/18/0", Description = "CTOT")]
         public decimal TotalChargeForChargeType { get; set; }
 
-        [EdiValue("X(4)", Path = "CCD/18/1", Description = "CTOT")]
+        [EdiValue("X(4)", FormatterType.PictureSpec, Path = "CCD/18/1", Description = "CTOT")]
         public string TotalChargeCreditIndicator { get; set; }
 
 
-        [EdiValue("X(1)", Path = "CCD/19", Description = "TSUP")]
+        [EdiValue("X(1)", FormatterType.PictureSpec, Path = "CCD/19", Description = "TSUP")]
         public string VatTypeOfSupply { get; set; }
 
-        [EdiValue("X(1)", Path = "CCD/20", Description = "VATC")]
+        [EdiValue("X(1)", FormatterType.PictureSpec, Path = "CCD/20", Description = "VATC")]
         public VatRateCategoryCode? VatRateCategoryCode { get; set; }
 
-        [EdiValue("9(3)V9(3)", Path = "CCD/21", Description = "VATP")]
+        [EdiValue("9(3)V9(3)", FormatterType.PictureSpec, Path = "CCD/21", Description = "VATP")]
         public string VatRatePercentage { get; set; }
 
-        [EdiValue("X(17)", Path = "CCD/22/0", Description = "MSAD")]
+        [EdiValue("X(17)", FormatterType.PictureSpec, Path = "CCD/22/0", Description = "MSAD")]
         public string MeterSubAddressCode { get; set; }
 
-        [EdiValue("X(40)", Path = "CCD/22/1", Description = "MSAD")]
+        [EdiValue("X(40)", FormatterType.PictureSpec, Path = "CCD/22/1", Description = "MSAD")]
         public string MeterSubAddressLine { get; set; }
 
         public override string ToString() {
@@ -275,16 +276,16 @@ namespace indice.Edi.Tests.Models
         //[EdiValue("9(10)", Path = "BTL/0")]
         //public decimal TotalPaymentDetails { get; set; }
 
-        [EdiValue("9(10)", Path = "BTL/1")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "BTL/1")]
         public decimal TotalChargeBeforeVat { get; set; }
 
-        [EdiValue("9(10)", Path = "BTL/2")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "BTL/2")]
         public decimal BillTotalVatAmmoutPayable { get; set; }
 
         //[EdiValue("9(10)", Path = "BTL/3")]
         //public decimal BalanceBroughtForward { get; set; }
 
-        [EdiValue("9(10)", Path = "BTL/4")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "BTL/4")]
         public decimal TotalBillAmountPayable { get; set; }
         public override string ToString() {
             return string.Format("Net:{0} Vat:{1} Gross:{2}", TotalChargeBeforeVat, BillTotalVatAmmoutPayable, TotalBillAmountPayable);
@@ -314,13 +315,13 @@ namespace indice.Edi.Tests.Models
                 _distributorsIdentifier.Add("TR", "TRANSCO");
             }
         }
-        [EdiValue("9(10)", Path = "MAN/0", Description = "SEQA")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "MAN/0", Description = "SEQA")]
         public int FirstLevelSequenceNumber { get; set; }
 
-        [EdiValue("9(10)", Path = "MAN/1", Description = "SEQB")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "MAN/1", Description = "SEQB")]
         public int SecondLevelSequenceNumber { get; set; }
 
-        [EdiValue("X(2)", Path = "MAN/2/0", Description = "MADN")]
+        [EdiValue("X(2)", FormatterType.PictureSpec, Path = "MAN/2/0", Description = "MADN")]
         public string DistributorIdentifier { get; set; }
         public string DistributorName {
             get {
@@ -332,25 +333,25 @@ namespace indice.Edi.Tests.Models
             }
         }
 
-        [EdiValue("X(10)", Path = "MAN/2/1", Description = "MADN")]
+        [EdiValue("X(10)", FormatterType.PictureSpec, Path = "MAN/2/1", Description = "MADN")]
         public string UniqueReferenceNumber { get; set; }
 
-        [EdiValue("9(1)", Path = "MAN/2/2", Description = "MADN")]
+        [EdiValue("9(1)", FormatterType.PictureSpec, Path = "MAN/2/2", Description = "MADN")]
         public int? CheckDigit { get; set; }
 
-        [EdiValue("9(2)", Path = "MAN/2/3", Description = "MADN")]
+        [EdiValue("9(2)", FormatterType.PictureSpec, Path = "MAN/2/3", Description = "MADN")]
         public int? ProfileType { get; set; }
 
-        [EdiValue("9(3)", Path = "MAN/2/4", Description = "MADN")]
+        [EdiValue("9(3)", FormatterType.PictureSpec, Path = "MAN/2/4", Description = "MADN")]
         public int? MeterTimeSwitchDetails { get; set; }
 
-        [EdiValue("9(3)", Path = "MAN/2/5", Description = "MADN")]
+        [EdiValue("9(3)", FormatterType.PictureSpec, Path = "MAN/2/5", Description = "MADN")]
         public int? LineLossFactor { get; set; }
 
-        [EdiValue("X(35)", Path = "MAN/3", Description = "MTNR")]
+        [EdiValue("X(35)", FormatterType.PictureSpec, Path = "MAN/3", Description = "MTNR")]
         public string MeterSerialNumber { get; set; }
 
-        [EdiValue("9(1)", Path = "MAN/4", Description = "NDIG")]
+        [EdiValue("9(1)", FormatterType.PictureSpec, Path = "MAN/4", Description = "NDIG")]
         public int? NumberOfDigits { get; set; }
 
         public override string ToString() {
@@ -362,34 +363,34 @@ namespace indice.Edi.Tests.Models
     [EdiSegment, EdiPath("VAT")]
     public class UtilityBillValueAddedTax
     {
-        [EdiValue("9(10)", Path = "VAT/0", Description = "SEQA")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "VAT/0", Description = "SEQA")]
         public int FirstLevelSequenceNumber { get; set; }
 
-        [EdiValue("9(3)", Path = "VAT/1", Description = "NDVT")]
+        [EdiValue("9(3)", FormatterType.PictureSpec, Path = "VAT/1", Description = "NDVT")]
         public int? NumberOfDays { get; set; }
 
-        [EdiValue("9(3)V9(3)", Path = "VAT/2", Description = "PNDP")]
+        [EdiValue("9(3)V9(3)", FormatterType.PictureSpec, Path = "VAT/2", Description = "PNDP")]
         public decimal? PercentageQualifyingFor { get; set; }
 
-        [EdiValue("X(1)", Path = "VAT/3", Description = "VATC")]
+        [EdiValue("X(1)", FormatterType.PictureSpec, Path = "VAT/3", Description = "VATC")]
         public VatRateCategoryCode VatRateCategoryCode { get; set; }
 
-        [EdiValue("9(3)", Path = "VAT/4", Description = "VATP")]
+        [EdiValue("9(3)", FormatterType.PictureSpec, Path = "VAT/4", Description = "VATP")]
         public decimal VatRatePercentage { get; set; }
 
-        [EdiValue("9(10)", Path = "VAT/5/0", Description = "UVLA")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "VAT/5/0", Description = "UVLA")]
         public decimal TotalChargeBeforeVat { get; set; }
 
-        [EdiValue("9(10)", Path = "VAT/6/0", Description = "UVTT")]
+        [EdiValue("9(10)", FormatterType.PictureSpec, Path = "VAT/6/0", Description = "UVTT")]
         public decimal VatAmmountPayable { get; set; }
 
-        [EdiValue("9(10)V9(2)", Path = "VAT/7/0", Description = "UCSI")]
+        [EdiValue("9(10)V9(2)", FormatterType.PictureSpec, Path = "VAT/7/0", Description = "UCSI")]
         public decimal TotalChargeIncludingVat { get; set; }
 
-        [EdiValue("9(4)", Path = "VAT/8", Description = "NRIL")]
+        [EdiValue("9(4)", FormatterType.PictureSpec, Path = "VAT/8", Description = "NRIL")]
         public int? NumberOfItemLines { get; set; }
 
-        [EdiValue("X(3)", Path = "VAT/9", Description = "RFLV")]
+        [EdiValue("X(3)", FormatterType.PictureSpec, Path = "VAT/9", Description = "RFLV")]
         public ReasonForLowerVatRateType ReasonForLowerZeroVatRate { get; set; }//null-able
 
         public override string ToString() {
@@ -400,25 +401,25 @@ namespace indice.Edi.Tests.Models
     [EdiSegment, EdiPath("CDA")]
     public class ContractData
     {
-        [EdiValue("X(17)", Path = "CDA/0", Description = "CPSC")]
+        [EdiValue("X(17)", FormatterType.PictureSpec, Path = "CDA/0", Description = "CPSC")]
         public string CurrentPriceScheduleReference { get; set; }
 
-        [EdiValue("X(17)", Path = "CDA/1/0", Description = "ORNO")]
+        [EdiValue("X(17)", FormatterType.PictureSpec, Path = "CDA/1/0", Description = "ORNO")]
         public string CustomerOrderNumber { get; set; }
 
-        [EdiValue("X(17)", Path = "CDA/1/1", Description = "ORNO")]
+        [EdiValue("X(17)", FormatterType.PictureSpec, Path = "CDA/1/1", Description = "ORNO")]
         public string SupplierOrderNumber { get; set; }
 
-        [EdiValue("9(6)", Path = "CDA/1/2", Format = "yyMMdd", Description = "ORNO")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "CDA/1/2", Format = "yyMMdd", Description = "ORNO")]
         public DateTime? DateOrderedPlacedByCustomer { get; set; }
 
-        [EdiValue("9(6)", Path = "CDA/1/3", Format = "yyMMdd", Description = "ORNO")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "CDA/1/3", Format = "yyMMdd", Description = "ORNO")]
         public DateTime? DateOrderedReceivedBySupplier { get; set; }
 
-        [EdiValue("9(6)", Path = "CDA/2", Format = "yyMMdd", Description = "INSD")]
+        [EdiValue("9(6)", FormatterType.PictureSpec, Path = "CDA/2", Format = "yyMMdd", Description = "INSD")]
         public DateTime? InstallationDate { get; set; }
 
-        [EdiValue("X(3)", Path = "CDA/3", Description = "REPE")]
+        [EdiValue("X(3)", FormatterType.PictureSpec, Path = "CDA/3", Description = "REPE")]
         public string RentalPeriod { get; set; }
 
         public override string ToString() {
