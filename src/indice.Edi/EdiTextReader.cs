@@ -267,17 +267,8 @@ namespace indice.Edi
                     case StringUtils.LineFeed:
                         ProcessLineFeed();
                         break;
-                    case ' ':
-                    case StringUtils.Tab:
-                        // eat
-                        _charPos++;
-                        break;
                     default:
-                        if (char.IsWhiteSpace(currentChar)) {
-                            // eat
-                            _charPos++;
-                            break;
-                        } else if (_currentState == State.ElementStart) {
+                        if (_currentState == State.ElementStart) {
                             SetToken(EdiToken.ComponentStart);
                             return true;
                         } else if (Grammar.IsSpecial(currentChar)) {
