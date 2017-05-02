@@ -295,8 +295,38 @@ namespace indice.Edi.Tests.Models
     [EdiSegment, EdiPath("FTX")]
     public class FTX
     {
-        [EdiValue(Path = "FTX/0")]
+        [EdiValue("X(3)", Path = "FTX/0/0")]
         public string Field1 { get; set; }
+
+        [EdiValue("X(3)", Path = "FTX/1/0")]
+        public string Field2 { get; set; }
+
+        [EdiValue("X(3)", Path = "FTX/2/0")]
+        public string Field3a { get; set; }
+
+        [EdiValue("X(3)", Path = "FTX/2/1")]
+        public string Field3b { get; set; }
+
+        [EdiValue("X(3)", Path = "FTX/2/2")]
+        public string Field3c { get; set; }
+
+        [EdiValue("X(70)", Path = "FTX/3/0")]
+        public string Field4a { get; set; }
+
+        [EdiValue("X(70)", Path = "FTX/3/1")]
+        public string Field4b { get; set; }
+
+        [EdiValue("X(70)", Path = "FTX/3/2")]
+        public string Field4c { get; set; }
+
+        [EdiValue("X(70)", Path = "FTX/3/3")]
+        public string Field4d { get; set; }
+
+        [EdiValue("X(70)", Path = "FTX/3/4")]
+        public string Field4e { get; set; }
+
+        [EdiValue("X(3)", Path = "FTX/4/0")]
+        public string Field5 { get; set; }
     }
 
     [EdiSegment, EdiPath("MEA")]

@@ -611,6 +611,10 @@ namespace indice.Edi.Tests
             Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2b, "BG");
                                                         
             Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field1, "AAA");
+            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4a, "36 METRIC TONNES MILK SKIMMED POWDER LH HALAL 25KGS NO OF BAGS:1440 X");
+            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4b, " 25KGS NETT WEIGHT :36000.00KGS GROSS WEIGHT:36468.00KGS TOTAL VGM W");
+            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4c, "EIGHT: 42488.00KGS GROSS CARGO WEIGHT IS EQUAL TO GROSS WEIGHT FREIGH");
+            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4d, "T COLLECT 28 DAYS FREE DEMURRAGE");
                                                         
             Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].MEA[0].Field1, "AAE");
                                                         
