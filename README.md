@@ -206,7 +206,7 @@ for more information check .Net Core [official page](https://www.microsoft.com/n
 
 
 ## The Picture clause
-The _Picture Clause_ is taken from COBOL laguage and the way it handles expressing numeric and alphanumric data types. It is used throug out tradacoms.
+The _Picture Clause_ is taken from COBOL laguage and the way it handles expressing numeric and alphanumric data types. It is used throughout tradacoms.
 
 |Symbol | Description      | Example Picture  | Component           | c# result
 |:-----:|------------------|:----------------:|---------------------|------------------|
