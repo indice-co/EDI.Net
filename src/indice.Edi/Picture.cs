@@ -22,7 +22,7 @@ namespace indice.Edi
     {
         private const string PARSE_PATTERN = @"([9X]{1})\s?\((\d+?)\)\s?(V9\((\d+?)\))?";
         private readonly byte _Precision;
-        private readonly byte _Scale;
+        private readonly ushort _Scale;
         private readonly PictureKind _Kind;
 
         /// <summary>
@@ -61,26 +61,26 @@ namespace indice.Edi
             }
         }
 
-        public Picture(byte length) {
+        public Picture(ushort length) {
             _Scale = length;
             _Precision = 0;
             _Kind = PictureKind.Alphanumeric;
         }
 
-        public Picture(byte length, PictureKind kind) {
+        public Picture(ushort length, PictureKind kind) {
             _Scale = length;
             _Precision = 0;
             _Kind = kind;
         }
 
-        public Picture(byte integerLength, byte decimalLength) {
-            _Scale = (byte)(integerLength + decimalLength);
+        public Picture(ushort integerLength, byte decimalLength) {
+            _Scale = (ushort)(integerLength + decimalLength);
             _Precision = decimalLength;
             _Kind = PictureKind.Numeric;
         }
 
-        public Picture(byte integerLength, byte decimalLength, PictureKind kind) {
-            _Scale = (byte)(integerLength + decimalLength);
+        public Picture(ushort integerLength, byte decimalLength, PictureKind kind) {
+            _Scale = (ushort)(integerLength + decimalLength);
             _Precision = decimalLength;
             _Kind = kind;
         }
