@@ -113,7 +113,7 @@ namespace indice.Edi
 
             if (match != null) {
                 var kind = match.Groups[1].Value == "X" ? PictureKind.Alphanumeric : PictureKind.Numeric;
-                var length = byte.Parse(match.Groups[2].Value);
+                var length = ushort.Parse(match.Groups[2].Value);
                 byte decimalLength = 0;
                 if (kind == PictureKind.Numeric && !string.IsNullOrWhiteSpace(match.Groups[3].Value)) {
                     decimalLength = byte.Parse(match.Groups[4].Value);
