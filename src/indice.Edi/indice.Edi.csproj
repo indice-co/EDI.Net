@@ -14,7 +14,7 @@
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
     <PackageReleaseNotes>
-      Picture parse now supports field lengths greater than 255 characters (ushort pressision)
+      Picture parse now supports field lengths greater than 255 characters (ushort precision)
       Fixes #70
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
