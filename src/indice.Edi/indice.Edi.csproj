@@ -9,6 +9,7 @@
     <TargetFrameworks>net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8</TargetFrameworks>
     <AssemblyName>indice.Edi</AssemblyName>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Label="Package">
     <PackageId>indice.Edi</PackageId>
