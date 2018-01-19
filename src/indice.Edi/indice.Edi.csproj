@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.3.2</VersionPrefix>
+    <VersionPrefix>1.3.3</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8</TargetFrameworks>
@@ -15,8 +15,9 @@
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
     <PackageReleaseNotes>
-      Picture parse now supports field lengths greater than 255 characters (ushort precision)
-      Fixes #70
+      Add code to automatically end segment groups when a non-matching segment is found. Fixes #75 (#76)
+      * Add code to automatically end segment groups when a non-matching segment is found
+      * Do not require standard headers/trailers to be modelled explicitly
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
