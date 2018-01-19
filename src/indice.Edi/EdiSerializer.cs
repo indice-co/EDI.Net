@@ -83,6 +83,15 @@ namespace indice.Edi
         internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
+
+            var implicitSegments = new [] {
+                reader.Grammar.FunctionalGroupHeaderTag,
+                reader.Grammar.FunctionalGroupTrailerTag,
+                reader.Grammar.InterchangeHeaderTag,
+                reader.Grammar.InterchangeTrailerTag,
+                reader.Grammar.MessageHeaderTag,
+                reader.Grammar.MessageTrailerTag
+            };
             
             // the output value
             object value = null;
@@ -119,6 +128,7 @@ namespace indice.Edi
                         while (true) {
                             if (TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)
                                 || TryCreateContainer(reader, stack, EdiStructureType.Segment)
+                                || implicitSegments.Contains(reader.Value)
                                 || !AutoEndSegmentGroups) {
                                 break;
                             }
