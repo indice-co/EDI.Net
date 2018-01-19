@@ -19,6 +19,11 @@ namespace indice.Edi
     public class EdiSerializer
     {
         /// <summary>
+        ///     Gets or sets a value indicating whether segment groups should automatically end when a non-matching segment is found. 
+        /// </summary>
+        public bool AutoEndSegmentGroups { get; set; }
+
+        /// <summary>
         /// Deserializes the EDI structure contained by the specified <see cref="EdiReader"/>.
         /// </summary>
         /// <param name="reader">The <see cref="EdiReader"/> that contains the EDI structure to deserialize.</param>
@@ -78,6 +83,15 @@ namespace indice.Edi
         internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
+
+            var implicitSegments = new [] {
+                reader.Grammar.FunctionalGroupHeaderTag,
+                reader.Grammar.FunctionalGroupTrailerTag,
+                reader.Grammar.InterchangeHeaderTag,
+                reader.Grammar.InterchangeTrailerTag,
+                reader.Grammar.MessageHeaderTag,
+                reader.Grammar.MessageTrailerTag
+            };
             
             // the output value
             object value = null;
@@ -111,9 +125,22 @@ namespace indice.Edi
                         }
                         value = stack.Peek().Instance;
                     } else if (reader.TokenType == EdiToken.SegmentName) {
+                        while (true) {
+                            if (TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)
+                                || TryCreateContainer(reader, stack, EdiStructureType.Segment)
+                                || implicitSegments.Contains(reader.Value)
+                                || !AutoEndSegmentGroups) {
+                                break;
+                            }
 
-                        if (!TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)) {
-                                TryCreateContainer(reader, stack, EdiStructureType.Segment);
+                            stack.Pop();
+
+                            if (stack.Count == 0) {
+                                throw new EdiException(
+                                    "Unable to deserialize segment {0}. No matching property found on stack.".FormatWith(
+                                        reader.Culture,
+                                        reader.Value));
+                            }
                         }
                     }
                     else if (reader.TokenType == EdiToken.ElementStart) {
