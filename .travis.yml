@@ -3,7 +3,7 @@ mono: none
 dotnet: 2.0.0
 
 install:
- - cd EDI.Net\src\indice.Edi
+ - cd src/indice.Edi/
  - dotnet restore
 
 script:
