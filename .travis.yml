@@ -4,6 +4,7 @@ dotnet: 2.0.0
 
 install:
  - cd src/indice.Edi/
+ - dotnet add package indice.Edi --version 1.3.3
  - dotnet restore
 
 script:
