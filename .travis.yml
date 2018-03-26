@@ -1,0 +1,13 @@
+language: csharp
+mono: none
+dotnet: 2.0.0
+
+install:
+ - cd src/indice.Edi/
+ - dotnet add package indice.Edi --version 1.3.3
+ - dotnet restore
+
+script:
+ - dotnet build
+ - cd ../../test/indice.Edi.Tests
+ - dotnet test MTAServiceStatus.Tests/MTAServiceStatus.Tests.csproj
