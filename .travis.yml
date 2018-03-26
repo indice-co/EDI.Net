@@ -1,8 +1,6 @@
 language: csharp
 solution: indice.Edi.sln
-install:
-  - nuget restore indice.Edi.sln
-  - nuget install xunit.runners -Version 1.9.2 -OutputDirectory testrunner
+dotnet: 2.0.0
+sudo: required
 script:
-  - xbuild /p:Configuration=Release indice.Edi.sln
-  - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./MyProject.Tests/bin/Release/MyProject.Tests.dll
+ - dotnet build
