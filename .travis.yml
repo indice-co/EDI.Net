@@ -1,6 +1,5 @@
 language: csharp
 solution: indice.Edi.sln
-dotnet: 2.0.0
 sudo: required
-script:
- - dotnet build
+install:
+ - nuget restore indice.Edi.sln
