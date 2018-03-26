@@ -1,5 +1,12 @@
 language: csharp
-solution: indice.Edi.sln
-sudo: required
+mono: none
+dotnet: 2.0.0
+
 install:
- - nuget restore indice.Edi.sln
+ - cd src\indice.Edi
+ - dotnet restore
+
+script:
+ - dotnet build
+ - cd ../../test/indice.Edi.Tests
+ - dotnet test MTAServiceStatus.Tests/MTAServiceStatus.Tests.csproj
