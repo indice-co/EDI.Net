@@ -476,223 +476,223 @@ namespace indice.Edi.Tests
             }
 
             //Interchange header
-            Assert.Equal(interchange.Header_Field1a, "UNOA");
-            Assert.Equal(interchange.Header_Field1b, "1");
-            Assert.Equal(interchange.Header_Field2, "MSC");
-            Assert.Equal(interchange.Header_Field3, "ECA");
-            Assert.Equal(interchange.Header_Field4a, "20170119");
-            Assert.Equal(interchange.Header_Field4b, "1010");
-            Assert.Equal(interchange.Header_Field5, "20170119101016");
+            Assert.Equal("UNOA", interchange.Header_Field1a);
+            Assert.Equal("1", interchange.Header_Field1b);
+            Assert.Equal("MSC", interchange.Header_Field2);
+            Assert.Equal("ECA", interchange.Header_Field3);
+            Assert.Equal("20170119", interchange.Header_Field4a);
+            Assert.Equal("1010", interchange.Header_Field4b);
+            Assert.Equal("20170119101016", interchange.Header_Field5);
             
 
             //Message header info
             Assert.NotNull(interchange.Message);
-            Assert.Equal(interchange.Message.Field1, "201701191AB652");
-            Assert.Equal(interchange.Message.Field2a, null);
-            Assert.Equal(interchange.Message.Field2b, "D");
-            Assert.Equal(interchange.Message.Field2c, "95B");
-            Assert.Equal(interchange.Message.Field2d, "UN");
+            Assert.Equal("201701191AB652", interchange.Message.Field1);
+            Assert.Null(interchange.Message.Field2a);
+            Assert.Equal("D", interchange.Message.Field2b);
+            Assert.Equal("95B", interchange.Message.Field2c);
+            Assert.Equal("UN", interchange.Message.Field2d);
 
 
             //BGM - Begging of message
-            Assert.Equal(interchange.Message.BGM.Field1, "85");
-            Assert.Equal(interchange.Message.BGM.Field2, "201701191AB652");
-            Assert.Equal(interchange.Message.BGM.Field3, "9");
+            Assert.Equal("85", interchange.Message.BGM.Field1);
+            Assert.Equal("201701191AB652", interchange.Message.BGM.Field2);
+            Assert.Equal("9", interchange.Message.BGM.Field3);
 
 
-            Assert.Equal(interchange.Message.DTM.Field1a, "137");
-            Assert.Equal(interchange.Message.DTM.Field1b, "20170119");
-            Assert.Equal(interchange.Message.DTM.Field1c, "102");
+            Assert.Equal("137", interchange.Message.DTM.Field1a);
+            Assert.Equal("20170119", interchange.Message.DTM.Field1b);
+            Assert.Equal("102", interchange.Message.DTM.Field1c);
 
             //NAD - Name And Addresses
-            Assert.Equal(interchange.Message.NAD.Field1, "MS");
-            Assert.Equal(interchange.Message.NAD.Field2a, "202487288");
-            Assert.Equal(interchange.Message.NAD.Field2b, "172");
-            Assert.Equal(interchange.Message.NAD.Field2c, "166");
-            Assert.Equal(interchange.Message.NAD.Field3, "MSC");
+            Assert.Equal("MS", interchange.Message.NAD.Field1);
+            Assert.Equal("202487288", interchange.Message.NAD.Field2a);
+            Assert.Equal("172", interchange.Message.NAD.Field2b);
+            Assert.Equal("166", interchange.Message.NAD.Field2c);
+            Assert.Equal("MSC", interchange.Message.NAD.Field3);
 
             //Grou 1 - TDT Details of transport
             Assert.NotNull(interchange.Message.TDT_Group1);
-            Assert.Equal(interchange.Message.TDT_Group1.Count(), 1);
+            Assert.Equal(1, interchange.Message.TDT_Group1.Count());
 
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field1, "20");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field2, "AB652A");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field3, "1");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field4, null);
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field5a, "MSC");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field5b, "172");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field5c, "166");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field5d, "MSC SENA");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field6, null);
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field7a, null);
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field7b, null);
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field7c, "202487288");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field8a, "D5LQ7");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field8b, "146");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field8c, "14");
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field8d, null);
-            Assert.Equal(interchange.Message.TDT_Group1[0].Field8e, "EG");
+            Assert.Equal("20", interchange.Message.TDT_Group1[0].Field1);
+            Assert.Equal("AB652A", interchange.Message.TDT_Group1[0].Field2);
+            Assert.Equal("1", interchange.Message.TDT_Group1[0].Field3);
+            Assert.Null(interchange.Message.TDT_Group1[0].Field4);
+            Assert.Equal("MSC", interchange.Message.TDT_Group1[0].Field5a);
+            Assert.Equal("172", interchange.Message.TDT_Group1[0].Field5b);
+            Assert.Equal("166", interchange.Message.TDT_Group1[0].Field5c);
+            Assert.Equal("MSC SENA", interchange.Message.TDT_Group1[0].Field5d);
+            Assert.Null(interchange.Message.TDT_Group1[0].Field6);
+            Assert.Null(interchange.Message.TDT_Group1[0].Field7a);
+            Assert.Null(interchange.Message.TDT_Group1[0].Field7b);
+            Assert.Equal("202487288", interchange.Message.TDT_Group1[0].Field7c);
+            Assert.Equal("D5LQ7", interchange.Message.TDT_Group1[0].Field8a);
+            Assert.Equal("146", interchange.Message.TDT_Group1[0].Field8b);
+            Assert.Equal("14", interchange.Message.TDT_Group1[0].Field8c);
+            Assert.Null(interchange.Message.TDT_Group1[0].Field8d);
+            Assert.Equal("EG", interchange.Message.TDT_Group1[0].Field8e);
 
             //Group 1 - LOC Place/location identification
             Assert.NotNull(interchange.Message.TDT_Group1[0].LOC);
-            Assert.Equal(interchange.Message.TDT_Group1[0].LOC.Count(), 1);
-            Assert.Equal(interchange.Message.TDT_Group1[0].LOC[0].Field1, "60");
-            Assert.Equal(interchange.Message.TDT_Group1[0].LOC[0].Field2a, "EGEDK");
-            Assert.Equal(interchange.Message.TDT_Group1[0].LOC[0].Field2b, "139");
-            Assert.Equal(interchange.Message.TDT_Group1[0].LOC[0].Field2c, null);
-            Assert.Equal(interchange.Message.TDT_Group1[0].LOC[0].Field2d, "El Dekheila");
+            Assert.Equal(1, interchange.Message.TDT_Group1[0].LOC.Count());
+            Assert.Equal("60", interchange.Message.TDT_Group1[0].LOC[0].Field1);
+            Assert.Equal("EGEDK", interchange.Message.TDT_Group1[0].LOC[0].Field2a);
+            Assert.Equal("139", interchange.Message.TDT_Group1[0].LOC[0].Field2b);
+            Assert.Null(interchange.Message.TDT_Group1[0].LOC[0].Field2c);
+            Assert.Equal("El Dekheila", interchange.Message.TDT_Group1[0].LOC[0].Field2d);
 
             //Group 1 - DTM Date/time/period
             Assert.NotNull(interchange.Message.TDT_Group1[0].DTM);
-            Assert.Equal(interchange.Message.TDT_Group1[0].DTM.Count(), 2);
+            Assert.Equal(2, interchange.Message.TDT_Group1[0].DTM.Count());
 
-            Assert.Equal(interchange.Message.TDT_Group1[0].DTM[0].Field1a, "132");
-            Assert.Equal(interchange.Message.TDT_Group1[0].DTM[0].Field1b, "1701290000");
-            Assert.Equal(interchange.Message.TDT_Group1[0].DTM[0].Field1c, "201");
-            Assert.Equal(interchange.Message.TDT_Group1[0].DTM[1].Field1a, "137");
-            Assert.Equal(interchange.Message.TDT_Group1[0].DTM[1].Field1b, "20170110");
-            Assert.Equal(interchange.Message.TDT_Group1[0].DTM[1].Field1c, "102");
+            Assert.Equal("132", interchange.Message.TDT_Group1[0].DTM[0].Field1a);
+            Assert.Equal("1701290000", interchange.Message.TDT_Group1[0].DTM[0].Field1b);
+            Assert.Equal("201", interchange.Message.TDT_Group1[0].DTM[0].Field1c);
+            Assert.Equal("137", interchange.Message.TDT_Group1[0].DTM[1].Field1a);
+            Assert.Equal("20170110", interchange.Message.TDT_Group1[0].DTM[1].Field1b);
+            Assert.Equal("102", interchange.Message.TDT_Group1[0].DTM[1].Field1c);
             
 
             //Group 4 - CNI
             Assert.NotNull(interchange.Message.CNI_Group4);
-            Assert.Equal(interchange.Message.CNI_Group4.Count(), 2);
+            Assert.Equal(2, interchange.Message.CNI_Group4.Count());
 
             //CNI Segment 1
-            Assert.Equal(interchange.Message.CNI_Group4[0].Field1, "1");
-            Assert.Equal(interchange.Message.CNI_Group4[0].Field2, "MSCUXP080935");
+            Assert.Equal("1", interchange.Message.CNI_Group4[0].Field1);
+            Assert.Equal("MSCUXP080935", interchange.Message.CNI_Group4[0].Field2);
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].Field1, "AAA");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].Field2, "MSCUDB592345");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field1, "9");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2a, "IEDUB");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2b, "139");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2d, null);
+            Assert.Equal("AAA", interchange.Message.CNI_Group4[0].RFF_Group5[0].Field1);
+            Assert.Equal("MSCUDB592345", interchange.Message.CNI_Group4[0].RFF_Group5[0].Field2);
+            Assert.Equal("9", interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field1);
+            Assert.Equal("IEDUB", interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2a);
+            Assert.Equal("139", interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2c);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[0].Field2d);
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field1, "11");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2a, "EGEDK");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2b, "139");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2d, null);
+            Assert.Equal("11", interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field1);
+            Assert.Equal("EGEDK", interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2a);
+            Assert.Equal("139", interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2c);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].LOC[1].Field2d);
             
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field1, "CZ");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field2b, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field3, "LAKELAND DAIRIES,");
+            Assert.Equal("CZ", interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field2a);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field2c);
+            Assert.Equal("LAKELAND DAIRIES,", interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[0].Field3);
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field1, "CN");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field2b, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field3, "FRONERI ICE CREAM EGYPT");
+            Assert.Equal("CN", interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field2a);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field2c);
+            Assert.Equal("FRONERI ICE CREAM EGYPT", interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[1].Field3);
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field1, "N1");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field2b, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field3, "FRONERI ICE CREAM EGYPT");
+            Assert.Equal("N1", interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field2a);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field2c);
+            Assert.Equal("FRONERI ICE CREAM EGYPT", interchange.Message.CNI_Group4[0].RFF_Group5[0].NAD[2].Field3);
 
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field1, "1");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2a, "560");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2b, "BG");
+            Assert.Equal("1", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field1);
+            Assert.Equal("560", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2a);
+            Assert.Equal("BG", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2b);
             
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[1].Field1, "2");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[1].Field2a, "880");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[1].Field2b, "BG");
+            Assert.Equal("2", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[1].Field1);
+            Assert.Equal("880", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[1].Field2a);
+            Assert.Equal("BG", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[1].Field2b);
             
 
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field1, "1");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2a, "560");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2b, "BG");
+            Assert.Equal("1", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field1);
+            Assert.Equal("560", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2a);
+            Assert.Equal("BG", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].Field2b);
                                                         
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field1, "AAA");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4a, "36 METRIC TONNES MILK SKIMMED POWDER LH HALAL 25KGS NO OF BAGS:1440 X");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4b, " 25KGS NETT WEIGHT :36000.00KGS GROSS WEIGHT:36468.00KGS TOTAL VGM W");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4c, "EIGHT: 42488.00KGS GROSS CARGO WEIGHT IS EQUAL TO GROSS WEIGHT FREIGH");
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4d, "T COLLECT 28 DAYS FREE DEMURRAGE");
+            Assert.Equal("AAA", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field1);
+            Assert.Equal("36 METRIC TONNES MILK SKIMMED POWDER LH HALAL 25KGS NO OF BAGS:1440 X", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4a);
+            Assert.Equal(" 25KGS NETT WEIGHT :36000.00KGS GROSS WEIGHT:36468.00KGS TOTAL VGM W", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4b);
+            Assert.Equal("EIGHT: 42488.00KGS GROSS CARGO WEIGHT IS EQUAL TO GROSS WEIGHT FREIGH", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4c);
+            Assert.Equal("T COLLECT 28 DAYS FREE DEMURRAGE", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].FTX.Field4d);
                                                         
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].MEA[0].Field1, "AAE");
+            Assert.Equal("AAE", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].MEA[0].Field1);
                                                         
-            Assert.Equal(interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].SPG.Field1, "FCIU5956299");
+            Assert.Equal("FCIU5956299", interchange.Message.CNI_Group4[0].RFF_Group5[0].GID_Group10[0].SPG.Field1);
             
 
 
             //CNI Segment 2
-            Assert.Equal(interchange.Message.CNI_Group4[1].Field1, "2");
-            Assert.Equal(interchange.Message.CNI_Group4[1].Field2, "MSCUEK569969");
+            Assert.Equal("2", interchange.Message.CNI_Group4[1].Field1);
+            Assert.Equal("MSCUEK569969", interchange.Message.CNI_Group4[1].Field2);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].Field1, "BM");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].Field2, "MSCUEK569969");
+            Assert.Equal("BM", interchange.Message.CNI_Group4[1].RFF_Group5[0].Field1);
+            Assert.Equal("MSCUEK569969", interchange.Message.CNI_Group4[1].RFF_Group5[0].Field2);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field1, "9");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2a, "SGSIN");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2b, "139");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2d, null);
+            Assert.Equal("9", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field1);
+            Assert.Equal("SGSIN", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2a);
+            Assert.Equal("139", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2c);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[0].Field2d);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field1, "11");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2a, "EGALY");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2b, "139");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2d, null);
+            Assert.Equal("11", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field1);
+            Assert.Equal("EGALY", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2a);
+            Assert.Equal("139", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2c);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[1].Field2d);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field1, "8");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2b, "139");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2d, null);
+            Assert.Equal("8", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2a);
+            Assert.Equal("139", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2c);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[2].Field2d);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field1, "80");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2a, "SG");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2b, "139");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2d, null);
+            Assert.Equal("80", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field1);
+            Assert.Equal("SG", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2a);
+            Assert.Equal("139", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2c);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[3].Field2d);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field1, "28");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2b, "139");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2d, null);
+            Assert.Equal("28", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2a);
+            Assert.Equal("139", interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2c);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].LOC[4].Field2d);
 
 
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field1, "CZ");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field2b, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field3, "BPI A/S");
+            Assert.Equal("CZ", interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field2a);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field2c);
+            Assert.Equal("BPI A/S", interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[0].Field3);
                                                         
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field1, "CN");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field2b, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field3, "TO ORDER");
+            Assert.Equal("CN", interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field2a);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field2c);
+            Assert.Equal("TO ORDER", interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[1].Field3);
                                                         
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field1, "N1");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field2a, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field2b, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field2c, null);
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field3, "EL IMAN COMPANY FOR TRADING EXPORT AND IMPORT (SAAD AND MOHAMED ELFAR)");
+            Assert.Equal("N1", interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field1);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field2a);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field2b);
+            Assert.Null(interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field2c);
+            Assert.Equal("EL IMAN COMPANY FOR TRADING EXPORT AND IMPORT (SAAD AND MOHAMED ELFAR)", interchange.Message.CNI_Group4[1].RFF_Group5[0].NAD[2].Field3);
 
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].Field1, "1");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].Field2a, "699");
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].Field2b, "BG");
+            Assert.Equal("1", interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].Field1);
+            Assert.Equal("699", interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].Field2a);
+            Assert.Equal("BG", interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].Field2b);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].FTX.Field1, "AAA");
+            Assert.Equal("AAA", interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].FTX.Field1);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].MEA[0].Field1, "AAE");
+            Assert.Equal("AAE", interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].MEA[0].Field1);
 
-            Assert.Equal(interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].SPG.Field1, "FCIU2469131");
+            Assert.Equal("FCIU2469131", interchange.Message.CNI_Group4[1].RFF_Group5[0].GID_Group10[0].SPG.Field1);
 
             //Interchange trailer
-            Assert.Equal(interchange.Trailer_Field1, 1);
-            Assert.Equal(interchange.Trailer_Field2, "20170119101016");
+            Assert.Equal(1, interchange.Trailer_Field1);
+            Assert.Equal("20170119101016", interchange.Trailer_Field2);
         }
 
         [Fact]
@@ -723,5 +723,22 @@ namespace indice.Edi.Tests
             Assert.Equal("Z07", interchange.Message.IMD_Other.FieldC);
         }
 
+        [Fact]
+        [Trait(Traits.Tag, "X12")]
+        [Trait(Traits.Tag, "810")]
+        [Trait(Traits.Issue, "#83")]
+        public void X12_810_MandatoryConditions_Test() {
+            var grammar = EdiGrammar.NewX12();
+
+            var interchange = default(Invoice_810);
+            using (var stream = Helpers.GetResourceStream("x12.810.mandatory-conditions.edi")) {
+                interchange = new EdiSerializer().Deserialize<Invoice_810>(new StreamReader(stream), grammar);
+            }
+
+            Assert.NotNull(interchange.Groups[0].Invoice.TotalOutstandingBalance);
+            Assert.NotNull(interchange.Groups[0].Invoice.TotalPaymentsAndRefunds);
+            Assert.Equal(5.55M, interchange.Groups[0].Invoice.TotalPaymentsAndRefunds.Value);
+            Assert.Equal(3.33M, interchange.Groups[0].Invoice.TotalOutstandingBalance.Value);
+        }
     }
 }
