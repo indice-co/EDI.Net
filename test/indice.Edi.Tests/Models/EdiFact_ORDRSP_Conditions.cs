@@ -14,8 +14,7 @@ namespace indice.Edi.Tests.Models
     [EdiMessage]
     public class Message_ORDRSP
     {
-        [EdiCondition("Z01", Path = "IMD/1/0")]
-        [EdiCondition("Z10", Path = "IMD/1/0")]
+        [EdiCondition("Z01", "Z10", Path = "IMD/1/0")]
         public List<IMD> IMD_List { get; set; }
 
         [EdiCondition("Z01", "Z10", CheckFor = EdiConditionCheckType.NotEqual, Path = "IMD/1/0")]
