@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 namespace indice.Edi.Serialization
 {
     /// <summary>
-    /// 
+    /// The mode that a condition is checked against a value. By default the mode is set to check for <see cref="EdiConditionCheckType.Equal"/>
     /// </summary>
     public enum EdiConditionCheckType
     {
+        /// <summary>
+        /// The value should be  equal
+        /// </summary>
         Equal = 1,
+        /// <summary>
+        /// The value should not be equal.
+        /// </summary>
         NotEqual = 2
     }
 

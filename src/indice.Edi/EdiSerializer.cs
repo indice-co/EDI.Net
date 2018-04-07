@@ -541,7 +541,8 @@ namespace indice.Edi
                 }
             }
             
-            var property = candidates.SingleOrDefault(p => p.Conditions.All(c => c.SatisfiedBy(conditionPathValues[c.PathInternal])));
+            var property = candidates.SingleOrDefault(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(conditionPathValues[c.PathInternal]))
+                                                                                                             : p.Conditions.Any(c => c.SatisfiedBy(conditionPathValues[c.PathInternal])));
             if (property != null)
                 return property;
             return null;

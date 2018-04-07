@@ -16,6 +16,7 @@ namespace indice.Edi.Serialization
         private readonly EdiConditionAttribute[] _Conditions;
         private readonly EdiValueAttribute _ValueInfo;
         private readonly EdiSegmentGroupAttribute _SegmentGroupInfo;
+        private readonly EdiConditionStackMode _ConditionStackMode;
 
         public List<EdiAttribute> Attributes {
             get { return _Attributes; }
@@ -34,6 +35,12 @@ namespace indice.Edi.Serialization
         public string Segment {
             get {
                 return _PathInfo?.Segment;
+            }
+        }
+
+        public EdiConditionStackMode ConditionStackMode {
+            get {
+                return _ConditionStackMode;
             }
         }
 
@@ -95,6 +102,7 @@ namespace indice.Edi.Serialization
             if (_SegmentGroupInfo != null && _SegmentGroupInfo.StartInternal.Segment != null && _PathInfo == null) {
                 _PathInfo = new EdiPathAttribute(_SegmentGroupInfo.StartInternal.Segment);
             }
+            _ConditionStackMode = conditions.Length > 0 && Attributes.OfType<EdiAnyAttribute>().Any() ? EdiConditionStackMode.Any : EdiConditionStackMode.All;
         }
 
         public override string ToString() {
