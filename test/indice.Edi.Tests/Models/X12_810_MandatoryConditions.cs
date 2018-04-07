@@ -126,6 +126,9 @@ namespace indice.Edi.Tests.Models
 
             [EdiCondition("M", Path = "BAL/0"), EdiCondition("YB", Path = "BAL/1")]
             public Balance TotalOutstandingBalance { get; set; }
+
+            [EdiCondition("P", Path = "BAL/0"), EdiCondition("YB", Path = "BAL/1")]
+            public Balance PriorBalance { get; set; }
         }
 
         [EdiSegment]

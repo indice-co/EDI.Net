@@ -507,14 +507,13 @@ namespace indice.Edi
                 "More than one properties on type '{0}' have the '{1}' attribute. Please add a 'Condition' attribute to all properties in order to discriminate where each {2} will go."
                     .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType, newContainerType));
             }
-            var conditionPaths = candidates.SelectMany(p => p.Conditions.Select(c => c.Path)).Distinct().ToArray();
+            var conditionPathValues = candidates.SelectMany(p => p.Conditions.Select(c => c.Path)).Distinct().ToDictionary(x => x, x => (string)null);
             //if (conditionPaths.Length != 1) {
             //    throw new EdiException("More than one properties on type '{0}' have the '{1}' attribute but the 'Condition' attribute has a different search path declared."
             //        .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType));
             //}
             var cache = currentStructure.CachedReads;
-            var findingsPerPath = new Dictionary<string, string>();
-            foreach (var path in conditionPaths) {
+            foreach (var path in conditionPathValues.Keys.ToArray()) {
                 // search the cache first.
                 var value = default(string);
                 var found = false;
@@ -537,13 +536,14 @@ namespace indice.Edi
                         }
                     } while (!found || reader.TokenType != EdiToken.SegmentStart);
 
-                if (found) { 
-                    var property = candidates.SingleOrDefault(p => p.PathInfo.PathInternal == path && p.Conditions.Any(c => c.SatisfiedBy(value)));
-                    if (property != null)
-                        return property;
+                if (found) {
+                    conditionPathValues[path] = value;
                 }
             }
             
+            var property = candidates.SingleOrDefault(p => p.Conditions.All(c => c.SatisfiedBy(conditionPathValues[c.PathInternal])));
+            if (property != null)
+                return property;
             return null;
         }
         #endregion

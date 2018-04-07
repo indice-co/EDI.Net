@@ -739,6 +739,7 @@ namespace indice.Edi.Tests
             Assert.NotNull(interchange.Groups[0].Invoice.TotalPaymentsAndRefunds);
             Assert.Equal(5.55M, interchange.Groups[0].Invoice.TotalPaymentsAndRefunds.Value);
             Assert.Equal(3.33M, interchange.Groups[0].Invoice.TotalOutstandingBalance.Value);
+            Assert.Equal(6.66M, interchange.Groups[0].Invoice.PriorBalance.Value);
         }
     }
 }
