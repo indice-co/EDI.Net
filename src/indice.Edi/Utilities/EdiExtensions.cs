@@ -143,7 +143,10 @@ namespace indice.Edi.Utilities
                 return null;
             decimal d;
             var provider = NumberFormatInfo.InvariantInfo;
-            if (decimalMark.HasValue) {
+            if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && decimal.TryParse(value, NumberStyles.Integer, provider, out d)) {
+                d = d * (decimal)Math.Pow(0.1, picture.Value.Precision);
+                return d;
+            } else if (decimalMark.HasValue) {
                 if (provider.NumberDecimalSeparator != decimalMark.ToString()) {
                     provider = provider.Clone() as NumberFormatInfo;
                     provider.NumberDecimalSeparator = decimalMark.Value.ToString();
@@ -151,10 +154,6 @@ namespace indice.Edi.Utilities
                 if (decimal.TryParse(value, NumberStyles.Number, provider, out d)) {
                     return d;
                 }
-            }
-            else if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && decimal.TryParse(value, NumberStyles.Integer, provider, out d)) {
-                d = d * (decimal)Math.Pow(0.1, picture.Value.Precision);
-                return d;
             }
             throw new EdiException("Could not convert string to decimal: {0}.".FormatWith(CultureInfo.InvariantCulture, value));
         }
@@ -187,7 +186,14 @@ namespace indice.Edi.Utilities
             if (!value.HasValue)
                 return null;
             var provider = NumberFormatInfo.InvariantInfo;
-            if (decimalMark.HasValue) {
+             if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && picture.Value.HasPrecision) {
+                var pic = picture.Value;
+                var number = value.Value;
+                var integer = (int)(number * (decimal)Math.Pow(10.0, pic.Precision));
+                var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
+                var result = integer.ToString(padding);
+                return result;
+            } else if (decimalMark.HasValue) {
                 if (provider.NumberDecimalSeparator != decimalMark.ToString()) {
                     provider = provider.Clone() as NumberFormatInfo;
                     provider.NumberDecimalSeparator = decimalMark.Value.ToString();
@@ -196,12 +202,12 @@ namespace indice.Edi.Utilities
             } else if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric) {
                 var pic = picture.Value;
                 var number = value.Value;
-                var integer = (int)number * pic.Precision;
+                var integer = (int)(number * (decimal)Math.Pow(10.0, pic.Precision));
                 var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
                 var result = integer.ToString(padding);
                 return result;
-            }
-            return string.Format(NumberFormatInfo.InvariantInfo, "{0}", value);
+            } else
+                return string.Format(NumberFormatInfo.InvariantInfo, "{0}", value);
         }
 
         public static string ToEdiString(this long? value, Picture? picture) {

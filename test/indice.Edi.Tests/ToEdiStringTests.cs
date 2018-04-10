@@ -17,6 +17,8 @@ namespace indice.Edi.Tests
             Assert.Equal("00012", EdiExtensions.ToEdiString(12, (Picture)"9(5)"));
             Assert.Equal("12", EdiExtensions.ToEdiString(12, (Picture)"X(1)"));
             Assert.Equal("12", EdiExtensions.ToEdiString(12, (Picture)"9(1)"));
+            
+            Assert.Equal("29012", EdiExtensions.ToEdiString(290.12M, (Picture)"9(3)V9(2)", '.'));
         }
     }
 }
