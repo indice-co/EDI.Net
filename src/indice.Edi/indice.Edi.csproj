@@ -6,7 +6,7 @@
     <VersionPrefix>1.4.1</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
-    <TargetFrameworks>net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net40;net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8;netstandard2.0</TargetFrameworks>
     <AssemblyName>indice.Edi</AssemblyName>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -23,10 +23,15 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/indice-co/EDI.Net</RepositoryUrl>
     <Company>Indice</Company>
+    <Product>Edi.Net</Product>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
     <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net40'">
+    <AssemblyTitle>Json.NET .NET 4.0</AssemblyTitle>
+    <DefineConstants>$(DefineConstants);net40</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
     <AssemblyTitle>Edi.Net .NET Standard 1.0</AssemblyTitle>

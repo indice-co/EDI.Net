@@ -894,5 +894,35 @@ namespace indice.Edi.Utilities
             // possibly use IL initobj for perf here?
             return Activator.CreateInstance(type);
         }
+
+#if net40
+        /// <summary>
+        /// Sets the propery value of a given object to the given value.
+        /// </summary>
+        /// <param name="property">The property</param>
+        /// <param name="obj">The instance that contains the property to update</param>
+        /// <param name="value">The object value to set.</param>
+        internal static void SetValue(this PropertyInfo property, object obj, object value) {
+            property.SetValue(obj, value, null);
+        }
+
+        /// <summary>
+        /// Returns the property value of the specified object.
+        /// </summary>
+        /// <param name="property">The property</param>
+        /// <param name="obj">The instance that contains the property to retrieve</param>
+        /// <returns>the value of the property</returns>
+        internal static object GetValue(this PropertyInfo property, object obj) {
+            return property.GetValue(obj, null);
+        }
+
+        internal static Type GetTypeInfo(this Type type) {
+            return type;
+        }
+
+        internal static IEnumerable<T> GetCustomAttributes<T>(this MemberInfo element) where T : Attribute {
+            return element.GetCustomAttributes(typeof(T), true).Cast<T>();
+        }
+#endif
     }
 }
