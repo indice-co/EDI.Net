@@ -16,7 +16,7 @@ namespace indice.Edi.Tests
             var interchange = default(AutoEndSegmentGroups);
 
             using (var stream = Helpers.GetResourceStream("edifact.AutoEndSegmentGroups.edi")) {
-                var serializer = new EdiSerializer {AutoEndSegmentGroups = true};
+                var serializer = new EdiSerializer { AutoEndSegmentGroups = true };
                 interchange = serializer.Deserialize<AutoEndSegmentGroups>(new StreamReader(stream), grammar);
             }
 
@@ -31,5 +31,20 @@ namespace indice.Edi.Tests
             Assert.NotNull(message.AfterGroup);
             Assert.Equal(message.AfterGroup.Id, "Message1.AfterGroup");
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "EDIFact")]
+        public void AutoEndSegmentGroupsImplicitSegments() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(AutoEndSegmentGroups);
+
+            Assert.Throws<EdiException>(() => {
+                using (var stream = Helpers.GetResourceStream("edifact.AutoEndSegmentGroups.edi")) {
+                    var serializer = new EdiSerializer { AutoEndSegmentGroups = true, AutoEndSegmentGroupsOnImplicitSegments = true };
+                    interchange = serializer.Deserialize<AutoEndSegmentGroups>(new StreamReader(stream), grammar);
+                }
+            });
+        }
+
     }
 }
