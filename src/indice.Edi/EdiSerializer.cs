@@ -24,6 +24,12 @@ namespace indice.Edi
         public bool AutoEndSegmentGroups { get; set; }
 
         /// <summary>
+        ///     Gets or sets a value indicating whether segment groups should automatically end when a non-matching segment is found even if the segment is a implicid segment. 
+        /// </summary>
+        public bool AutoEndSegmentGroupsOnImplicitSegments { get; set; }
+
+
+        /// <summary>
         /// Deserializes the EDI structure contained by the specified <see cref="EdiReader"/>.
         /// </summary>
         /// <param name="reader">The <see cref="EdiReader"/> that contains the EDI structure to deserialize.</param>
@@ -128,7 +134,7 @@ namespace indice.Edi
                         while (true) {
                             if (TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)
                                 || TryCreateContainer(reader, stack, EdiStructureType.Segment)
-                                || implicitSegments.Contains(reader.Value)
+                                || (implicitSegments.Contains(reader.Value) && !AutoEndSegmentGroupsOnImplicitSegments)
                                 || !AutoEndSegmentGroups) {
                                 break;
                             }
