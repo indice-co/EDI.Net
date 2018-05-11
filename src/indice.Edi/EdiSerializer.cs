@@ -371,7 +371,10 @@ namespace indice.Edi
                         level.Close(); // Close this level
                         index = level.Index + 1;
                         break;
-                    } else if (reader.Value.Equals(sequenceEnd.Segment)) {
+                    } else if (sequenceEnd.HasValue && reader.Value.Equals(sequenceEnd.Value.Segment)) {
+                        level.Close(); // Close this level
+                        break;
+                    } else if (level.Descriptor.SegmentGroupInfo.Members.Length > 1 && !level.Descriptor.SegmentGroupInfo.Contains(reader.Value as string)) {
                         level.Close(); // Close this level
                         break;
                     }

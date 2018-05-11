@@ -15,39 +15,70 @@ namespace indice.Edi.Serialization
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public sealed class EdiSegmentGroupAttribute : EdiStructureAttribute
     {
-        private EdiPath _StartPath;
-        private EdiPath _EndPath;
+        private EdiPath[] _Members = new EdiPath[1];
+        private EdiPath? _EndPath;
 
         /// <summary>
-        /// The segment name that marks the begining of a each group.
+        /// The Segment group attribute identifies a logical group by passing the start segment name 
+        /// and the included (other segments included on the same level).
         /// </summary>
-        /// <param name="segmentStart"></param>
-        public EdiSegmentGroupAttribute(string segmentStart) {
-            Start = segmentStart;
+        /// <param name="segmentStart">The segment name that identifies the begining of the group</param>
+        /// <param name="includedSegments">The rest segments included under the same level in the group</param>
+        public EdiSegmentGroupAttribute(string segmentStart, params string[] includedSegments) {
+            _Members = new[] { segmentStart }.Concat(includedSegments).Select(x => (EdiPath)x).ToArray();
         }
         
         internal EdiPath StartInternal {
-            get { return _StartPath; }
+            get { return _Members[0]; }
         }
 
-        internal EdiPath SequenceEndInternal {
+        internal EdiPath? SequenceEndInternal {
             get { return _EndPath; }
+        }
+        internal EdiPath[] Members {
+            get { return _Members; }
         }
 
         /// <summary>
         /// The segment name that defines the start of a group.
         /// </summary>
         public string Start {
-            get { return _StartPath; }
-            set { _StartPath = (EdiPath)value; }
+            get { return _Members[0]; }
+            set { _Members[0] = (EdiPath)value; }
         }
         
         /// <summary>
-        /// Optionaly define the segment name that defines the end of the group or sequence.
+        /// Optionaly define the segment name that defines the end of the group or sequence. 
+        /// IMPORTANT: this segment must be one that is NOT included in the group, 
+        /// but one that safely can identify that the group has ended (outside the group).
         /// </summary>
         public string SequenceEnd {
-            get { return _EndPath; }
-            set { _EndPath = (EdiPath)value; }
+            get { return _EndPath.HasValue ? (string)_EndPath.Value : null; }
+            set { _EndPath = value != null ? new EdiPath?((EdiPath)value) : null; }
+        }
+
+        /// <summary>
+        /// Checks wether the group contains a segment
+        /// </summary>
+        /// <param name="segmentName"></param>
+        /// <returns></returns>
+        public bool Contains(string segmentName) {
+            if (_Members.Length == 1) {
+                throw new InvalidOperationException("Cannot determine if a segment name is contained in the segment group since the group members are not populated");
+            }
+            return _Members.Any(x => segmentName.Equals(x.Segment));
+        }
+
+        /// <summary>
+        /// Returns a string that represents the object as a concatenated list of segment names. Plus the break segment end if available.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() {
+            string text = string.Join(", ", _Members.Select(x => x.Segment));
+            if (_EndPath.HasValue) {
+                text += $" ↵ {_EndPath.Value.Segment}";
+            }
+            return text;
         }
     }
 }
