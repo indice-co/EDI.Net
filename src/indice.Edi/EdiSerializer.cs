@@ -642,7 +642,9 @@ namespace indice.Edi
                         writer.WriteSegmentName(property.PathInfo.Segment);
                         path = (EdiPath)writer.Path;
                     }
-
+                    // the following loop handles the write of unmapped preceding elements/components to the one being writen 
+                    // so that path progression stays intact even though we do not have all properties present on the model.
+                    // TODO: Potentialy this is related to compression.
                     while (structuralComparer.Compare(path, property.PathInfo.PathInternal) < 0) {
                         path = (EdiPath)writer.Path;
                         if (path.ElementIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)
