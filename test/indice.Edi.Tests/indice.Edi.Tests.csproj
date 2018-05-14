@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Samples\x12.Issue88.edi" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Samples\204-MGCTLYST-SAMPLE.EDI" />
     <EmbeddedResource Include="Samples\210-MGCTLYST-SAMPLE.EDI" />
     <EmbeddedResource Include="Samples\214-MGCTLYST-SAMPLE.EDI" />
@@ -20,6 +24,7 @@
     <EmbeddedResource Include="Samples\tradacoms.order9.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.escape.edi" />
+    <EmbeddedResource Include="Samples\x12.Issue88.edi" />
     <EmbeddedResource Include="Samples\x12.214.edi" />
     <EmbeddedResource Include="Samples\x12.810.mandatory-conditions.edi" />
     <EmbeddedResource Include="Samples\x12.810a.edi" />

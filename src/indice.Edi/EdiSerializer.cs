@@ -120,7 +120,7 @@ namespace indice.Edi
                     if (reader.IsStartGroup) {
                         TryCreateContainer(reader, stack, EdiStructureType.Group);
                     } else if (reader.IsEndGroup) {
-                        while (stack.Peek().Container != EdiStructureType.Group) {
+                        while (stack.Peek().Container > EdiStructureType.Group) {
                             stack.Pop();
                         }
                         value = stack.Peek().Instance;

@@ -740,5 +740,19 @@ namespace indice.Edi.Tests
             Assert.Equal(3.33M, interchange.Groups[0].Invoice.TotalOutstandingBalance.Value);
             Assert.Equal(6.66M, interchange.Groups[0].Invoice.PriorBalance.Value);
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "X12")]
+        [Trait(Traits.Issue, "#88")]
+        public void X12_Stack_Empty_InvalidOp_Exception() {
+            var grammar = EdiGrammar.NewX12();
+
+            var interchange = default(Interchange_Issue88);
+            using (var stream = Helpers.GetResourceStream("x12.Issue88.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue88>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal(1, interchange.TrailerControlNumber);
+        }
     }
 }
