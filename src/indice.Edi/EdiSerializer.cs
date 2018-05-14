@@ -640,12 +640,17 @@ namespace indice.Edi
                     if (path.Segment != property.PathInfo.Segment ||
                         structuralComparer.Compare(path, property.PathInfo.PathInternal) > 0) {
                         writer.WriteSegmentName(property.PathInfo.Segment);
+                        path = (EdiPath)writer.Path;
                     }
 
                     while (structuralComparer.Compare(path, property.PathInfo.PathInternal) < 0) {
                         path = (EdiPath)writer.Path;
-                        if (path.ElementIndex != property.PathInfo.ElementIndex)
+                        if (path.ElementIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)
+                            writer.WriteToken(EdiToken.Null);
+                        else if (path.ElementIndex != property.PathInfo.ElementIndex)
                             writer.WriteToken(EdiToken.ElementStart);
+                        else if (path.ComponentIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)
+                            writer.WriteToken(EdiToken.Null);
                         else if (path.ComponentIndex != property.PathInfo.ComponentIndex)
                             writer.WriteToken(EdiToken.ComponentStart);
                     }
