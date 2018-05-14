@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using indice.Edi.Tests.Models;
 using Xunit;
 
 namespace indice.Edi.Tests
@@ -62,6 +63,25 @@ UNZ+1+20101000064507'
                 new EdiSerializer().Serialize(writer, interchange);
             }
             Assert.Equal(expected, output.ToString());
+        }
+
+        [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Bug, "#74")]
+        public void SegmentWithOneElementDoesNotPrintPrecedingComponentSeparators() {
+            var interchange = new Interchange_Issue74() {
+                Msg = new Interchange_Issue74.Message {
+                    TSR = new Interchange_Issue74.TSR_Segment {
+                        ServiceCode = "270"
+                    }
+                }
+            };
+
+            var expected = "UNA:+.? '\r\nTSR+++270'";
+            var output = new StringBuilder();
+            var grammar = EdiGrammar.NewEdiFact();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
+                new EdiSerializer().Serialize(writer, interchange);
+            }
+            Assert.Equal(expected, output.ToString().TrimEnd());
         }
     }
 }

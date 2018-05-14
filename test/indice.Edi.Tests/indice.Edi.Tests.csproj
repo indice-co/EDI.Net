@@ -7,7 +7,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Samples\**\*.edi" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <EmbeddedResource Include="Samples\204-MGCTLYST-SAMPLE.EDI" />
+    <EmbeddedResource Include="Samples\210-MGCTLYST-SAMPLE.EDI" />
+    <EmbeddedResource Include="Samples\214-MGCTLYST-SAMPLE.EDI" />
+    <EmbeddedResource Include="Samples\990-MGCTLYST-SAMPLE.EDI" />
+    <EmbeddedResource Include="Samples\edifact.01.edi" />
+    <EmbeddedResource Include="Samples\edifact.01.multi-message.edi" />
+    <EmbeddedResource Include="Samples\edifact.AutoEndSegmentGroups.edi" />
+    <EmbeddedResource Include="Samples\edifact.D95B.CUSCAR.EDI" />
+    <EmbeddedResource Include="Samples\edifact.ORDRSP-formatted.edi" />
+    <EmbeddedResource Include="Samples\edifact.ORDRSP.edi" />
+    <EmbeddedResource Include="Samples\tradacoms.order9.edi" />
+    <EmbeddedResource Include="Samples\tradacoms.utilitybill.edi" />
+    <EmbeddedResource Include="Samples\tradacoms.utilitybill.escape.edi" />
+    <EmbeddedResource Include="Samples\x12.214.edi" />
+    <EmbeddedResource Include="Samples\x12.810.mandatory-conditions.edi" />
+    <EmbeddedResource Include="Samples\x12.810a.edi" />
+    <EmbeddedResource Include="Samples\x12.810b.edi" />
+    <EmbeddedResource Include="Samples\x12.810c.edi" />
+    <EmbeddedResource Include="Samples\x12.810d.edi" />
+    <EmbeddedResource Include="Samples\x12.850.edi" />
+    <EmbeddedResource Include="Samples\x12.850a.edi" />
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

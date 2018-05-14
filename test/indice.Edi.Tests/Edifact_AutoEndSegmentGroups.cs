@@ -20,16 +20,16 @@ namespace indice.Edi.Tests
                 interchange = serializer.Deserialize<AutoEndSegmentGroups>(new StreamReader(stream), grammar);
             }
 
-            Assert.Equal(1, interchange.Messages.Count);
+            Assert.Single(interchange.Messages);
 
             var message = interchange.Messages.First();
-            Assert.Equal(message.Group.Id, "Message1.Group");
+            Assert.Equal("Message1.Group", message.Group.Id);
             Assert.NotNull(message.Group.Element1);
-            Assert.Equal(message.Group.Element1.Id, "Message1.Group.Element1");
+            Assert.Equal("Message1.Group.Element1", message.Group.Element1.Id);
             Assert.NotNull(message.Group.Element2);
-            Assert.Equal(message.Group.Element2.Id, "Message1.Group.Element2");
+            Assert.Equal("Message1.Group.Element2", message.Group.Element2.Id);
             Assert.NotNull(message.AfterGroup);
-            Assert.Equal(message.AfterGroup.Id, "Message1.AfterGroup");
+            Assert.Equal("Message1.AfterGroup", message.AfterGroup.Id);
         }
     }
 }
