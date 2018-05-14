@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.4.1</VersionPrefix>
+    <VersionPrefix>1.5.0</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net40;net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8;netstandard2.0</TargetFrameworks>
@@ -15,7 +15,13 @@
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
     <PackageReleaseNotes>
-      Fixed an issue when there where both Implicit Decimal Picture anotation on a value as well as decimal mark present in the EdiGrammar. The decimal mark always won and the implicit decimal was ignored. Closes #84
+      Fixed several bugs. The most significant is added a new functionality for the `SegmentGroupAttribute`. Now one can define all included segment names as members that are part of the same hierarchy level. 
+      This is complementary to the existing befavior for segment groups that is still functional. 
+      Details:
+      - added .net 4.0 support closes #86 
+      - Added members to SegmentGroupAttribute related to #87 
+      - Serilization: Fixed a bug when the component of the first element of a segment was not mapped then the serialization would not fill the gaps (empy unmapped components and elementst between the element and the component) closes issue #74
+      - There was an aggresive while loop that caused the container stack to empty if a Message Group segment end was found but not mapped in the model Closes #88
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
