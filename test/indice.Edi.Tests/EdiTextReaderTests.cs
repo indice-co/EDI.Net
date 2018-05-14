@@ -34,7 +34,7 @@ namespace indice.Edi.Tests
             using (var stream = Helpers.GetResourceStream("tradacoms.utilitybill.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
             }
-            Assert.Equal(1, interchange.Invoices.Count);
+            Assert.Single(interchange.Invoices);
         }
 
         [Fact]
@@ -87,11 +87,10 @@ namespace indice.Edi.Tests
             Assert.Equal("9", quote.MessageFunction);
             Assert.Equal("AB", quote.ResponseType);
 
-            Assert.NotNull(interchange.QuoteMessage.MessageDate.ID);
-            Assert.NotNull(interchange.QuoteMessage.ProcessingStartDate.ID);
-            Assert.NotNull(interchange.QuoteMessage.ProcessingEndDate.ID);
-
-
+            Assert.NotEqual(default(int), interchange.QuoteMessage.MessageDate.ID);
+            Assert.NotEqual(default(int), interchange.QuoteMessage.ProcessingStartDate.ID);
+            Assert.NotEqual(default(int), interchange.QuoteMessage.ProcessingEndDate.ID);
+            
             Assert.Equal(new DateTime(2010, 10, 19, 11, 04, 00), quote.MessageDate.DateTime);
             Assert.Equal(new DateTime(2010, 10, 19, 23, 00, 00), quote.ProcessingStartDate.DateTime);
             Assert.Equal(new DateTime(2010, 10, 20, 23, 00, 00), quote.ProcessingEndDate.DateTime);
@@ -170,9 +169,9 @@ namespace indice.Edi.Tests
             Assert.Equal("AB", bgm.ResponseType);
 
             var dtm = interchange.DTM;
-            Assert.NotNull(dtm.MessageDate.ID);
-            Assert.NotNull(dtm.ProcessingStartDate.ID);
-            Assert.NotNull(dtm.ProcessingEndDate.ID);
+            Assert.NotEqual(default(int), dtm.MessageDate.ID);
+            Assert.NotEqual(default(int), dtm.ProcessingStartDate.ID);
+            Assert.NotEqual(default(int), dtm.ProcessingEndDate.ID);
 
 
             Assert.Equal(new DateTime(2010, 10, 19, 11, 04, 00), dtm.MessageDate.DateTime);
@@ -304,9 +303,9 @@ namespace indice.Edi.Tests
             Assert.Equal("AB", bgm.ResponseType);
 
             var dtm = message.DTM;
-            Assert.NotNull(dtm.MessageDate.ID);
-            Assert.NotNull(dtm.ProcessingStartDate.ID);
-            Assert.NotNull(dtm.ProcessingEndDate.ID);
+            Assert.NotEqual(default(int), dtm.MessageDate.ID);
+            Assert.NotEqual(default(int), dtm.ProcessingStartDate.ID);
+            Assert.NotEqual(default(int), dtm.ProcessingEndDate.ID);
 
 
             Assert.Equal(new DateTime(2010, 10, 19, 11, 04, 00), dtm.MessageDate.DateTime);
@@ -513,7 +512,7 @@ namespace indice.Edi.Tests
 
             //Grou 1 - TDT Details of transport
             Assert.NotNull(interchange.Message.TDT_Group1);
-            Assert.Equal(1, interchange.Message.TDT_Group1.Count());
+            Assert.Single(interchange.Message.TDT_Group1);
 
             Assert.Equal("20", interchange.Message.TDT_Group1[0].Field1);
             Assert.Equal("AB652A", interchange.Message.TDT_Group1[0].Field2);
@@ -535,7 +534,7 @@ namespace indice.Edi.Tests
 
             //Group 1 - LOC Place/location identification
             Assert.NotNull(interchange.Message.TDT_Group1[0].LOC);
-            Assert.Equal(1, interchange.Message.TDT_Group1[0].LOC.Count());
+            Assert.Single(interchange.Message.TDT_Group1[0].LOC);
             Assert.Equal("60", interchange.Message.TDT_Group1[0].LOC[0].Field1);
             Assert.Equal("EGEDK", interchange.Message.TDT_Group1[0].LOC[0].Field2a);
             Assert.Equal("139", interchange.Message.TDT_Group1[0].LOC[0].Field2b);
