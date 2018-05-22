@@ -352,6 +352,7 @@ namespace indice.Edi
 
         internal bool TryCreateContainer(EdiReader reader, Stack<EdiStructure> stack, EdiStructureType newContainer) {
             var index = 0;
+            var property = default(EdiPropertyDescriptor);
             if (stack.Count == 0)
                 return false;
 
@@ -368,8 +369,15 @@ namespace indice.Edi
                     var groupStart = level.Descriptor.SegmentGroupInfo.StartInternal;
                     var sequenceEnd = level.Descriptor.SegmentGroupInfo.SequenceEndInternal;
                     if (reader.Value.Equals(groupStart.Segment)) {
-                        level.Close(); // Close this level
-                        index = level.Index + 1;
+                        bool closeThisLevel = true;
+                        if (level.Descriptor.SegmentGroupInfo.AllowNestedGroupWithSameStartSegment) {
+                            property = FindForCurrentSegment(reader, level, newContainer);
+                            closeThisLevel = property == null;
+                        }
+                        if (closeThisLevel) {
+                            level.Close(); // Close this level
+                            index = level.Index + 1;
+                        }
                         break;
                     } else if (sequenceEnd.HasValue && reader.Value.Equals(sequenceEnd.Value.Segment)) {
                         level.Close(); // Close this level
@@ -394,21 +402,22 @@ namespace indice.Edi
             }
 
             var current = stack.Peek();
-            var property = default(EdiPropertyDescriptor);
-
-            switch (newContainer) {
-                case EdiStructureType.SegmentGroup:
-                    property = FindForCurrentSegment(reader, current, newContainer);
-                    break;
-                case EdiStructureType.Segment:
-                    property = FindForCurrentSegment(reader, current, newContainer);
-                    break;
-                case EdiStructureType.Element:
-                    property = FindForCurrentElement(reader, current, newContainer);
-                    break;
-                default:
-                    property = FindForCurrentLogicalStructure(reader, current, newContainer);
-                    break;
+            // If the property has been found above, it would be a waste to look it up again.
+            if (property == null) {
+                switch (newContainer) {
+                    case EdiStructureType.SegmentGroup:
+                        property = FindForCurrentSegment(reader, current, newContainer);
+                        break;
+                    case EdiStructureType.Segment:
+                        property = FindForCurrentSegment(reader, current, newContainer);
+                        break;
+                    case EdiStructureType.Element:
+                        property = FindForCurrentElement(reader, current, newContainer);
+                        break;
+                    default:
+                        property = FindForCurrentLogicalStructure(reader, current, newContainer);
+                        break;
+                }
             }
             if (property == null) {
                 return false;
