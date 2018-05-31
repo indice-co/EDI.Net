@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Samples\x12.Issue88.edi" />
+    <None Remove="Samples\x12.Issue91.edi" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <EmbeddedResource Include="Samples\tradacoms.order9.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.escape.edi" />
+    <EmbeddedResource Include="Samples\x12.Issue91.edi" />
     <EmbeddedResource Include="Samples\x12.Issue88.edi" />
     <EmbeddedResource Include="Samples\x12.214.edi" />
     <EmbeddedResource Include="Samples\x12.810.mandatory-conditions.edi" />
@@ -43,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="xunit" Version="2.3.1" />
   </ItemGroup>

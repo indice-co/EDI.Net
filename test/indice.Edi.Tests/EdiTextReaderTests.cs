@@ -754,5 +754,25 @@ namespace indice.Edi.Tests
 
             Assert.Equal(1, interchange.TrailerControlNumber);
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "X12")]
+        [Trait(Traits.Issue, "#91")]
+        public void X12_SegmentGroups_Nesting_SameSegment() {
+            var grammar = EdiGrammar.NewX12();
+
+            var interchange = default(Interchange_Issue91);
+            using (var stream = Helpers.GetResourceStream("x12.Issue91.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue91>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(2, interchange.Msg.Foos.Count);
+            Assert.Equal("TOM", interchange.Msg.Foos[0].Name);
+            Assert.Equal(2, interchange.Msg.Foos[0].Bars.Count);
+            Assert.Equal(123, interchange.Msg.Foos[0].Bars[0].Amount);
+            Assert.Equal(456, interchange.Msg.Foos[0].Bars[1].Amount);
+            Assert.Equal("TIM", interchange.Msg.Foos[0].Name);
+            Assert.Single(interchange.Msg.Foos[1].Bars);
+            Assert.Equal(125, interchange.Msg.Foos[0].Bars[0].Amount);
+        }
     }
 }
