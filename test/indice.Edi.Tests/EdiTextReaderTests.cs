@@ -770,9 +770,9 @@ namespace indice.Edi.Tests
             Assert.Equal(2, interchange.Msg.Foos[0].Bars.Count);
             Assert.Equal(123, interchange.Msg.Foos[0].Bars[0].Amount);
             Assert.Equal(456, interchange.Msg.Foos[0].Bars[1].Amount);
-            Assert.Equal("TIM", interchange.Msg.Foos[0].Name);
+            Assert.Equal("TIM", interchange.Msg.Foos[1].Name);
             Assert.Single(interchange.Msg.Foos[1].Bars);
-            Assert.Equal(125, interchange.Msg.Foos[0].Bars[0].Amount);
+            Assert.Equal(125, interchange.Msg.Foos[1].Bars[0].Amount);
         }
     }
 }

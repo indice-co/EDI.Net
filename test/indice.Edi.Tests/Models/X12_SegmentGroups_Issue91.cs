@@ -17,7 +17,7 @@ namespace indice.Edi.Tests.Models
         }
 
 
-        [EdiSegmentGroup("XYZ"), EdiCondition("F", Path = "XYZ/0")]
+        [EdiSegmentGroup("XYZ", AllowNestedGroupWithSameStartSegment = true), EdiCondition("F", Path = "XYZ/0")]
         public class Foo
         {
             [EdiValue("X(3)", Path = "XYZ/1")]
