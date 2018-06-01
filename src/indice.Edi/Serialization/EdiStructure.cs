@@ -17,30 +17,52 @@ namespace indice.Edi.Serialization
         private readonly EdiConditionStackMode _ConditionStackMode;
         private bool _isClosed;
 
+        /// <summary>
+        /// Represents the type of the structure. (Interchange, Group, Message, Segment etc.) 
+        /// </summary>
         public EdiStructureType Container {
             get { return _Container; }
         }
 
+        /// <summary>
+        /// The <see cref="EdiTypeDescriptor"/> that contains all information derived from the anotations on the CLR <seealso cref="Type"/>.
+        /// </summary>
         public EdiTypeDescriptor Descriptor {
             get { return _Descriptor; }
         }
 
+        /// <summary>
+        /// An index indicating that this structure is part of a collention at posion <see cref="Index"/>
+        /// </summary>
         public int Index {
             get { return _Index; }
         }
 
+        /// <summary>
+        /// The CLR model instance that maps to the structure
+        /// </summary>
         public object Instance {
             get { return _Instance; }
         }
 
+        /// <summary>
+        /// A queue that contains all the read entries that where used by advancing the reader in order to search for pottential clues. 
+        /// It is populated when searching for Conditions and emptied when populating the values.
+        /// </summary>
         public Queue<EdiEntry> CachedReads {
             get { return _CachedReads; }
         }
 
+        /// <summary>
+        /// All conditions that led to the creation of this structure. 
+        /// </summary>
         public EdiConditionAttribute[] Conditions {
             get { return _Conditions; }
         }
 
+        /// <summary>
+        /// The conditions stack mode.
+        /// </summary>
         public EdiConditionStackMode ConditionStackMode {
             get { return _ConditionStackMode; }
         }
