@@ -368,8 +368,10 @@ namespace indice.Edi
                     var groupStart = level.GroupStart;
                     var sequenceEnd = level.SequenceEnd;
                     if (reader.Value.Equals(groupStart.Segment)) {
-                        level.Close(); // Close this level
-                        index = level.Index + 1;
+                        //if (PositionMatchesStructure(reader, level)) { 
+                            level.Close(); // Close this level
+                            index = level.Index + 1;
+                        //}
                         break;
                     } else if (sequenceEnd.HasValue && reader.Value.Equals(sequenceEnd.Value.Segment)) {
                         level.Close(); // Close this level
@@ -510,13 +512,33 @@ namespace indice.Edi
                 "More than one properties on type '{0}' have the '{1}' attribute. Please add a 'Condition' attribute to all properties in order to discriminate where each {2} will go."
                     .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType, newContainerType));
             }
-            var conditionPathValues = candidates.SelectMany(p => p.Conditions.Select(c => c.Path)).Distinct().ToDictionary(x => x, x => (string)null);
-            //if (conditionPaths.Length != 1) {
+
+            var searchResults = SearchForward(reader, currentStructure.CachedReads, candidates.SelectMany(p => p.Conditions.Select(c => c.Path)));
+            //if (searchResults.Length != 1) {
             //    throw new EdiException("More than one properties on type '{0}' have the '{1}' attribute but the 'Condition' attribute has a different search path declared."
             //        .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType));
             //}
-            var cache = currentStructure.CachedReads;
-            foreach (var path in conditionPathValues.Keys.ToArray()) {
+            var property = candidates.SingleOrDefault(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
+                                                                                                             : p.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal])));
+            if (property != null)
+                return property;
+            return null;
+        }
+
+        private static bool PositionMatchesStructure(EdiReader reader, EdiStructure structure) {
+            if (structure.Conditions == null || structure.Conditions.Length == 0)
+                return true; // cannot determine.
+
+            var searchResults = SearchForward(reader, structure.CachedReads, structure.Conditions.Select(c => c.Path));
+
+            var result = structure.ConditionStackMode == EdiConditionStackMode.All ? structure.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
+                                                                                   : structure.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal]));
+            return result;
+        }
+
+        private static Dictionary<string, string> SearchForward(EdiReader reader, Queue<EdiEntry> cache, IEnumerable<string> pathsToSeekForValues) {
+            var searchResults = pathsToSeekForValues.Distinct().ToDictionary(x => x, x => (string)null);
+            foreach (var path in searchResults.Keys.ToArray()) {
                 // search the cache first.
                 var value = default(string);
                 var found = false;
@@ -540,16 +562,12 @@ namespace indice.Edi
                     } while (!found || reader.TokenType != EdiToken.SegmentStart);
 
                 if (found) {
-                    conditionPathValues[path] = value;
+                    searchResults[path] = value;
                 }
             }
-            
-            var property = candidates.SingleOrDefault(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(conditionPathValues[c.PathInternal]))
-                                                                                                             : p.Conditions.Any(c => c.SatisfiedBy(conditionPathValues[c.PathInternal])));
-            if (property != null)
-                return property;
-            return null;
+            return searchResults;
         }
+
 
         #endregion
 

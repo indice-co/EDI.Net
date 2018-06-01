@@ -767,6 +767,7 @@ namespace indice.Edi.Tests
             }
             Assert.Equal(2, interchange.Msg.Foos.Count);
             Assert.Equal("TOM", interchange.Msg.Foos[0].Name);
+            Assert.NotNull(interchange.Msg.Foos[0].Bars);
             Assert.Equal(2, interchange.Msg.Foos[0].Bars.Count);
             Assert.Equal(123, interchange.Msg.Foos[0].Bars[0].Amount);
             Assert.Equal(456, interchange.Msg.Foos[0].Bars[1].Amount);
