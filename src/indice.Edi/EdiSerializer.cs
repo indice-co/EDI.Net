@@ -352,6 +352,7 @@ namespace indice.Edi
 
         internal bool TryCreateContainer(EdiReader reader, Stack<EdiStructure> stack, EdiStructureType newContainer) {
             var index = 0;
+            var property = default(EdiPropertyDescriptor);
             if (stack.Count == 0)
                 return false;
 
@@ -362,15 +363,57 @@ namespace indice.Edi
                     var previous = stack.Pop(); // close this level
                 }
                 // nested hierarchy
+                bool needToFindPropertyOnParent = false;
+                bool mayNeedToCloseChildGroup = false;
+                EdiStructure child = default(EdiStructure);
                 foreach (var level in stack) {
-                    if (!level.IsGroup)
+                    if (!level.IsGroup) {
+                        if (mayNeedToCloseChildGroup) {
+                            // The parent isn't a group, let alone one with the same starting segment,
+                            // so close the child.
+                            child.Close();
+                            index = child.Index + 1;
+                            break;
+                        }
                         continue;
+                    }
                     var groupStart = level.Descriptor.SegmentGroupInfo.StartInternal;
                     var sequenceEnd = level.Descriptor.SegmentGroupInfo.SequenceEndInternal;
                     if (reader.Value.Equals(groupStart.Segment)) {
-                        level.Close(); // Close this level
-                        index = level.Index + 1;
-                        break;
+                        if (mayNeedToCloseChildGroup) {
+                            bool sameStart = groupStart.Segment == child.Descriptor.SegmentGroupInfo.StartInternal.Segment;
+                            // If the parent and child group segments are not the same, only the child needs
+                            // to be closed, which is the normal situation.  Otherwise we need to continue
+                            // processing to determine if the parent or the child ought to be closed.
+                            if (!sameStart) {
+                                child.Close();
+                                index = child.Index + 1;
+                                break;
+                            }
+                        }
+                        if (level.Descriptor.SegmentGroupInfo.AllowNestedGroupWithSameStartSegment) {
+                            property = FindForCurrentSegment(reader, level, newContainer);
+                            if (property == null) {
+                                // We probably found a sibling of the current level's instance.
+                                if (mayNeedToCloseChildGroup && reader.TokenType != EdiToken.SegmentName) {
+                                    // We need to search for the property on this level's parent but
+                                    // we have already done our conditional search on this level and
+                                    // our reader is forward-only.  We need to preserve the reference
+                                    // to this level so we can access the cached reads.
+                                    needToFindPropertyOnParent = true;
+                                    child = level;
+                                }
+                                level.Close();
+                                index = level.Index + 1;
+                            } else if (mayNeedToCloseChildGroup) {
+                                // We found a sibling to the child's instance.
+                                child.Close();
+                                index = child.Index + 1;
+                            }
+                            break;
+                        }
+                        mayNeedToCloseChildGroup = true;
+                        child = level;
                     } else if (sequenceEnd.HasValue && reader.Value.Equals(sequenceEnd.Value.Segment)) {
                         level.Close(); // Close this level
                         break;
@@ -384,6 +427,16 @@ namespace indice.Edi
                     do previous = stack.Pop();
                     while (!previous.IsClosed);
                 }
+                if (needToFindPropertyOnParent) {
+                    // We need this overload with the child because we have no chance of the
+                    // normal FindForCurrentSegment call succeeding.
+                    property = FindForCurrentSegment(reader, stack.Peek(), child, newContainer);
+                    if (property == null) {
+                        // We don't expect to not find a property here. If our efforts fail
+                        // here, there is no chance of them succeeding below, so exit early.
+                        return false;
+                    }
+                }
             } else {
                 // strict hierarchy
                 while (stack.Peek().Container >= newContainer) {
@@ -394,21 +447,22 @@ namespace indice.Edi
             }
 
             var current = stack.Peek();
-            var property = default(EdiPropertyDescriptor);
-
-            switch (newContainer) {
-                case EdiStructureType.SegmentGroup:
-                    property = FindForCurrentSegment(reader, current, newContainer);
-                    break;
-                case EdiStructureType.Segment:
-                    property = FindForCurrentSegment(reader, current, newContainer);
-                    break;
-                case EdiStructureType.Element:
-                    property = FindForCurrentElement(reader, current, newContainer);
-                    break;
-                default:
-                    property = FindForCurrentLogicalStructure(reader, current, newContainer);
-                    break;
+            // If the property has been found above, it would be a waste to look it up again.
+            if (property == null) {
+                switch (newContainer) {
+                    case EdiStructureType.SegmentGroup:
+                        property = FindForCurrentSegment(reader, current, newContainer);
+                        break;
+                    case EdiStructureType.Segment:
+                        property = FindForCurrentSegment(reader, current, newContainer);
+                        break;
+                    case EdiStructureType.Element:
+                        property = FindForCurrentElement(reader, current, newContainer);
+                        break;
+                    default:
+                        property = FindForCurrentLogicalStructure(reader, current, newContainer);
+                        break;
+                }
             }
             if (property == null) {
                 return false;
@@ -467,6 +521,35 @@ namespace indice.Edi
                 } else {
                     property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
                 }
+            }
+            return property;
+        }
+
+        private EdiPropertyDescriptor FindForCurrentSegment(EdiReader reader, EdiStructure currentStructure, EdiStructure childStructure, EdiStructureType newContainerType) {
+            // The child structure was searched in the same way we want to search the current
+            // structure.  Since we can't rewind the reader, we need to move the cached reads
+            // to the current structure.
+            currentStructure.CachedReads.Clear();
+            foreach (var read in childStructure.CachedReads) {
+                currentStructure.CachedReads.Enqueue(read);
+            }
+            var candidates = currentStructure.GetMatchingProperties(newContainerType);
+            if (candidates.Length == 0) {
+                return null;
+            }
+            string startingSegmentName = childStructure.Descriptor.SegmentGroupInfo.StartInternal.Segment;
+            var matches = candidates.Where(w => w.Segment.Equals(startingSegmentName)).ToArray();
+            var property = default(EdiPropertyDescriptor);
+            if (matches.Length == 0) {
+                return property;
+            }
+            if (currentStructure.CachedReads.Count == 0) {
+                // If there are no values read into the cache, the condition must be rather trivial
+                // and it is likely the reader is sitting on the current path and match value.
+                string value = reader.Value as string;
+                property = matches.SingleOrDefault(s => s.Conditions.Any(a => a.Path.Equals(reader.Path) && a.SatisfiedBy(value)));
+            } else {
+                property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
             }
             return property;
         }

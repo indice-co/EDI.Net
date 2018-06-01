@@ -40,6 +40,12 @@ namespace indice.Edi.Serialization
         }
 
         /// <summary>
+        /// Allows for a container class to have one or more instances of a child
+        /// SegmentGroup containing the same starting segment.
+        /// </summary>
+        public bool AllowNestedGroupWithSameStartSegment { get; set; }
+
+        /// <summary>
         /// The segment name that defines the start of a group.
         /// </summary>
         public string Start {
