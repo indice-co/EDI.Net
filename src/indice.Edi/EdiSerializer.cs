@@ -365,8 +365,8 @@ namespace indice.Edi
                 foreach (var level in stack) {
                     if (!level.IsGroup)
                         continue;
-                    var groupStart = level.Descriptor.SegmentGroupInfo.StartInternal;
-                    var sequenceEnd = level.Descriptor.SegmentGroupInfo.SequenceEndInternal;
+                    var groupStart = level.GroupStart;
+                    var sequenceEnd = level.SequenceEnd;
                     if (reader.Value.Equals(groupStart.Segment)) {
                         level.Close(); // Close this level
                         index = level.Index + 1;
@@ -374,7 +374,7 @@ namespace indice.Edi
                     } else if (sequenceEnd.HasValue && reader.Value.Equals(sequenceEnd.Value.Segment)) {
                         level.Close(); // Close this level
                         break;
-                    } else if (level.Descriptor.SegmentGroupInfo.Members.Length > 1 && !level.Descriptor.SegmentGroupInfo.Contains(reader.Value as string)) {
+                    } else if (level.GroupMembers.Length > 1 && !level.GroupContains(reader.Value as string)) {
                         level.Close(); // Close this level
                         break;
                     }
@@ -447,7 +447,7 @@ namespace indice.Edi
                 }
                 propValue = item;
             }
-            stack.Push(new EdiStructure(newContainer, propValue, index, current.CachedReads));
+            stack.Push(new EdiStructure(newContainer, property, propValue, index, current.CachedReads));
             return true;
         }
 
@@ -504,7 +504,7 @@ namespace indice.Edi
             return property;
         }
 
-        private static EdiPropertyDescriptor ConditionalMatch(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType, EdiPropertyDescriptor[] candidates) {
+        private static EdiPropertyDescriptor ConditionalMatch(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType, params EdiPropertyDescriptor[] candidates) {
             if (!candidates.All(p => p.Conditions != null)) {
                 throw new EdiException(
                 "More than one properties on type '{0}' have the '{1}' attribute. Please add a 'Condition' attribute to all properties in order to discriminate where each {2} will go."
@@ -550,6 +550,7 @@ namespace indice.Edi
                 return property;
             return null;
         }
+
         #endregion
 
         /// <summary>
@@ -677,7 +678,7 @@ namespace indice.Edi
                             while (stack.Peek().Container >= container) {
                                 var previous = stack.Pop();
                             }
-                            stack.Push(new EdiStructure(container, item, i, null));
+                            stack.Push(new EdiStructure(container, property, item, i, null));
                             SerializeStructure(writer, stack, structuralComparer);
                         }
                     } else {
@@ -690,7 +691,7 @@ namespace indice.Edi
                         }
                         if (value == null)
                             continue;
-                        stack.Push(new EdiStructure(container, value));
+                        stack.Push(new EdiStructure(container, property, value));
                         SerializeStructure(writer, stack, structuralComparer);
                     }
                 }

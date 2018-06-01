@@ -13,6 +13,8 @@ namespace indice.Edi.Serialization
         private readonly object _Instance;
         private readonly EdiTypeDescriptor _Descriptor;
         private readonly Queue<EdiEntry> _CachedReads;
+        private readonly EdiConditionAttribute[] _Conditions;
+        private readonly EdiConditionStackMode _ConditionStackMode;
         private bool _isClosed;
 
         public EdiStructureType Container {
@@ -33,6 +35,14 @@ namespace indice.Edi.Serialization
 
         public Queue<EdiEntry> CachedReads {
             get { return _CachedReads; }
+        }
+
+        public EdiConditionAttribute[] Conditions {
+            get { return _Conditions; }
+        }
+
+        public EdiConditionStackMode ConditionStackMode {
+            get { return _ConditionStackMode; }
         }
 
         /// <summary>
@@ -59,7 +69,7 @@ namespace indice.Edi.Serialization
         }
 
         /// <summary>
-        /// The sequence start path.
+        /// The sequence escape path.
         /// </summary>
         public EdiPath? SequenceEnd {
             get {
@@ -67,17 +77,44 @@ namespace indice.Edi.Serialization
             }
         }
 
-        public EdiStructure(EdiStructureType container, object instance)
-            : this(container, instance, 0, new Queue<EdiEntry>()) {
+        /// <summary>
+        /// The sequence members.
+        /// </summary>
+        public EdiPath[] GroupMembers {
+            get {
+                return Descriptor.SegmentGroupInfo.Members;
+            }
         }
 
-        public EdiStructure(EdiStructureType container, object instance, int index, Queue<EdiEntry> cache) {
+        /// <summary>
+        /// Checks wether the group contains a segment. Will throw in case of not defined members on the group attribute.
+        /// </summary>
+        /// <param name="segmentName"></param>
+        /// <returns></returns>
+        public bool GroupContains(string segmentName) {
+            return Descriptor.SegmentGroupInfo.Contains(segmentName);
+        }
+
+        public EdiStructure(EdiStructureType container, object instance)
+            : this(container, null, instance, 0, new Queue<EdiEntry>()) {
+        }
+
+        public EdiStructure(EdiStructureType container, EdiPropertyDescriptor property, object instance)
+            : this(container, property, instance, 0, new Queue<EdiEntry>()) {
+        }
+
+        public EdiStructure(EdiStructureType container, EdiPropertyDescriptor property, object instance, int index, Queue<EdiEntry> cache) {
             ValidationUtils.ArgumentNotNull(instance, "instance");
             _Container = container;
             _Instance = instance;
             _Index = index;
             _Descriptor = typeStore.Get(instance.GetType());
             _CachedReads = cache;
+            _Conditions = Descriptor.Attributes.OfType<EdiConditionAttribute>().Concat(property?.Conditions ?? new EdiConditionAttribute[0]).ToArray();
+            _ConditionStackMode = _Conditions.Length > 0 && (
+                property?.ConditionStackMode == EdiConditionStackMode.Any ||
+                Descriptor.Attributes.OfType<EdiAnyAttribute>().Any())
+                ? EdiConditionStackMode.Any : EdiConditionStackMode.All;
         }
 
         private static EdiTypeDescriptor GetTypeDescriptor(Type type) => new EdiTypeDescriptor(type);
