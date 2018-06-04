@@ -8,7 +8,8 @@ namespace indice.Edi.Serialization
 {
     internal class EdiStructure {
         private static readonly ThreadSafeStore<Type, EdiTypeDescriptor> typeStore = new ThreadSafeStore<Type, EdiTypeDescriptor>(GetTypeDescriptor);
-        private readonly EdiStructureType _Container;
+        private readonly EdiStructureType _StructureType;
+        private readonly EdiStructure _Container;
         private readonly int _Index;
         private readonly object _Instance;
         private readonly EdiTypeDescriptor _Descriptor;
@@ -20,7 +21,14 @@ namespace indice.Edi.Serialization
         /// <summary>
         /// Represents the type of the structure. (Interchange, Group, Message, Segment etc.) 
         /// </summary>
-        public EdiStructureType Container {
+        public EdiStructureType StructureType {
+            get { return _StructureType; }
+        }
+        
+        /// <summary>
+         /// Represents immediate container structure. Essentialy this is the parent level. 
+         /// </summary>
+        public EdiStructure Container {
             get { return _Container; }
         }
 
@@ -117,17 +125,18 @@ namespace indice.Edi.Serialization
             return Descriptor.SegmentGroupInfo.Contains(segmentName);
         }
 
-        public EdiStructure(EdiStructureType container, object instance)
-            : this(container, null, instance, 0, new Queue<EdiEntry>()) {
+        public EdiStructure(EdiStructureType structureType, object instance)
+            : this(structureType, null, null, instance, 0, new Queue<EdiEntry>()) {
         }
 
-        public EdiStructure(EdiStructureType container, EdiPropertyDescriptor property, object instance)
-            : this(container, property, instance, 0, new Queue<EdiEntry>()) {
+        public EdiStructure(EdiStructureType structureType, EdiStructure parent, EdiPropertyDescriptor property, object instance)
+            : this(structureType, parent, property, instance, 0, new Queue<EdiEntry>()) {
         }
 
-        public EdiStructure(EdiStructureType container, EdiPropertyDescriptor property, object instance, int index, Queue<EdiEntry> cache) {
+        public EdiStructure(EdiStructureType structureType, EdiStructure parent, EdiPropertyDescriptor property, object instance, int index, Queue<EdiEntry> cache) {
             ValidationUtils.ArgumentNotNull(instance, "instance");
-            _Container = container;
+            _StructureType = structureType;
+            _Container = parent;
             _Instance = instance;
             _Index = index;
             _Descriptor = typeStore.Get(instance.GetType());
@@ -155,8 +164,8 @@ namespace indice.Edi.Serialization
         
         public override string ToString() {
             var text = new System.Text.StringBuilder();
-            text.Append($"{Container}");
-            switch (Container) {
+            text.Append($"{StructureType}");
+            switch (StructureType) {
                 case EdiStructureType.Element:
                     text.Append($" {Descriptor.Attributes.OfType<EdiPathAttribute>().FirstOrDefault()?.PathInternal.ToString("e")}"); // element
                     break;

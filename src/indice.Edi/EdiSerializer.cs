@@ -111,7 +111,7 @@ namespace indice.Edi
                     }
 
                     if (reader.IsEndInterchange) {
-                        while (stack.Peek().Container != EdiStructureType.Interchange) {
+                        while (stack.Peek().StructureType != EdiStructureType.Interchange) {
                             stack.Pop();
                         }
                         value = stack.Peek().Instance;
@@ -120,7 +120,7 @@ namespace indice.Edi
                     if (reader.IsStartGroup) {
                         TryCreateContainer(reader, stack, EdiStructureType.Group);
                     } else if (reader.IsEndGroup) {
-                        while (stack.Peek().Container > EdiStructureType.Group) {
+                        while (stack.Peek().StructureType > EdiStructureType.Group) {
                             stack.Pop();
                         }
                         value = stack.Peek().Instance;
@@ -361,9 +361,9 @@ namespace indice.Edi
             }
             
             if (newContainer == EdiStructureType.SegmentGroup && 
-                stack.Peek().Container >= EdiStructureType.SegmentGroup) {
+                stack.Peek().StructureType >= EdiStructureType.SegmentGroup) {
                 // strict hierarchy
-                while (stack.Peek().Container > newContainer) {
+                while (stack.Peek().StructureType > newContainer) {
                     var previous = stack.Pop(); // close this level
                 }
                 // nested hierarchy
@@ -374,7 +374,7 @@ namespace indice.Edi
                     var groupStart = level.GroupStart;
                     var sequenceEnd = level.SequenceEnd;
                     if (readerSegment.Equals(groupStart.Segment)) {
-                        if (PositionMatchesStructure(reader, level)) { 
+                        if (PositionMatchesStructure(reader, level, readerSegment as string)) {
                             level.Close(); // Close this level
                             index = level.Index + 1;
                             break;
@@ -394,9 +394,9 @@ namespace indice.Edi
                 }
             } else {
                 // strict hierarchy
-                while (stack.Peek().Container >= newContainer) {
+                while (stack.Peek().StructureType >= newContainer) {
                     var previous = stack.Pop(); // close this level
-                    if (previous.Container == newContainer)
+                    if (previous.StructureType == newContainer)
                         index = previous.Index + 1; // seed collection index 
                 }
             }
@@ -455,7 +455,7 @@ namespace indice.Edi
                 }
                 propValue = item;
             }
-            stack.Push(new EdiStructure(newContainer, property, propValue, index, current.CachedReads));
+            stack.Push(new EdiStructure(newContainer, current, property, propValue, index, current.CachedReads));
             return true;
         }
 
@@ -485,8 +485,9 @@ namespace indice.Edi
                 return null;
             }
             var property = default(EdiPropertyDescriptor);
-            if (reader.TokenType == EdiToken.ElementStart) {
-                var matches = candidates.Where(p => p.PathInfo.PathInternal.ToString("E").Equals(reader.Path)).ToArray();
+            if (reader.TokenType == EdiToken.ElementStart || currentStructure.CachedReads.Count > 0) {
+                var elementPath = reader.TokenType == EdiToken.ElementStart ? reader.Path : ((EdiPath)currentStructure.CachedReads.Peek().Path).ToString("E");
+                var matches = candidates.Where(p => p.PathInfo.PathInternal.ToString("E").Equals(elementPath)).ToArray();
                 if (matches.Length == 0) {
                     property = null;
                 } else if (matches.Length == 1 && matches[0].Conditions == null) {
@@ -531,13 +532,20 @@ namespace indice.Edi
             return null;
         }
 
-        private static bool PositionMatchesStructure(EdiReader reader, EdiStructure structure) {
+        private static bool PositionMatchesStructure(EdiReader reader, EdiStructure structure, string segmentName) {
             if (structure.Conditions == null || structure.Conditions.Length == 0)
                 return true; // cannot determine.
             var searchResults = SearchForward(reader, structure.CachedReads, structure.Conditions.Select(c => c.Path));
 
             var result = structure.ConditionStackMode == EdiConditionStackMode.All ? structure.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
                                                                                    : structure.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal]));
+
+            if (!result) {
+                // search siblings on the same level before returning.
+                var siblingConditions = structure.Container.GetMatchingProperties(segmentName)?.Where(x => x.Conditions != null).SelectMany(x => x.Conditions);
+                searchResults = SearchForward(reader, structure.Container.CachedReads, siblingConditions.Select(c => c.Path));
+                result = siblingConditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal]));
+            }
             return result;
         }
 
@@ -701,10 +709,10 @@ namespace indice.Edi
                             if (stack.Count == 0) {
                                 throw new EdiException($"Serialization stack empty while in the middle of proccessing a collection of {itemType.Name}");
                             }
-                            while (stack.Peek().Container >= container) {
+                            while (stack.Peek().StructureType >= container) {
                                 var previous = stack.Pop();
                             }
-                            stack.Push(new EdiStructure(container, property, item, i, null));
+                            stack.Push(new EdiStructure(container, stack.Peek(), property, item, i, null));
                             SerializeStructure(writer, stack, structuralComparer);
                         }
                     } else {
@@ -712,12 +720,12 @@ namespace indice.Edi
                         if (stack.Count == 0) {
                             throw new EdiException($"Serialization stack empty while in the middle of proccessing a collection of {property.Info.PropertyType.Name}");
                         }
-                        while (stack.Peek().Container >= container) {
+                        while (stack.Peek().StructureType >= container) {
                             var previous = stack.Pop();
                         }
                         if (value == null)
                             continue;
-                        stack.Push(new EdiStructure(container, property, value));
+                        stack.Push(new EdiStructure(container, stack.Peek(), property, value));
                         SerializeStructure(writer, stack, structuralComparer);
                     }
                 }
