@@ -355,6 +355,11 @@ namespace indice.Edi
             if (stack.Count == 0)
                 return false;
 
+            // clear once upon segment start. This is done here in order to keep any findings for future use
+            if (newContainer == EdiStructureType.SegmentGroup || newContainer == EdiStructureType.Segment) {
+                stack.Peek().CachedReads.Clear();
+            }
+            
             if (newContainer == EdiStructureType.SegmentGroup && 
                 stack.Peek().Container >= EdiStructureType.SegmentGroup) {
                 // strict hierarchy
@@ -362,21 +367,22 @@ namespace indice.Edi
                     var previous = stack.Pop(); // close this level
                 }
                 // nested hierarchy
+                var readerSegment = reader.Value;
                 foreach (var level in stack) {
                     if (!level.IsGroup)
                         continue;
                     var groupStart = level.GroupStart;
                     var sequenceEnd = level.SequenceEnd;
-                    if (reader.Value.Equals(groupStart.Segment)) {
-                        //if (PositionMatchesStructure(reader, level)) { 
+                    if (readerSegment.Equals(groupStart.Segment)) {
+                        if (PositionMatchesStructure(reader, level)) { 
                             level.Close(); // Close this level
                             index = level.Index + 1;
-                        //}
-                        break;
-                    } else if (sequenceEnd.HasValue && reader.Value.Equals(sequenceEnd.Value.Segment)) {
+                            break;
+                        }
+                    } else if (sequenceEnd.HasValue && readerSegment.Equals(sequenceEnd.Value.Segment)) {
                         level.Close(); // Close this level
                         break;
-                    } else if (level.GroupMembers.Length > 1 && !level.GroupContains(reader.Value as string)) {
+                    } else if (level.GroupMembers.Length > 1 && !level.GroupContains(readerSegment as string)) {
                         level.Close(); // Close this level
                         break;
                     }
@@ -454,14 +460,14 @@ namespace indice.Edi
         }
 
         private EdiPropertyDescriptor FindForCurrentSegment(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
-            currentStructure.CachedReads.Clear();
             var candidates = currentStructure.GetMatchingProperties(newContainerType);
             if (candidates.Length == 0) {
                 return null;
             }
             var property = default(EdiPropertyDescriptor);
-            if (reader.TokenType == EdiToken.SegmentName) {
-                var matches = candidates.Where(p => p.Segment.Equals(reader.Value)).ToArray();
+            if (reader.TokenType == EdiToken.SegmentName || currentStructure.CachedReads.Count > 0) {
+                var segmentName = reader.TokenType == EdiToken.SegmentName ? reader.Value : ((EdiPath)currentStructure.CachedReads.Peek().Path).Segment;
+                var matches = candidates.Where(p => p.Segment.Equals(segmentName)).ToArray();
                 if (matches.Length == 0) {
                     property = null;
                 } else if (matches.Length == 1 && matches[0].Conditions == null) {
@@ -528,7 +534,6 @@ namespace indice.Edi
         private static bool PositionMatchesStructure(EdiReader reader, EdiStructure structure) {
             if (structure.Conditions == null || structure.Conditions.Length == 0)
                 return true; // cannot determine.
-
             var searchResults = SearchForward(reader, structure.CachedReads, structure.Conditions.Select(c => c.Path));
 
             var result = structure.ConditionStackMode == EdiConditionStackMode.All ? structure.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
@@ -543,8 +548,11 @@ namespace indice.Edi
                 var value = default(string);
                 var found = false;
                 if (cache.Count > 0) {
-                    var entry = cache.Where(r => r.Path == path).SingleOrDefault();
-                    found = !default(EdiEntry).Equals(entry);
+                    var entry = cache.Where(r => r.Path == path && r.Token.IsPrimitiveToken()).SingleOrDefault();
+                    if (!default(EdiEntry).Equals(entry)) {
+                        found = true;
+                        value = entry.Value;
+                    }
                 }
                 if (!found)
                     // if nothing found search the reader (arvance forward).
