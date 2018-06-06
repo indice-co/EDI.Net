@@ -271,7 +271,7 @@ namespace indice.Edi
                         } else {
                             existingDate = ((DateTime)existingDateObject);
                         }
-                        if (date - date.Date == default(TimeSpan)) {
+                        if (date - date.Date == default(TimeSpan) && DateTime.Today != date) {
                             date = date.Date.Add(existingDate - existingDate.Date);
                         } else {
                             date = existingDate.Add(date - date.Date);
