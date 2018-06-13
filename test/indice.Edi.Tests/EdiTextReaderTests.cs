@@ -780,14 +780,28 @@ namespace indice.Edi.Tests
         [Trait(Traits.Tag, "EDIFact")]
         [Trait(Traits.Issue, "#98")]
         public void EDIFact_SegmentGroups_Weird_Group_Behaviour() {
-            var grammar = EdiGrammar.NewX12();
+            var grammar = EdiGrammar.NewEdiFact();
 
             var interchange = default(Interchange_Issue98);
-            using (var stream = Helpers.GetResourceStream("x12.Issue91.edi")) {
+            using (var stream = Helpers.GetResourceStream("edifact.Issue98.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange_Issue98>(new StreamReader(stream), grammar);
             }
-            
-            Assert.Equal("5900001400006", interchange.Message.Buyer.PartyIdentifier);
+
+            Assert.Equal("3210987654321", interchange.Message.Buyer.PartyIdentifier);
+        }
+
+        [Fact]
+        [Trait(Traits.Tag, "EDIFact")]
+        [Trait(Traits.Issue, "#98")]
+        public void EDIFact_SegmentGroups_Weird_Group_Behaviour_2() {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            var interchange = default(Interchange_Issue98);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue98.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue98>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal(2, interchange.Message.Buyer.References.Count);
         }
     }
 }
