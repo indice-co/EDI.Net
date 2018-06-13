@@ -46,5 +46,25 @@ IEA*1*000000001~
             
             Assert.Equal(expected, interchange.Msg.DateTime);
         }
+
+        [Theory]
+        [InlineData("20171020", "2017-10-20T00:00:00Z")]
+        [Trait(Traits.Issue, "#95")]
+        public void DateTimeFromString_Component_MaxLength_Exceeds_StringLength_Test(string dateText, string output) {
+            var expected = DateTime.Parse(output, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+            var grammar = EdiGrammar.NewEdiFact();
+            var edi = $@"UNB+UNOC:3+109910000+999999999+171215:1048+00336++AO05Q118ke1'
+UNH+00001+AESG:02:001:KV'
+DTM+137:{dateText}:102'
+UNT+6+00001'
+UNZ+1+00336'
+";
+            var interchange = default(Interchange_Issue95);
+            using (var stream = Helpers.StreamFromString(edi)) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue95>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal(expected, interchange.Msg.DateTime);
+        }
     }
 }
