@@ -775,5 +775,19 @@ namespace indice.Edi.Tests
             Assert.Single(interchange.Msg.Foos[1].Bars);
             Assert.Equal(125, interchange.Msg.Foos[1].Bars[0].Amount);
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "EDIFact")]
+        [Trait(Traits.Issue, "#98")]
+        public void EDIFact_SegmentGroups_Weird_Group_Behaviour() {
+            var grammar = EdiGrammar.NewX12();
+
+            var interchange = default(Interchange_Issue98);
+            using (var stream = Helpers.GetResourceStream("x12.Issue91.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue98>(new StreamReader(stream), grammar);
+            }
+            
+            Assert.Equal("5900001400006", interchange.Message.Buyer.PartyIdentifier);
+        }
     }
 }
