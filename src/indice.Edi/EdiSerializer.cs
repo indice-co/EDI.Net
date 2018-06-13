@@ -374,10 +374,13 @@ namespace indice.Edi
                     var groupStart = level.GroupStart;
                     var sequenceEnd = level.SequenceEnd;
                     if (readerSegment.Equals(groupStart.Segment)) {
-                        if (PositionMatchesStructure(reader, level, readerSegment as string)) {
+
+                        if (PositionMatchesStructure(reader, level, readerSegment as string) ||  // if new occurance of my level or sibling found
+                            FindForCurrentSegment(reader, level, EdiStructureType.SegmentGroup) == null) { // if cannot advance either.
+
                             level.Close(); // Close this level
                             index = level.Index + 1;
-                            break;
+                            continue;
                         }
                     } else if (sequenceEnd.HasValue && readerSegment.Equals(sequenceEnd.Value.Segment)) {
                         level.Close(); // Close this level
@@ -387,10 +390,11 @@ namespace indice.Edi
                         break;
                     }
                 }
-                if (stack.Any(s => s.IsClosed)) {
-                    var previous = stack.Peek();
-                    do previous = stack.Pop();
-                    while (!previous.IsClosed);
+                var clearUpTo = stack.Reverse().FirstOrDefault(x => x.IsClosed)?.Container;
+                if (clearUpTo != null) {
+                    while (stack.Peek() != clearUpTo) {
+                        stack.Pop();
+                    }
                 }
             } else {
                 // strict hierarchy
@@ -540,13 +544,27 @@ namespace indice.Edi
             var result = structure.ConditionStackMode == EdiConditionStackMode.All ? structure.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
                                                                                    : structure.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal]));
 
-            if (!result) {
-                // search siblings on the same level before returning.
-                var siblingConditions = structure.Container.GetMatchingProperties(segmentName)?.Where(x => x.Conditions != null).SelectMany(x => x.Conditions);
-                searchResults = SearchForward(reader, structure.Container.CachedReads, siblingConditions.Select(c => c.Path));
-                result = siblingConditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal]));
+            if (result) {
+                return true;
             }
-            return result;
+
+            // search siblings on the same level before returning.
+            var matchingProperties = structure.Container.GetMatchingProperties(segmentName);
+            if (matchingProperties == null || matchingProperties.Length == 0)
+                return false;
+            foreach (var prop in matchingProperties) {
+                // if there is simply a matching sibling with no conditions return ok.
+                if (prop.Conditions == null)
+                    return true;
+                searchResults = SearchForward(reader, structure.Container.CachedReads, prop.Conditions.Select(c => c.Path));
+
+                var check = prop.ConditionStackMode == EdiConditionStackMode.All ? prop.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
+                                                                                 : prop.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal]));
+                if (check) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static Dictionary<string, string> SearchForward(EdiReader reader, Queue<EdiEntry> cache, IEnumerable<string> pathsToSeekForValues) {

@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.6.1</VersionPrefix>
+    <VersionPrefix>1.6.2</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net40;net45;netstandard1.0;netstandard1.3;portable-net45+win8+wpa81+wp8;netstandard2.0</TargetFrameworks>
@@ -15,7 +15,11 @@
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
     <PackageReleaseNotes>
-      Minor Bugfix for Zero *time* binding on a DateTime causes *date* alredy bound to reset to 'Today'. Closes #96
+      Bug fixes and support for more SegmentGroups scenarios.
+
+      - ArgumentOutOfRangeException when DateTime picture length is greater than field's real length #95
+      - Weird group behaviour (add elements out of EdiCondition) after update to 1.6.0 #98
+      - Serialization problem: Excess Trailing Data Element Delimiter(s) #99
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
