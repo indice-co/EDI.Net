@@ -780,7 +780,7 @@ namespace indice.Edi.Tests
         [Trait(Traits.Tag, "EDIFact")]
         [Trait(Traits.Issue, "#98")]
         public void EDIFact_SegmentGroups_Weird_Group_Behaviour() {
-            var grammar = EdiGrammar.NewX12();
+            var grammar = EdiGrammar.NewEdiFact();
 
             var interchange = default(Interchange_Issue98);
             using (var stream = Helpers.GetResourceStream("edifact.Issue98.edi")) {
