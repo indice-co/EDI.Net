@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <Description>indice.Edi.Tests Class Library</Description>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Samples\edifact.Issue98.edi" />
     <None Remove="Samples\x12.Issue88.edi" />
     <None Remove="Samples\x12.Issue91.edi" />
   </ItemGroup>
@@ -25,6 +26,7 @@
     <EmbeddedResource Include="Samples\tradacoms.order9.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.escape.edi" />
+    <EmbeddedResource Include="Samples\edifact.Issue98.edi" />
     <EmbeddedResource Include="Samples\x12.Issue91.edi" />
     <EmbeddedResource Include="Samples\x12.Issue88.edi" />
     <EmbeddedResource Include="Samples\x12.214.edi" />
