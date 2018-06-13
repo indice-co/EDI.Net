@@ -783,7 +783,7 @@ namespace indice.Edi.Tests
             var grammar = EdiGrammar.NewX12();
 
             var interchange = default(Interchange_Issue98);
-            using (var stream = Helpers.GetResourceStream("x12.Issue91.edi")) {
+            using (var stream = Helpers.GetResourceStream("edifact.Issue98.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange_Issue98>(new StreamReader(stream), grammar);
             }
             
