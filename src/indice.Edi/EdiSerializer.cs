@@ -109,6 +109,12 @@ namespace indice.Edi
                     if (reader.IsStartMessage) {
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
                     }
+                    else if (reader.IsEndMessage) {
+                        while (stack.Peek().StructureType > EdiStructureType.Message) {
+                            stack.Pop();
+                        }
+                        value = stack.Peek().Instance;
+                    }
 
                     if (reader.IsEndInterchange) {
                         while (stack.Peek().StructureType != EdiStructureType.Interchange) {

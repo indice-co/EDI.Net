@@ -790,5 +790,25 @@ namespace indice.Edi.Tests
             Assert.Equal("3210987654321", interchange.Message.Buyer.PartyIdentifier);
             Assert.Equal(2, interchange.Message.Buyer.References.Count);
         }
+        
+        [Fact]
+        [Trait(Traits.Tag, "X12")]
+        [Trait(Traits.Issue, "#101")]
+        public void X12_EndMessage_Mapping() {
+            var grammar = EdiGrammar.NewX12();
+
+            var interchange = default(Interchange_Issue101);
+            using (var stream = Helpers.GetResourceStream("x12.Issue101.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue101>(new StreamReader(stream), grammar);
+            }
+            
+            Assert.NotNull(interchange.Msg.Return);
+			var rtn = interchange.Msg.Return;
+            Assert.Equal("12345", rtn.FormGroupSegment.Id);
+            Assert.NotNull(rtn.FormGroupSegment.DateSegment);
+            Assert.Equal(new DateTime(2018, 5, 25), rtn.FormGroupSegment.DateSegment.Date);
+            Assert.Equal("0012", interchange.Msg.HeaderControl);
+            Assert.Equal(interchange.Msg.HeaderControl, interchange.Msg.TrailerControl);
+        }
     }
 }
