@@ -104,6 +104,11 @@ namespace indice.Edi
                 while (reader.Read()) {
                     if (reader.IsStartInterchange) {
                         stack.Push(new EdiStructure(EdiStructureType.Interchange, Activator.CreateInstance(objectType)));
+                    } else if (reader.IsEndInterchange) {
+                        while (stack.Peek().StructureType != EdiStructureType.Interchange) {
+                            stack.Pop();
+                        }
+                        value = stack.Peek().Instance;
                     }
 
                     if (reader.IsStartMessage) {
@@ -111,13 +116,6 @@ namespace indice.Edi
                     }
                     else if (reader.IsEndMessage) {
                         while (stack.Peek().StructureType > EdiStructureType.Message) {
-                            stack.Pop();
-                        }
-                        value = stack.Peek().Instance;
-                    }
-
-                    if (reader.IsEndInterchange) {
-                        while (stack.Peek().StructureType != EdiStructureType.Interchange) {
                             stack.Pop();
                         }
                         value = stack.Peek().Instance;
