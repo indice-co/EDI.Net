@@ -28,6 +28,7 @@
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.escape.edi" />
     <EmbeddedResource Include="Samples\edifact.Issue98.edi" />
     <EmbeddedResource Include="Samples\x12.Issue91.edi" />
+    <EmbeddedResource Include="Samples\x12.Issue101.edi" />
     <EmbeddedResource Include="Samples\x12.Issue88.edi" />
     <EmbeddedResource Include="Samples\x12.214.edi" />
     <EmbeddedResource Include="Samples\x12.810.mandatory-conditions.edi" />
