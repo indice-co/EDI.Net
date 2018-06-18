@@ -27,7 +27,7 @@ namespace indice.Edi
         /// Deserializes the EDI structure contained by the specified <see cref="EdiReader"/>.
         /// </summary>
         /// <param name="reader">The <see cref="EdiReader"/> that contains the EDI structure to deserialize.</param>
-        /// <returns>The <see cref="Object"/> being deserialized.</returns>
+        /// <returns>The <see cref="object"/> being deserialized.</returns>
         public object Deserialize(EdiReader reader) {
             return Deserialize(reader, null);
         }
@@ -334,8 +334,8 @@ namespace indice.Edi
                                                      read ? reader.ReadAsString() : (string)reader.Value;
 
             if (!string.IsNullOrEmpty(text)) {
-                int integerValue = default(int);
-                bool booleanValue = default(bool);
+                var integerValue = default(int);
+                var booleanValue = default(bool);
                 if (int.TryParse(text, NumberStyles.Integer, reader.Culture, out integerValue)) {
                     booleanValue = integerValue == 1;
                 } else if (bool.TryParse(text, out booleanValue)) {
@@ -429,7 +429,7 @@ namespace indice.Edi
             if (property == null) {
                 return false;
             }
-            object propValue = property.Info.GetValue(current.Instance, null);
+            var propValue = property.Info.GetValue(current.Instance, null);
             if (propValue == null) {
                 if (property.Info.PropertyType.IsCollectionType()) {
                     if (property.Info.PropertyType.IsArray) {
@@ -610,24 +610,24 @@ namespace indice.Edi
         #endregion
 
         /// <summary>
-        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// Serializes the specified <see cref="object"/> and writes the EDI structure
         /// to a <c>Stream</c> using the specified <see cref="TextWriter"/>. 
         /// </summary>
         /// <param name="textWriter">The <see cref="TextWriter"/> used to write the EDI structure.</param>
         /// <param name="grammar">The <see cref="IEdiGrammar"/> to use for reading from the text reader</param>
-        /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        /// <param name="value">The <see cref="object"/> to serialize.</param>
         public void Serialize(TextWriter textWriter, IEdiGrammar grammar, object value) {
             Serialize(new EdiTextWriter(textWriter, grammar), value, null);
         }
 
 
         /// <summary>
-        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// Serializes the specified <see cref="object"/> and writes the EDI structure
         /// to a <c>Stream</c> using the specified <see cref="TextWriter"/>. 
         /// </summary>
         /// <param name="textWriter">The <see cref="TextWriter"/> used to write the EDI structure.</param>
         /// <param name="grammar">The <see cref="IEdiGrammar"/> to use for reading from the text reader</param>
-        /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        /// <param name="value">The <see cref="object"/> to serialize.</param>
         /// <param name="objectType">
         /// The type of the value being serialized.
         /// Specifing the type is optional.
@@ -637,21 +637,21 @@ namespace indice.Edi
         }
 
         /// <summary>
-        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// Serializes the specified <see cref="object"/> and writes the EDI structure
         /// to a <c>Stream</c> using the specified <see cref="EdiWriter"/>. 
         /// </summary>
         /// <param name="ediWriter">The <see cref="EdiWriter"/> used to write the EDI structure.</param>
-        /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        /// <param name="value">The <see cref="object"/> to serialize.</param>
         public void Serialize(EdiWriter ediWriter, object value) {
             SerializeInternal(ediWriter, value, null);
         }
 
         /// <summary>
-        /// Serializes the specified <see cref="Object"/> and writes the EDI structure
+        /// Serializes the specified <see cref="object"/> and writes the EDI structure
         /// to a <c>Stream</c> using the specified <see cref="EdiWriter"/>. 
         /// </summary>
         /// <param name="ediWriter">The <see cref="EdiWriter"/> used to write the EDI structure.</param>
-        /// <param name="value">The <see cref="Object"/> to serialize.</param>
+        /// <param name="value">The <see cref="object"/> to serialize.</param>
         /// <param name="objectType">
         /// The type of the value being serialized.
         /// Specifing the type is optional.

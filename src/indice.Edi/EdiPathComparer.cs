@@ -24,6 +24,11 @@ namespace indice.Edi
     {
         private readonly List<string> segmentOrder;
         private readonly int customSegmentIndex;
+
+        /// <summary>
+        /// Construct an <see cref="EdiPathComparer"/> given the <seealso cref="IEdiGrammar"/>.
+        /// </summary>
+        /// <param name="grammar"></param>
         public EdiPathComparer(IEdiGrammar grammar) {
             if (null == grammar)
                 throw new ArgumentNullException(nameof(grammar));
@@ -44,6 +49,12 @@ namespace indice.Edi
             }
         }
         
+        /// <summary>
+        /// Compares two <see cref="EdiPath"/>
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public int Compare(EdiPath x, EdiPath y) {
             if (x.Segment != y.Segment) { 
                 var i = Rank(x);
@@ -53,6 +64,11 @@ namespace indice.Edi
             return x.CompareTo(y);
         }
 
+        /// <summary>
+        /// Rank an <see cref="EdiPath"/>
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public int Rank(EdiPath path) {
             var i = segmentOrder.IndexOf(path.Segment);
             i = i > -1 ? i : customSegmentIndex;

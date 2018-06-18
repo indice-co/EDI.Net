@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace indice.Edi
 {
+    /// <summary>
+    /// An <see cref="IFormatProvider"/> for the <seealso cref="EdiPath"/> struct.
+    /// </summary>
     public class EdiPathFormat : IFormatProvider, ICustomFormatter
     {
         private const string ALL_ARRAY_FORMAT = "{0}[{1}][{2}]";
@@ -15,6 +18,11 @@ namespace indice.Edi
         private const string ELEMENT_ARRAY_FORMAT = "{0}[{1}]";
         private static readonly string[] availableFormatStrings = { "S", "E", "C", "s", "e", "c" };
 
+        /// <summary>
+        /// Gets the format provider for the given <paramref name="formatType"/>.
+        /// </summary>
+        /// <param name="formatType"></param>
+        /// <returns></returns>
         public object GetFormat(Type formatType) {
             if (formatType == typeof(ICustomFormatter))
                 return this;
@@ -22,6 +30,13 @@ namespace indice.Edi
                 return null;
         }
 
+        /// <summary>
+        /// Formats the object <paramref name="arg"/> using the <paramref name="formatProvider"/>.
+        /// </summary>
+        /// <param name="fmt">Format string</param>
+        /// <param name="arg">the object to format</param>
+        /// <param name="formatProvider">The provider</param>
+        /// <returns></returns>
         public string Format(string fmt, object arg, IFormatProvider formatProvider) {
             // Provide default formatting if arg is not an Int64. 
             if (arg.GetType() != typeof(EdiPath))

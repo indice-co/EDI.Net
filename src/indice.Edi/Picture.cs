@@ -7,9 +7,19 @@ using System.Threading.Tasks;
 
 namespace indice.Edi
 {
+    /// <summary>
+    /// Picture Kind is used to specify the pattern of an Edi value.
+    /// </summary>
     public enum PictureKind
     {
+        /// <summary>
+        /// Characters and numbers are allowed
+        /// </summary>
         Alphanumeric,
+
+        /// <summary>
+        /// Only numbers are allowed.
+        /// </summary>
         Numeric
     }
 
@@ -55,40 +65,71 @@ namespace indice.Edi
             }
         }
 
+        /// <summary>
+        /// Checks of the scale is a positive integer
+        /// </summary>
         public bool IsValid {
             get {
                 return _Scale > 0;
             }
         }
 
+        /// <summary>
+        /// Constructs an <see cref="PictureKind.Alphanumeric"/> <see cref="Picture"/> of a given <paramref name="length"/>.
+        /// </summary>
         public Picture(ushort length) {
             _Scale = length;
             _Precision = 0;
             _Kind = PictureKind.Alphanumeric;
         }
 
+        /// <summary>
+        /// Constructs a <see cref="Picture"/> of a given <paramref name="length"/>. Used to instantiate integer formats and alphanumerics.
+        /// </summary>
+        /// <param name="length"></param>
+        /// <param name="kind"></param>
         public Picture(ushort length, PictureKind kind) {
             _Scale = length;
             _Precision = 0;
             _Kind = kind;
         }
 
+        /// <summary>
+        /// Constructs a <see cref="PictureKind.Numeric"/> <seealso cref="Picture"/>.
+        /// </summary>
+        /// <param name="integerLength"></param>
+        /// <param name="decimalLength"></param>
         public Picture(ushort integerLength, byte decimalLength) {
             _Scale = (ushort)(integerLength + decimalLength);
             _Precision = decimalLength;
             _Kind = PictureKind.Numeric;
         }
 
+        /// <summary>
+        /// Constructs a <see cref="Picture"/>.
+        /// </summary>
+        /// <param name="integerLength"></param>
+        /// <param name="decimalLength"></param>
+        /// <param name="kind"></param>
         public Picture(ushort integerLength, byte decimalLength, PictureKind kind) {
             _Scale = (ushort)(integerLength + decimalLength);
             _Precision = decimalLength;
             _Kind = kind;
         }
 
+        /// <summary>
+        /// Returns a hash code for the value of this instance.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode() {
             return _Kind.GetHashCode() ^ _Scale.GetHashCode() ^ _Precision.GetHashCode();
         }
 
+        /// <summary>
+        /// Indictes wheather this instance and the given object are equal.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj) {
             if (obj != null && obj is Picture) {
                 var other = ((Picture)obj);
@@ -97,6 +138,10 @@ namespace indice.Edi
             return base.Equals(obj);
         }
 
+        /// <summary>
+        /// String representation of a <see cref="Picture"/> clause.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() {
             switch (Kind) {
                 case PictureKind.Alphanumeric:
@@ -108,6 +153,11 @@ namespace indice.Edi
             }
         }
 
+        /// <summary>
+        /// Parse a text representation of a <see cref="Picture"/> into the struct.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static Picture Parse(string text) {
             var match = Regex.Match(text, PARSE_PATTERN);
 
@@ -124,12 +174,17 @@ namespace indice.Edi
             }
         }
 
-        public static implicit operator String(Picture value) {
+        /// <summary>
+        /// Implicit cast operator from <see cref="Picture"/> to <seealso cref="string"/>
+        /// </summary>
+        /// <param name="value"></param>
+        public static implicit operator string(Picture value) {
             return value.ToString();
         }
 
+        /// Explicit cast operator from <see cref="string"/> to <seealso cref="Picture"/>
         public static explicit operator Picture(string value) {
-            return Picture.Parse(value);
+            return Parse(value);
         }
     }
 }

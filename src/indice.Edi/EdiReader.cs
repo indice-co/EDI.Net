@@ -6,6 +6,9 @@ using System.Linq;
 
 namespace indice.Edi
 {
+    /// <summary>
+    /// An abstract class that contains the logic to read from an Edi file.
+    /// </summary>
     public abstract class EdiReader : IDisposable
     {
         #region Reader State
