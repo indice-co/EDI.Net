@@ -55,11 +55,35 @@ namespace indice.Edi
         /// Only available in EDI Fact. Otherwize null
         /// </summary>
         string ServiceStringAdviceTag { get; }
+
+        /// <summary>
+        /// The segment name that marks the Interchange Header.
+        /// </summary>
         string InterchangeHeaderTag { get; }
+
+        /// <summary>
+        /// The segment name that marks the Functional Group Header.
+        /// </summary>
         string FunctionalGroupHeaderTag { get; }
+
+        /// <summary>
+        /// The segment name that marks the Message Header.
+        /// </summary>
         string MessageHeaderTag { get; }
+
+        /// <summary>
+        /// The segment name that marks the Message Trailer.
+        /// </summary>
         string MessageTrailerTag { get; }
+        
+        /// <summary>
+        /// The segment name that marks the Functional Group Trailer.
+        /// </summary>
         string FunctionalGroupTrailerTag { get; }
+
+        /// <summary>
+        /// The segment name that marks the interchange Trailer.
+        /// </summary>
         string InterchangeTrailerTag { get; }
 
         /// <summary>
