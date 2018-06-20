@@ -43,7 +43,9 @@ namespace indice.Edi.Serialization
         public EdiTypeDescriptor(Type clrType) {
             _ClrType = clrType;
             _Properties = new List<EdiPropertyDescriptor>();
-            var props = ClrType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(pi => new EdiPropertyDescriptor(pi)).Where(pi => pi.Attributes.Any());
+            // list inherited properties first; so SegmentGroups can inherit from there first Segment
+            var clrProps = ClrType.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(p => p.DeclaringType == clrType);
+            var props = clrProps.Select(pi => new EdiPropertyDescriptor(pi)).Where(pi => pi.Attributes.Any());
             // support for multiple value attributes on the same property. Bit hacky.
             foreach (var p in props) {
                 var valueAttributes = p.Attributes.OfType<EdiValueAttribute>().ToArray();
