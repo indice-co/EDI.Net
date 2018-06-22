@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace indice.Edi.Utilities
 {
+    /// <summary>
+    /// Helper Extension methods.
+    /// </summary>
     public static class EdiExtensions
     {
         public static bool IsStartToken(this EdiToken token) {
@@ -93,6 +96,14 @@ namespace indice.Edi.Utilities
             return structureType;
         }
 
+        /// <summary>
+        /// Numberic Parse helper from string to <see cref="decimal"/>. 
+        /// </summary>
+        /// <param name="value">The decimal string representation</param>
+        /// <param name="picture">The format spec</param>
+        /// <param name="decimalMark">The character used to represent a decimal point</param>
+        /// <param name="number">The outcome</param>
+        /// <returns></returns>
         public static bool TryParse(this string value, Picture? picture, char? decimalMark, out decimal number) {
             number = 0.0M;
             try {
@@ -104,11 +115,27 @@ namespace indice.Edi.Utilities
                 return false;
             }
         }
+
+        /// <summary>
+        /// Parses a string representation of a date into a clr <see cref="DateTime"/> struct
+        /// </summary>
+        /// <param name="value">The string date value</param>
+        /// <param name="format">The dotnet style format string</param>
+        /// <param name="culture">The culture info</param>
+        /// <returns></returns>
         public static DateTime ParseEdiDate(this string value, string format, CultureInfo culture = null) {
             var date = ParseEdiDateInternal(value, format, culture);
             return date.Value;
         }
 
+        /// <summary>
+        /// Parses a string representation of a date into a clr <see cref="DateTime"/> struct
+        /// </summary>
+        /// <param name="value">The string date value</param>
+        /// <param name="format">The dotnet style format string</param>
+        /// <param name="culture">The culture info</param>
+        /// <param name="date">The outcome</param>
+        /// <returns></returns>
         public static bool TryParseEdiDate(this string value, string format, CultureInfo culture, out DateTime date) {
             date = default(DateTime);
             var dateNullable = ParseEdiDateInternal(value, format, culture);

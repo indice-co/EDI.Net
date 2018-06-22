@@ -19,10 +19,10 @@ namespace indice.Edi
     public class EdiSerializer
     {
         /// <summary>
-        ///     Gets or sets a value indicating whether segment groups should automatically end when a non-matching segment is found. 
+        /// Gets or sets a value indicating whether segment groups should automatically end when a non-matching segment is found. 
         /// </summary>
         public bool AutoEndSegmentGroups { get; set; }
-
+        
         /// <summary>
         /// Deserializes the EDI structure contained by the specified <see cref="EdiReader"/>.
         /// </summary>

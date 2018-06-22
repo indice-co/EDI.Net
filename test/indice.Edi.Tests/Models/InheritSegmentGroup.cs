@@ -9,7 +9,7 @@ namespace indice.Edi.Tests.Models
     {
         public List<Message> Messages { get; set; }
 
-        [EdiSegment(), EdiPath("GRP")]
+        [EdiSegment, EdiPath("GRP")]
         public class GRP
         {
             [EdiValue("X(35)", Path = "GRP/0")]
