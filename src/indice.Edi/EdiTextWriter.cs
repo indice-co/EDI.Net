@@ -40,6 +40,7 @@ namespace indice.Edi
         /// Creates an instance of the <c>EdiWriter</c> class using the specified <see cref="TextWriter"/>. 
         /// </summary>
         /// <param name="textWriter">The <c>TextWriter</c> to write to.</param>
+        /// <param name="grammar">The <see cref="IEdiGrammar"/> to use for structure and dilimiters</param>
         public EdiTextWriter(TextWriter textWriter, IEdiGrammar grammar)
             : base(grammar) {
             if (textWriter == null) {

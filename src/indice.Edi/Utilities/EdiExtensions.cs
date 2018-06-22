@@ -14,6 +14,11 @@ namespace indice.Edi.Utilities
     /// </summary>
     public static class EdiExtensions
     {
+        /// <summary>
+        /// Check to see if the given <see cref="EdiToken"/> represents the begining of a structural container.
+        /// </summary>
+        /// <param name="token">The token to check</param>
+        /// <returns></returns>
         public static bool IsStartToken(this EdiToken token) {
             switch (token) {
                 case EdiToken.SegmentStart:
@@ -25,6 +30,11 @@ namespace indice.Edi.Utilities
             }
         }
 
+        /// <summary>
+        /// Check to see if the given <see cref="EdiToken"/> represents primitive value type.
+        /// </summary>
+        /// <param name="token">The token to check</param>
+        /// <returns></returns>
         public static bool IsPrimitiveToken(this EdiToken token) {
             switch (token) {
                 case EdiToken.Integer:
@@ -40,7 +50,8 @@ namespace indice.Edi.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Allows the filtering of tokens based on the <see cref="EdiStructureType"/> they represent 
+        /// instead of the build in way using the corresponding CLR <seealso cref="Type"/>. 
         /// </summary>
         /// <param name="attributes">The list of available attributes</param>
         /// <param name="container">This is the type of container we are searchig attributes for.</param>
@@ -163,6 +174,13 @@ namespace indice.Edi.Utilities
             return null;
         }
 
+        /// <summary>
+        /// Parse the <see cref="string"/> value into a decimal using any formatting hints available from the grammar itself as well as value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <param name="decimalMark"></param>
+        /// <returns></returns>
         public static decimal? Parse(this string value, Picture? picture, char? decimalMark) {
             if (value != null)
                 value = value.TrimStart('Z'); // Z suppresses leading zeros
@@ -185,30 +203,90 @@ namespace indice.Edi.Utilities
             throw new EdiException("Could not convert string to decimal: {0}.".FormatWith(CultureInfo.InvariantCulture, value));
         }
 
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <param name="decimalMark"></param>
+        /// <returns></returns>
         public static string ToEdiString(this float value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
 
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <param name="decimalMark"></param>
+        /// <returns></returns>
         public static string ToEdiString(this double value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
-
+        
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <param name="decimalMark"></param>
+        /// <returns></returns>
         public static string ToEdiString(this decimal value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
-        
+
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <param name="decimalMark"></param>
+        /// <returns></returns>
         public static string ToEdiString(this float? value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
 
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <param name="decimalMark"></param>
+        /// <returns></returns>
         public static string ToEdiString(this double? value, Picture? picture, char? decimalMark) =>
             ToEdiString((decimal?)value, picture, decimalMark);
 
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <returns></returns>
         public static string ToEdiString(this int? value, Picture? picture) =>
             ToEdiString((long?)value, picture);
 
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <returns></returns>
         public static string ToEdiString(this int value, Picture? picture) =>
             ToEdiString((long?)value, picture);
-
+        
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <returns></returns>
         public static string ToEdiString(this long value, Picture? picture) =>
             ToEdiString((long?)value, picture);
-        
+
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <param name="decimalMark"></param>
+        /// <returns></returns>
         public static string ToEdiString(this decimal? value, Picture? picture, char? decimalMark) {
             if (!value.HasValue)
                 return null;
@@ -237,6 +315,12 @@ namespace indice.Edi.Utilities
                 return string.Format(NumberFormatInfo.InvariantInfo, "{0}", value);
         }
 
+        /// <summary>
+        /// Converts the given value into a string representation according to the <see cref="IEdiGrammar"/> and the value spec.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="picture"></param>
+        /// <returns></returns>
         public static string ToEdiString(this long? value, Picture? picture) {
             if (!value.HasValue && !picture.HasValue)
                 return null;

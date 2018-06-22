@@ -178,6 +178,10 @@ namespace indice.Edi
         }
 
         #region EDI Logical Structure
+        /// <summary>
+        /// Indicates that the current possition of the <see cref="EdiReader"/> is located just after a <seealso cref="EdiToken.SegmentName"/>
+        /// configured as <seealso cref="IEdiGrammar.ServiceStringAdviceTag"/> in the <seealso cref="Grammar"/>.
+        /// </summary>
         protected bool IsServiceStringAdvice {
             get {
                 return Grammar.ServiceStringAdviceTag != null && 
@@ -186,13 +190,21 @@ namespace indice.Edi
             }
         }
 
+        /// <summary>
+        /// Indicates that the current possition of the <see cref="EdiReader"/> is located just after a <seealso cref="EdiToken.SegmentName"/>
+        /// configured as <seealso cref="IEdiGrammar.InterchangeHeaderTag"/> in the <seealso cref="Grammar"/>.
+        /// </summary>
         public bool IsStartInterchange {
             get {
                 return TokenType == EdiToken.SegmentName && 
                        _currentPosition.SegmentName == Grammar.InterchangeHeaderTag;
             }
         }
-        
+
+        /// <summary>
+        /// Indicates that the current possition of the <see cref="EdiReader"/> is located just after a <seealso cref="EdiToken.SegmentName"/> 
+        /// configured as <seealso cref="IEdiGrammar.InterchangeTrailerTag"/> in the <seealso cref="Grammar"/>.
+        /// </summary>
         public bool IsEndInterchange {
             get {
                 return TokenType == EdiToken.SegmentName &&
@@ -200,6 +212,10 @@ namespace indice.Edi
             }
         }
 
+        /// <summary>
+        /// Indicates that the current possition of the <see cref="EdiReader"/> is located just after a <seealso cref="EdiToken.SegmentName"/> 
+        /// configured as <seealso cref="IEdiGrammar.FunctionalGroupHeaderTag"/> in the <seealso cref="Grammar"/>.
+        /// </summary>
         public bool IsStartGroup {
             get {
                 return TokenType == EdiToken.SegmentName &&
@@ -207,6 +223,10 @@ namespace indice.Edi
             }
         }
 
+        /// <summary>
+        /// Indicates that the current possition of the <see cref="EdiReader"/> is located just after a <seealso cref="EdiToken.SegmentName"/> 
+        /// configured as <seealso cref="IEdiGrammar.FunctionalGroupTrailerTag"/> in the <seealso cref="Grammar"/>.
+        /// </summary>
         public bool IsEndGroup {
             get {
                 return TokenType == EdiToken.SegmentName &&
@@ -214,6 +234,10 @@ namespace indice.Edi
             }
         }
 
+        /// <summary>
+        /// Indicates that the current possition of the <see cref="EdiReader"/> is located just after a <seealso cref="EdiToken.SegmentName"/> 
+        /// configured as <seealso cref="IEdiGrammar.MessageHeaderTag"/> in the <seealso cref="Grammar"/>.
+        /// </summary>
         public bool IsStartMessage {
             get {
                 return TokenType == EdiToken.SegmentName &&
@@ -221,21 +245,15 @@ namespace indice.Edi
             }
         }
 
+        /// <summary>
+        /// Indicates that the current possition of the <see cref="EdiReader"/> is located just after a <seealso cref="EdiToken.SegmentName"/> 
+        /// configured as <seealso cref="IEdiGrammar.MessageTrailerTag"/> in the <seealso cref="Grammar"/>.
+        /// </summary>
         public bool IsEndMessage {
             get {
                 return TokenType == EdiToken.SegmentName &&
                        _currentPosition.SegmentName == Grammar.MessageTrailerTag;
             }
-        }
-
-        public virtual bool CheckInsideSegment(string segmentName) {
-            if (string.IsNullOrEmpty(segmentName)) {
-                throw new ArgumentNullException(nameof(segmentName));
-            }
-            if (segmentName.Length != 3) {
-                throw new ArgumentOutOfRangeException(nameof(segmentName), segmentName, "Unexpected value '{1}' for parameter {0}");
-            }
-            return Path.StartsWith(segmentName.ToUpperInvariant(), StringComparison.Ordinal);
         }
         #endregion 
 

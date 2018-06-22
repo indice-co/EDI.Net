@@ -12,42 +12,26 @@ namespace indice.Edi
     /// </summary>
     public class EdiGrammar : IEdiGrammar
     {
-        protected char _SegmentNameDelimiter;
-        protected char _ComponentDataElementSeparator;
-        protected char _DataElementSeparator;
-        protected char? _DecimalMark;
-        protected char? _ReleaseCharacter;
-        protected char[] _Reserved;
-        protected char _SegmentTerminator;
-
         char[] _separators;
         
-        protected string _ServiceStringAdviceTag;
-        protected string _InterchangeHeaderTag;
-        protected string _FunctionalGroupHeaderTag;
-        protected string _MessageHeaderTag;
-        protected string _MessageTrailerTag;
-        protected string _FunctionalGroupTrailerTag;
-        protected string _InterchangeTrailerTag;
-
         /// <summary>
         /// Constructs an <see cref="EdiGrammar"/> with the EdiFact defaults
         /// </summary>
         public EdiGrammar() {
-            _ComponentDataElementSeparator = ':';
-            _SegmentNameDelimiter = _DataElementSeparator = '+';
-            _DecimalMark = '.';
-            _ReleaseCharacter = '?';
-            _Reserved = new[] { ' ' };
-            _SegmentTerminator = '\'';
+            ComponentDataElementSeparator = ':';
+            SegmentNameDelimiter = DataElementSeparator = '+';
+            DecimalMark = '.';
+            ReleaseCharacter = '?';
+            Reserved = new[] { ' ' };
+            SegmentTerminator = '\'';
             
-            _ServiceStringAdviceTag = "UNA";
-            _InterchangeHeaderTag = "UNB";
-            _FunctionalGroupHeaderTag = "UNG";
-            _MessageHeaderTag = "UNH";
-            _MessageTrailerTag = "UNT";
-            _FunctionalGroupTrailerTag = "UNE";
-            _InterchangeTrailerTag = "UNZ";
+            ServiceStringAdviceTag = "UNA";
+            InterchangeHeaderTag = "UNB";
+            FunctionalGroupHeaderTag = "UNG";
+            MessageHeaderTag = "UNH";
+            MessageTrailerTag = "UNT";
+            FunctionalGroupTrailerTag = "UNE";
+            InterchangeTrailerTag = "UNZ";
         }
 
         /// <summary>
@@ -55,20 +39,20 @@ namespace indice.Edi
         /// </summary>
         /// <param name="grammar"></param>
         public EdiGrammar(IEdiGrammar grammar) {
-            _ComponentDataElementSeparator = grammar.ComponentDataElementSeparator;
-            _DataElementSeparator = grammar.DataElementSeparator;
-            _DecimalMark = grammar.DecimalMark;
-            _ReleaseCharacter = grammar.ReleaseCharacter;
-            _Reserved = grammar.Reserved.Clone() as char[];
-            _SegmentTerminator = grammar.SegmentTerminator;
+            ComponentDataElementSeparator = grammar.ComponentDataElementSeparator;
+            DataElementSeparator = grammar.DataElementSeparator;
+            DecimalMark = grammar.DecimalMark;
+            ReleaseCharacter = grammar.ReleaseCharacter;
+            Reserved = grammar.Reserved.Clone() as char[];
+            SegmentTerminator = grammar.SegmentTerminator;
 
-            _ServiceStringAdviceTag = grammar.ServiceStringAdviceTag;
-            _InterchangeHeaderTag = grammar.InterchangeHeaderTag;
-            _FunctionalGroupHeaderTag = grammar.FunctionalGroupHeaderTag;
-            _MessageHeaderTag = grammar.MessageHeaderTag;
-            _MessageTrailerTag = grammar.MessageTrailerTag;
-            _FunctionalGroupTrailerTag = grammar.FunctionalGroupTrailerTag;
-            _InterchangeTrailerTag = grammar.InterchangeTrailerTag;
+            ServiceStringAdviceTag = grammar.ServiceStringAdviceTag;
+            InterchangeHeaderTag = grammar.InterchangeHeaderTag;
+            FunctionalGroupHeaderTag = grammar.FunctionalGroupHeaderTag;
+            MessageHeaderTag = grammar.MessageHeaderTag;
+            MessageTrailerTag = grammar.MessageTrailerTag;
+            FunctionalGroupTrailerTag = grammar.FunctionalGroupTrailerTag;
+            InterchangeTrailerTag = grammar.InterchangeTrailerTag;
         }
 
 
@@ -76,10 +60,10 @@ namespace indice.Edi
             get {
                 if (_separators == null) {
                     _separators = new[] {
-                        _SegmentNameDelimiter,
-                        _ComponentDataElementSeparator,
-                        _DataElementSeparator,
-                        _SegmentTerminator
+                        SegmentNameDelimiter,
+                        ComponentDataElementSeparator,
+                        DataElementSeparator,
+                        SegmentTerminator
                     }.Distinct().ToArray();
                 }
                 return _separators;
@@ -89,41 +73,31 @@ namespace indice.Edi
         /// <summary>
         /// Segment name delimiter is the character used to seperate between a segment name and its elements. Default value <value>'+'</value> same as <see cref="DataElementSeparator"/>
         /// </summary>
-        public char SegmentNameDelimiter {
-            get { return _SegmentNameDelimiter; }
-        }
+        public char SegmentNameDelimiter { get; protected set; }
 
         /// <summary>
         /// Component data element separator is the "second level" separator of data elements within a message segment. Default value  <value>':'</value>
         /// </summary>
         /// <value>The character used to separate between components</value>
-        public char ComponentDataElementSeparator {
-            get { return _ComponentDataElementSeparator; }
-        }
+        public char ComponentDataElementSeparator { get; protected set; }
 
         /// <summary>
         /// Data element separator is the "first level" separator of data elements within a message segment. Default value <value>'+'</value>
         /// </summary>
         /// <value>An array of possible characters</value>
-        public char DataElementSeparator {
-            get { return _DataElementSeparator; }
-        }
+        public char DataElementSeparator { get; protected set; }
 
         /// <summary>
         /// Used in EDI-Fact Only. Otherwize null
         /// </summary>
-        public char? DecimalMark {
-            get { return _DecimalMark; }
-        }
+        public char? DecimalMark { get; protected set; }
 
         /// <summary>
         /// <para>The release character (analogous to the \ in regular expressions)</para>
         /// is used as a prefix to remove special meaning from the separator, segment termination, 
         /// and release characters when they are used as plain text. Default value is <value>'?'</value>
         /// </summary>
-        public char? ReleaseCharacter {
-            get { return _ReleaseCharacter; }
-        }
+        public char? ReleaseCharacter { get; protected set; }
 
         /// <summary>
         /// <para>
@@ -132,52 +106,48 @@ namespace indice.Edi
         /// eg. <see cref="SegmentTerminator" /> or <seealso cref="DataElementSeparator" /> can not be any in this list.
         /// </summary>
         /// <value>An array of possible characters</value>
-        public char[] Reserved {
-            get { return _Reserved; }
-        }
+        public char[] Reserved { get; protected set; }
 
         /// <summary>
         /// Segment terminator indicates the end of a message segment.
         /// </summary>
-        public char SegmentTerminator {
-            get { return _SegmentTerminator; }
-        }
+        public char SegmentTerminator { get; protected set; }
 
         /// <summary>
         /// Only available in EDI Fact. Otherwize null
         /// </summary>
-        public string ServiceStringAdviceTag { get { return _ServiceStringAdviceTag; } }
-        
+        public string ServiceStringAdviceTag { get; protected set; }
+
         /// <summary>
         /// The segment name that marks the Interchange Header.
         /// </summary>
-        public string InterchangeHeaderTag { get { return _InterchangeHeaderTag; } }
+        public string InterchangeHeaderTag { get; protected set; }
 
         /// <summary>
         /// The segment name that marks the Functional Group Header.
         /// </summary>
-        public string FunctionalGroupHeaderTag { get { return _FunctionalGroupHeaderTag; } }
-        
+        public string FunctionalGroupHeaderTag { get; protected set; }
+
         /// <summary>
         /// The segment name that marks the Message Header.
         /// </summary>
-        public string MessageHeaderTag { get { return _MessageHeaderTag; } }
-        
+        public string MessageHeaderTag { get; protected set; }
+
         /// <summary>
         /// The segment name that marks the Message Trailer.
         /// </summary>
-        public string MessageTrailerTag { get { return _MessageTrailerTag; } }
-        
+        public string MessageTrailerTag { get; protected set; }
+
         /// <summary>
         /// The segment name that marks the Functional Group Trailer.
         /// </summary>
-        public string FunctionalGroupTrailerTag { get { return _FunctionalGroupTrailerTag; } }
-        
+        public string FunctionalGroupTrailerTag { get; protected set; }
+
         /// <summary>
         /// The segment name that marks the interchange Trailer.
         /// </summary>
-        public string InterchangeTrailerTag { get { return _InterchangeTrailerTag; } }
-        
+        public string InterchangeTrailerTag { get; protected set; }
+
         /// <summary>
         /// Checks to see if a character is any of the known special characters.
         /// </summary>
@@ -192,12 +162,12 @@ namespace indice.Edi
         /// </summary>
         /// <param name="chars"></param>
         public void SetAdvice(char[] chars) {
-            _ComponentDataElementSeparator = chars[0];
-            _SegmentNameDelimiter = _DataElementSeparator = chars[1];
-            _DecimalMark = chars[2];
-            _ReleaseCharacter = chars[3];
-            _Reserved = new[] { chars[4] };
-            _SegmentTerminator = chars[5];
+            ComponentDataElementSeparator = chars[0];
+            SegmentNameDelimiter = DataElementSeparator = chars[1];
+            DecimalMark = chars[2];
+            ReleaseCharacter = chars[3];
+            Reserved = new[] { chars[4] };
+            SegmentTerminator = chars[5];
 
             //TODO: must figure this out to work both for EDIFact and X12. 
             // The above is only used by the former. http://stackoverflow.com/a/20112217/61577
@@ -220,13 +190,13 @@ namespace indice.Edi
                               char? releaseCharacter,
                               char? reserved,
                               char? decimalMark) {
-            _ComponentDataElementSeparator = componentDataElementSeparator;
-            _DataElementSeparator = dataElementSeparator;
-            _SegmentNameDelimiter = segmentNameDelimiter;
-            _ReleaseCharacter = releaseCharacter;
-            _Reserved = reserved.HasValue ? new[] { reserved.Value } : new char[0];
-            _DecimalMark = decimalMark;
-            _SegmentTerminator = segmentTerminator;
+            ComponentDataElementSeparator = componentDataElementSeparator;
+            DataElementSeparator = dataElementSeparator;
+            SegmentNameDelimiter = segmentNameDelimiter;
+            ReleaseCharacter = releaseCharacter;
+            Reserved = reserved.HasValue ? new[] { reserved.Value } : new char[0];
+            DecimalMark = decimalMark;
+            SegmentTerminator = segmentTerminator;
         }
 
         /// <summary>
@@ -243,20 +213,20 @@ namespace indice.Edi
         /// <returns>The <see cref="IEdiGrammar"/></returns>
         public static IEdiGrammar NewTradacoms() {
             return new EdiGrammar() {
-                _SegmentNameDelimiter = '=',
-                _ComponentDataElementSeparator = ':',
-                _DataElementSeparator = '+',
-                _DecimalMark = null,
-                _ReleaseCharacter = '?',
-                _Reserved = new[] { ' ' },
-                _SegmentTerminator = '\'',
-                _ServiceStringAdviceTag = null,
-                _InterchangeHeaderTag = "STX",
-                _FunctionalGroupHeaderTag = "BAT",
-                _MessageHeaderTag = "MHD",
-                _MessageTrailerTag = "MTR",
-                _FunctionalGroupTrailerTag = "EOB",
-                _InterchangeTrailerTag = "END",
+                SegmentNameDelimiter = '=',
+                ComponentDataElementSeparator = ':',
+                DataElementSeparator = '+',
+                DecimalMark = null,
+                ReleaseCharacter = '?',
+                Reserved = new[] { ' ' },
+                SegmentTerminator = '\'',
+                ServiceStringAdviceTag = null,
+                InterchangeHeaderTag = "STX",
+                FunctionalGroupHeaderTag = "BAT",
+                MessageHeaderTag = "MHD",
+                MessageTrailerTag = "MTR",
+                FunctionalGroupTrailerTag = "EOB",
+                InterchangeTrailerTag = "END",
             };
         }
 
@@ -266,20 +236,20 @@ namespace indice.Edi
         /// <returns>The <see cref="IEdiGrammar"/></returns>
         public static IEdiGrammar NewX12() {
             return new EdiGrammar() {
-                _SegmentNameDelimiter = '*',
-                _ComponentDataElementSeparator = '>',
-                _DataElementSeparator = '*',
-                _DecimalMark = '.',
-                _ReleaseCharacter = null,
-                _Reserved = new char[0],
-                _SegmentTerminator = '~',
-                _ServiceStringAdviceTag = null,
-                _InterchangeHeaderTag = "ISA",
-                _FunctionalGroupHeaderTag = "GS",
-                _MessageHeaderTag = "ST",
-                _MessageTrailerTag = "SE",
-                _FunctionalGroupTrailerTag = "GE",
-                _InterchangeTrailerTag = "IEA",
+                SegmentNameDelimiter = '*',
+                ComponentDataElementSeparator = '>',
+                DataElementSeparator = '*',
+                DecimalMark = '.',
+                ReleaseCharacter = null,
+                Reserved = new char[0],
+                SegmentTerminator = '~',
+                ServiceStringAdviceTag = null,
+                InterchangeHeaderTag = "ISA",
+                FunctionalGroupHeaderTag = "GS",
+                MessageHeaderTag = "ST",
+                MessageTrailerTag = "SE",
+                FunctionalGroupTrailerTag = "GE",
+                InterchangeTrailerTag = "IEA",
             };
         }
 

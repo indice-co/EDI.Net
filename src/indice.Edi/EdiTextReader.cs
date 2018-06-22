@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace indice.Edi
 {
+    /// <summary>
+    /// Represents a reader that provides a fast, non-cached, forward-only way of reading EDI data from a <see cref="TextReader"/>.
+    /// </summary>
     public class EdiTextReader : EdiReader, IEdiLineInfo
     {
         private const char UnicodeReplacementChar = '\uFFFD';
@@ -24,6 +27,11 @@ namespace indice.Edi
         private StringReference _stringReference;
         internal NameTable NameTable;
 
+        /// <summary>
+        /// Constructs an <see cref="EdiTextReader"/> using the <seealso cref="IEdiGrammar"/> of choice and a <seealso cref="TextReader"/>
+        /// </summary>
+        /// <param name="reader">The <see cref="TextReader"/></param>
+        /// <param name="grammar">The <see cref="IEdiGrammar"/></param>
         public EdiTextReader(TextReader reader, IEdiGrammar grammar)
             : base(grammar) {
             if (null == reader)
