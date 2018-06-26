@@ -4,11 +4,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using indice.Edi.Utilities;
 using indice.Edi.Serialization;
-using System.Reflection;
 
 namespace indice.Edi
 {
@@ -22,7 +19,12 @@ namespace indice.Edi
         /// Gets or sets a value indicating whether segment groups should automatically end when a non-matching segment is found. 
         /// </summary>
         public bool AutoEndSegmentGroups { get; set; }
-        
+
+        /// <summary>
+        /// Enables compression when Serializing to edi. Sets the internal <see cref="EdiWriter.EnableCompression"/>. By default is set to true.
+        /// </summary>
+        public bool EnableCompression { get; set; } = true;
+
         /// <summary>
         /// Deserializes the EDI structure contained by the specified <see cref="EdiReader"/>.
         /// </summary>
@@ -643,6 +645,7 @@ namespace indice.Edi
         /// <param name="ediWriter">The <see cref="EdiWriter"/> used to write the EDI structure.</param>
         /// <param name="value">The <see cref="object"/> to serialize.</param>
         public void Serialize(EdiWriter ediWriter, object value) {
+            ediWriter.EnableCompression = EnableCompression;
             SerializeInternal(ediWriter, value, null);
         }
 
@@ -657,6 +660,7 @@ namespace indice.Edi
         /// Specifing the type is optional.
         /// </param>
         public void Serialize(EdiWriter ediWriter, object value, Type objectType) {
+            ediWriter.EnableCompression = EnableCompression;
             SerializeInternal(ediWriter, value, objectType);
         }
 
@@ -688,7 +692,7 @@ namespace indice.Edi
             structuralComparer = structuralComparer ?? new EdiPathComparer(writer.Grammar);
             var structure = stack.Peek();
             var properies = structure.GetOrderedProperties(structuralComparer);
-
+            
             foreach (var property in properies) {
 
                 var value = property.Info.GetValue(structure.Instance);
@@ -702,6 +706,7 @@ namespace indice.Edi
                     // the following loop handles the write of unmapped preceding elements/components to the one being writen 
                     // so that path progression stays intact even though we do not have all properties present on the model.
                     // TODO: Potentialy this is related to compression.
+
                     while (structuralComparer.Compare(path, property.PathInfo.PathInternal) < 0) {
                         path = (EdiPath)writer.Path;
                         if (path.ElementIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)

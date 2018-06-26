@@ -100,7 +100,7 @@ namespace indice.Edi
         /// Writes the end of a Edi <see cref="EdiContainerType.Segment"/>.
         /// </summary>
         public override void WriteSegmentTerminator() {
-            _writer.Write(Grammar.SegmentTerminator); 
+             _writer.Write(Grammar.SegmentTerminator); 
             if (Formatting == Formatting.LinePerSegment) {
                 WriteNewLine();
             }
@@ -234,9 +234,11 @@ namespace indice.Edi
                     // write remaining text
                     _writer.Write(_writeBuffer, 0, length);
                 }
+            } else {
+                WriteNull();
             }
         }
-
+        
         /// <summary>
         /// Writes a <see cref="Int32"/> value.
         /// </summary>
@@ -306,9 +308,9 @@ namespace indice.Edi
         }
 
         /// <summary>
-        /// Writes a <see cref="Double"/> value.
+        /// Writes a <see cref="double"/> value.
         /// </summary>
-        /// <param name="value">The <see cref="Double"/> value to write.</param>
+        /// <param name="value">The <see cref="double"/> value to write.</param>
         /// <param name="picture"></param>
         public override void WriteValue(double value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Float);

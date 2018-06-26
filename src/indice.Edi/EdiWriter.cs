@@ -188,6 +188,15 @@ namespace indice.Edi
         }
 
         /// <summary>
+        /// Enable compression of edi messages. Avoids unnecessary empty component separators.
+        /// </summary>
+        public bool EnableCompression { get; set; }
+
+        internal bool LastWriteNull { get; set; }
+        internal int UnwrittenComponents { get; set; }
+        internal int UnwrittenElements { get; set; }
+
+        /// <summary>
         /// Creates an instance of the <c>EdiWriter</c> class. 
         /// </summary>
         protected EdiWriter(IEdiGrammar grammar) {
@@ -304,11 +313,11 @@ namespace indice.Edi
                     break;
                 case EdiToken.ElementStart:
                     InternalWriteStart(EdiToken.ElementStart, EdiContainerType.Element);
-                    WriteElementDelimiter();
+                    if(!EnableCompression) WriteElementDelimiter();
                     break;
                 case EdiToken.ComponentStart:
                     InternalWriteStart(EdiToken.ComponentStart, EdiContainerType.Component);
-                    WriteComponentDelimiter();
+                    if (!EnableCompression) WriteComponentDelimiter();
                     break;
                 case EdiToken.Integer:
                     ValidationUtils.ArgumentNotNull(value, nameof(value));
@@ -513,20 +522,31 @@ namespace indice.Edi
 
             // gets new state based on the current state and what is being written
             State newState = StateArray[(int)tokenBeingWritten][(int)_currentState];
-
             if (newState == State.Error) {
                 throw EdiWriterException.Create(this, "Token {0} in state {1} would result in an invalid Edi object.".FormatWith(CultureInfo.InvariantCulture, tokenBeingWritten.ToString(), _currentState.ToString()), null);
             }
+            var isPrimitiveToken = tokenBeingWritten.IsPrimitiveToken();
+            if (EnableCompression && isPrimitiveToken && !LastWriteNull) {
+                for (var i = 0; i < UnwrittenElements; i++) {
+                    WriteElementDelimiter();
+                }
+                for (var i = 0; i < UnwrittenComponents; i++) {
+                    WriteComponentDelimiter();
+                }
+                UnwrittenElements = UnwrittenComponents = 0;
+            }
             if ((_currentState == State.Element || _currentState == State.Component || _currentState == State.Value || _currentState == State.SegmentName) && tokenBeingWritten == EdiToken.SegmentName) {
                 AutoCompleteClose(EdiContainerType.Segment);
-            } else if (_currentState == State.SegmentName && tokenBeingWritten.IsPrimitiveToken()) {
+            } else if (_currentState == State.SegmentName && isPrimitiveToken) {
                 Push(EdiContainerType.Element);
                 Push(EdiContainerType.Component);
-            } else if (_currentState == State.Element && tokenBeingWritten.IsPrimitiveToken()) {
+            } else if (_currentState == State.Element && isPrimitiveToken) {
                 Push(EdiContainerType.Component);
-            } else if (_currentState == State.Value && tokenBeingWritten.IsPrimitiveToken()) {
+            } else if (_currentState == State.Value && isPrimitiveToken) {
                 AutoCompleteClose(EdiContainerType.Component);
-                WriteComponentDelimiter();
+                if (!EnableCompression || !LastWriteNull) {
+                    WriteComponentDelimiter();
+                }
                 Push(EdiContainerType.Component);
             } else if ((_currentState == State.Component || _currentState == State.Value) && tokenBeingWritten == EdiToken.ElementStart) {
                 AutoCompleteClose(EdiContainerType.Element);
@@ -607,9 +627,9 @@ namespace indice.Edi
         }
 
         /// <summary>
-        /// Writes a <see cref="Double"/> value.
+        /// Writes a <see cref="double"/> value.
         /// </summary>
-        /// <param name="value">The <see cref="Double"/> value to write.</param>
+        /// <param name="value">The <see cref="double"/> value to write.</param>
         /// <param name="picture"></param>
         public virtual void WriteValue(double value, Picture? picture) {
             InternalWriteValue(EdiToken.Float);
@@ -1193,11 +1213,25 @@ namespace indice.Edi
         }
 
         internal void InternalWriteStart(EdiToken token, EdiContainerType container) {
+            if (EnableCompression)
+                switch (container) {
+                    case EdiContainerType.Segment:
+                        UnwrittenElements = UnwrittenComponents = 0;
+                        break;
+                    case EdiContainerType.Element:
+                        UnwrittenComponents = 0;
+                        UnwrittenElements++;
+                        break;
+                    case EdiContainerType.Component:
+                        UnwrittenComponents++;
+                        break;
+                }
             AutoComplete(token);
             Push(container);
         }
 
         internal void InternalWriteValue(EdiToken token) {
+            LastWriteNull = (token == EdiToken.Null);
             AutoComplete(token);
         }
 
