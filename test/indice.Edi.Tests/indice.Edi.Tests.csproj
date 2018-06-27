@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Samples\edifact.Issue98.edi" />
+    <None Remove="Samples\tradacoms.productplanning.edi" />
     <None Remove="Samples\x12.Issue88.edi" />
     <None Remove="Samples\x12.Issue91.edi" />
   </ItemGroup>
@@ -23,6 +24,7 @@
     <EmbeddedResource Include="Samples\edifact.D95B.CUSCAR.EDI" />
     <EmbeddedResource Include="Samples\edifact.ORDRSP-formatted.edi" />
     <EmbeddedResource Include="Samples\edifact.ORDRSP.edi" />
+    <EmbeddedResource Include="Samples\tradacoms.productplanning.edi" />
     <EmbeddedResource Include="Samples\tradacoms.order9.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.edi" />
     <EmbeddedResource Include="Samples\tradacoms.utilitybill.escape.edi" />

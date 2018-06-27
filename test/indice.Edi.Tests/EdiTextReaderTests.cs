@@ -810,5 +810,22 @@ namespace indice.Edi.Tests
             Assert.Equal("0012", interchange.Msg.HeaderControl);
             Assert.Equal(interchange.Msg.HeaderControl, interchange.Msg.TrailerControl);
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "Tradacoms")]
+        [Trait(Traits.Issue, "#103")]
+        public void Tradacoms_ProductPlanning_SampleTest() {
+            var grammar = EdiGrammar.NewTradacoms();
+
+            var interchange = default(PPRHDR);
+            using (var stream = Helpers.GetResourceStream("tradacoms.productplanning.edi")) {
+                interchange = new EdiSerializer().Deserialize<PPRHDR>(new StreamReader(stream), grammar);
+            }
+            
+            Assert.NotNull(interchange.Detail);
+            Assert.Equal(2, interchange.Detail.ProductRows.Count);
+            Assert.Equal(4, interchange.Detail.ProductRows[0].PosRows.Count);
+            Assert.Equal(3, interchange.Detail.ProductRows[1].PosRows.Count);
+        }
     }
 }
