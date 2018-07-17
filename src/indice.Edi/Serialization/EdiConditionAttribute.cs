@@ -134,13 +134,17 @@ namespace indice.Edi.Serialization
         /// <returns></returns>
         public override string ToString() {
             switch (CheckFor) {
-                case EdiConditionCheckType.Equal when Options == null || Options.Length == 1:
-                    return $"Condition = {MatchValue}";
-                case EdiConditionCheckType.NotEqual when Options == null || Options.Length == 1:
-                    return $"Condition != {MatchValue}";
                 case EdiConditionCheckType.Equal:
+                    if(Options == null || Options.Length == 1)
+                    {
+                        return $"Condition = {MatchValue}";
+                    }
                     return $"Condition in ({string.Join(", ", Options)})";
                 case EdiConditionCheckType.NotEqual:
+                    if(Options == null || Options.Length == 1)
+                    {
+                        return $"Condition != {MatchValue}";
+                    }
                     return $"Condition not in ({string.Join(", ", Options)})";
                 default:
                     throw new EdiException($"Unexpected condition type {CheckFor}");
