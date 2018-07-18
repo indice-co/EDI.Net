@@ -574,8 +574,7 @@ namespace indice.Edi.Utilities
         {
             Attribute[] a = GetAttributes(attributeProvider, typeof(T), inherit);
 
-            if (a is T[])
-            {
+            if (a is T[]) {
                 var attributes = a as T[];
                 return attributes;
             }

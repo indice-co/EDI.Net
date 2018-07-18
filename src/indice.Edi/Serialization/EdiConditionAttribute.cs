@@ -135,14 +135,12 @@ namespace indice.Edi.Serialization
         public override string ToString() {
             switch (CheckFor) {
                 case EdiConditionCheckType.Equal:
-                    if(Options == null || Options.Length == 1)
-                    {
+                    if(Options == null || Options.Length == 1) {
                         return $"Condition = {MatchValue}";
                     }
                     return $"Condition in ({string.Join(", ", Options)})";
                 case EdiConditionCheckType.NotEqual:
-                    if(Options == null || Options.Length == 1)
-                    {
+                    if(Options == null || Options.Length == 1) {
                         return $"Condition != {MatchValue}";
                     }
                     return $"Condition not in ({string.Join(", ", Options)})";
