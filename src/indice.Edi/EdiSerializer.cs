@@ -696,20 +696,6 @@ namespace indice.Edi
             foreach (var property in properies) {
 
                 var value = property.Info.GetValue(structure.Instance);
-                
-                // Check if the property is null and mandatory or not
-                switch (value)
-                {
-                    // throw exception if value is mandatory
-                    case null when property.ValueInfo.Mandatory:
-                        throw new ArgumentNullException($"Path: {property.Path} - Element: {property.Info.Name}");
-                    // skip this property if it is not mandatory - added it to prevent empty segments
-                    // e.g. without fix: BGM+380:+100112008658:+9+'
-                    //      with fix:    BGM+380+100112008658+9'
-                    case null when !property.ValueInfo.Mandatory:
-                        continue;
-                }
-                
                 if (property.ValueInfo != null) {
                     var path = (EdiPath)writer.Path;
                     if (path.Segment != property.PathInfo.Segment ||
