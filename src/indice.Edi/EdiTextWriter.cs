@@ -167,6 +167,9 @@ namespace indice.Edi
         /// <param name="value">The <see cref="String"/> value to write.</param>
         /// <param name="picture"></param>
         public override void WriteValue(string value, Picture? picture) {
+            if (picture.HasValue && picture.Value.Scale < value.Length) {
+                throw new LengthLimitExceededException($"Value:{value} exeeded the limit of {picture.Value.Scale} by {value.Length}");
+            }
             InternalWriteValue(EdiToken.String);
             WriteEscapedString(value);
         }
