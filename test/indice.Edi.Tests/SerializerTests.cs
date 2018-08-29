@@ -96,9 +96,9 @@ UNT+158+1'
 UNZ+1+20101000064507'
 ";
             #endregion
-
-            if (!"\r\n".Equals(Environment.NewLine)) {
-                expected = expected.Replace("\r\n", Environment.NewLine);
+            var newLine = new StringBuilder().AppendLine().ToString();
+            if (!"\r\n".Equals(newLine)) {
+                expected = expected.Replace("\r\n", newLine);
             }
             
             var output = new StringBuilder();
