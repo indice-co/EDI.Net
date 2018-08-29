@@ -23,89 +23,85 @@ namespace indice.Edi.Tests
             }
 
 
-            var expected = withCompression ?
-
-            #region ...compressed output...
-@"UNA:+.? '
-UNB+UNOC:3+1234567891123:14+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'
-UNH+1+QUOTES:D:96A:UN:EDIEL2+S'
-BGM+310+2010101900026812+9+AB'
-DTM+137:201010191104:203'
-DTM+163:201010192300:203'
-DTM+164:201010202300:203'
-DTM+:1:805'
-CUX+2:SEK'
-NAD+FR+1234567891123::9'
-NAD+DO+7080005059275::9'
-LOC+105+SE1::SM'
-LIN+1++1420:::SM'
-DTM+324:201010192300201010200000:013'
-PRI+CAL:-2100'
-RNG+4+1:-0.1'
-PRI+CAL:21000'
-RNG+4+1:-0.1'
-LIN+2++1420:::SM'
-DTM+324:201010200000201010200100:013'
-PRI+CAL:-2100'
-RNG+4+1:0'
-PRI+CAL:21000'
-RNG+4+1:0'
-LIN+3++1420:::SM'
-DTM+324:201010200100201010200200:013'
-PRI+CAL:-2100'
-RNG+4+1:0'
-PRI+CAL:21000'
-UNS+S'
-UNT+158+1'
-UNZ+1+20101000064507'
-"
-            #endregion
-            :
-            #region ...uncompressed output...
-            @"UNA:+.? '
-UNB+UNOC:3+1234567891123:14:+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'
-UNH+1+QUOTES:D:96A:UN:EDIEL2+S'
-BGM+310+2010101900026812+9+AB'
-DTM+137:201010191104:203'
-DTM+163:201010192300:203'
-DTM+164:201010202300:203'
-DTM+:1:805'
-CUX+2:SEK'
-NAD+FR+1234567891123::9'
-NAD+DO+7080005059275::9'
-LOC+105+SE1::SM'
-LIN+1++1420:::SM'
-DTM+324:201010192300201010200000:013'
-PRI+CAL:-2100:'
-RNG+4+1:-0.1'
-PRI+CAL:21000:'
-RNG+4+1:-0.1'
-LIN+2++1420:::SM'
-DTM+324:201010200000201010200100:013'
-PRI+CAL:-2100:'
-RNG+4+1:0'
-PRI+CAL:21000:'
-RNG+4+1:0'
-LIN+3++1420:::SM'
-DTM+324:201010200100201010200200:013'
-PRI+CAL:-2100:'
-RNG+4+1:0'
-PRI+CAL:21000:'
-UNS+S'
-UNT+158+1'
-UNZ+1+20101000064507'
-";
-            #endregion
-            var newLine = new StringBuilder().AppendLine().ToString();
-            if (!"\r\n".Equals(newLine)) {
-                expected = expected.Replace("\r\n", newLine);
+            var expected = new StringBuilder();
+            if (withCompression) {
+                #region ...compressed output... 
+                expected.AppendLine("UNA:+.? '");
+                expected.AppendLine("UNB+UNOC:3+1234567891123:14+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'");
+                expected.AppendLine("UNH+1+QUOTES:D:96A:UN:EDIEL2+S'");
+                expected.AppendLine("BGM+310+2010101900026812+9+AB'");
+                expected.AppendLine("DTM+137:201010191104:203'");
+                expected.AppendLine("DTM+163:201010192300:203'");
+                expected.AppendLine("DTM+164:201010202300:203'");
+                expected.AppendLine("DTM+:1:805'");
+                expected.AppendLine("CUX+2:SEK'");
+                expected.AppendLine("NAD+FR+1234567891123::9'");
+                expected.AppendLine("NAD+DO+7080005059275::9'");
+                expected.AppendLine("LOC+105+SE1::SM'");
+                expected.AppendLine("LIN+1++1420:::SM'");
+                expected.AppendLine("DTM+324:201010192300201010200000:013'");
+                expected.AppendLine("PRI+CAL:-2100'");
+                expected.AppendLine("RNG+4+1:-0.1'");
+                expected.AppendLine("PRI+CAL:21000'");
+                expected.AppendLine("RNG+4+1:-0.1'");
+                expected.AppendLine("LIN+2++1420:::SM'");
+                expected.AppendLine("DTM+324:201010200000201010200100:013'");
+                expected.AppendLine("PRI+CAL:-2100'");
+                expected.AppendLine("RNG+4+1:0'");
+                expected.AppendLine("PRI+CAL:21000'");
+                expected.AppendLine("RNG+4+1:0'");
+                expected.AppendLine("LIN+3++1420:::SM'");
+                expected.AppendLine("DTM+324:201010200100201010200200:013'");
+                expected.AppendLine("PRI+CAL:-2100'");
+                expected.AppendLine("RNG+4+1:0'");
+                expected.AppendLine("PRI+CAL:21000'");
+                expected.AppendLine("UNS+S'");
+                expected.AppendLine("UNT+158+1'");
+                expected.AppendLine("UNZ+1+20101000064507'");
             }
-            
+            #endregion
+            else {
+                #region ...uncompressed output...
+                expected.AppendLine("UNA:+.? '");
+                expected.AppendLine("UNB+UNOC:3+1234567891123:14:+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'");
+                expected.AppendLine("UNH+1+QUOTES:D:96A:UN:EDIEL2+S'");
+                expected.AppendLine("BGM+310+2010101900026812+9+AB'");
+                expected.AppendLine("DTM+137:201010191104:203'");
+                expected.AppendLine("DTM+163:201010192300:203'");
+                expected.AppendLine("DTM+164:201010202300:203'");
+                expected.AppendLine("DTM+:1:805'");
+                expected.AppendLine("CUX+2:SEK'");
+                expected.AppendLine("NAD+FR+1234567891123::9'");
+                expected.AppendLine("NAD+DO+7080005059275::9'");
+                expected.AppendLine("LOC+105+SE1::SM'");
+                expected.AppendLine("LIN+1++1420:::SM'");
+                expected.AppendLine("DTM+324:201010192300201010200000:013'");
+                expected.AppendLine("PRI+CAL:-2100:'");
+                expected.AppendLine("RNG+4+1:-0.1'");
+                expected.AppendLine("PRI+CAL:21000:'");
+                expected.AppendLine("RNG+4+1:-0.1'");
+                expected.AppendLine("LIN+2++1420:::SM'");
+                expected.AppendLine("DTM+324:201010200000201010200100:013'");
+                expected.AppendLine("PRI+CAL:-2100:'");
+                expected.AppendLine("RNG+4+1:0'");
+                expected.AppendLine("PRI+CAL:21000:'");
+                expected.AppendLine("RNG+4+1:0'");
+                expected.AppendLine("LIN+3++1420:::SM'");
+                expected.AppendLine("DTM+324:201010200100201010200200:013'");
+                expected.AppendLine("PRI+CAL:-2100:'");
+                expected.AppendLine("RNG+4+1:0'");
+                expected.AppendLine("PRI+CAL:21000:'");
+                expected.AppendLine("UNS+S'");
+                expected.AppendLine("UNT+158+1'");
+                expected.AppendLine("UNZ+1+20101000064507'");
+                #endregion
+            }
+
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
                 new EdiSerializer() { EnableCompression = withCompression }.Serialize(writer, interchange);
             }
-            Assert.Equal(expected, output.ToString());
+            Assert.Equal(expected.ToString(), output.ToString());
         }
 
         [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Bug, "#74")]
@@ -154,6 +150,6 @@ UNZ+1+20101000064507'
             Assert.True(ElmPos >= 0);
             Assert.True(GrpPos < ElmPos);
         }
-        
+
     }
 }
