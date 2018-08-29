@@ -97,6 +97,10 @@ UNZ+1+20101000064507'
 ";
             #endregion
 
+            if (!"\r\n".Equals(Environment.NewLine)) {
+                expected = expected.Replace("\r\n", Environment.NewLine);
+            }
+            
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
                 new EdiSerializer() { EnableCompression = withCompression }.Serialize(writer, interchange);
