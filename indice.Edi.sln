@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65B79EC4-4844-4EF1-8CBC-FD978EB28EBA}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		appveyor.yml = appveyor.yml
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -39,5 +40,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{CC65B600-E714-4C3C-8908-8A8BC0431A7A} = {CCDA51C2-7B50-4B8A-AE79-5AAE72ADF7F6}
 		{6C51495A-98D6-423F-B14F-5AF38EE18D38} = {B01DA332-38EF-4AC7-AEF6-B22B33F7D40F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BEFAD03D-3DBF-4B88-9439-E0C87E51B805}
 	EndGlobalSection
 EndGlobal
