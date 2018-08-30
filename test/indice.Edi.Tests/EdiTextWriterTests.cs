@@ -26,7 +26,7 @@ namespace indice.Edi.Tests
         public void WriterWritesStructureTest() {
             var grammar = EdiGrammar.NewEdiFact();
             var expected = new StringBuilder().AppendLine("UNA:+.? '")
-                                              .AppendLine("UNB +UNOC:3+1234567891123:14+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'")
+                                              .AppendLine("UNB+UNOC:3+1234567891123:14+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'")
                                               .AppendLine("UNH+1+QUOTES:D:96A:UN:EDIEL2+S'");
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
