@@ -921,8 +921,8 @@ namespace indice.Edi.Utilities
             return type;
         }
 
-        internal static IEnumerable<T> GetCustomAttributes<T>(this MemberInfo element) where T : Attribute {
-            return element.GetCustomAttributes(typeof(T), true).Cast<T>();
+        internal static IEnumerable<T> GetCustomAttributes<T>(this MemberInfo element, bool inherit = true) where T : Attribute {
+            return element.GetCustomAttributes(typeof(T), inherit).Cast<T>();
         }
 #endif
     }

@@ -266,7 +266,9 @@ namespace indice.Edi
             var dateString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
                                                            read ? reader.ReadAsString() : (string)reader.Value;
             if (dateString != null) {
-                dateString = dateString.Substring(0, Math.Min(dateString.Length, valueInfo.Picture.Scale));
+                if (valueInfo.Picture != default(Picture)) {
+                    dateString = dateString.Substring(0, Math.Min(dateString.Length, valueInfo.Picture.Scale));
+                }
                 var date = default(DateTime);
                 if (dateString.TryParseEdiDate(valueInfo.Format, CultureInfo.InvariantCulture, out date)) {
                     var existingDateObject = descriptor.Info.GetValue(structure.Instance);

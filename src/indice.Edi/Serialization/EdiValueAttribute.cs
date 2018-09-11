@@ -5,7 +5,7 @@ namespace indice.Edi.Serialization
     /// <summary>
     /// Use <see cref="EdiValueAttribute"/> for any value inside a segment. 
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public sealed class EdiValueAttribute : EdiAttribute
     {
         private Picture _picture;
