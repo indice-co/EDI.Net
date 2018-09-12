@@ -150,6 +150,16 @@ namespace indice.Edi.Tests
             Assert.True(ElmPos >= 0);
             Assert.True(GrpPos < ElmPos);
         }
+        
+        [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#109")]
+        public void SegmentGroup_Close_logic_Should_Iterate_Over_Parents() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EDIFact_D01B_IFCSUM);
+            using (var stream = Helpers.GetResourceStream("edifact.D01B.IFCSUM.EDI")) {
+                interchange = new EdiSerializer().Deserialize<EDIFact_D01B_IFCSUM>(new StreamReader(stream), grammar);
+            }
 
+            Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
+        }
     }
 }

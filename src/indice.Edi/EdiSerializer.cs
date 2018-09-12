@@ -392,10 +392,10 @@ namespace indice.Edi
                         }
                     } else if (sequenceEnd.HasValue && readerSegment.Equals(sequenceEnd.Value.Segment)) {
                         level.Close(); // Close this level
-                        break;
+                        continue;
                     } else if (level.GroupMembers.Length > 1 && !level.GroupContains(readerSegment as string)) {
                         level.Close(); // Close this level
-                        break;
+                        continue;
                     }
                 }
                 var clearUpTo = stack.Reverse().FirstOrDefault(x => x.IsClosed)?.Container;
