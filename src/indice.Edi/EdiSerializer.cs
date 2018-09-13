@@ -86,7 +86,7 @@ namespace indice.Edi
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
-            var implicitSegments = new [] {
+            var implicitSegments = new[] {
                 reader.Grammar.FunctionalGroupHeaderTag,
                 reader.Grammar.FunctionalGroupTrailerTag,
                 reader.Grammar.InterchangeHeaderTag,
@@ -94,7 +94,7 @@ namespace indice.Edi
                 reader.Grammar.MessageHeaderTag,
                 reader.Grammar.MessageTrailerTag
             };
-            
+
             // the output value
             object value = null;
 
@@ -115,8 +115,7 @@ namespace indice.Edi
 
                     if (reader.IsStartMessage) {
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
-                    }
-                    else if (reader.IsEndMessage) {
+                    } else if (reader.IsEndMessage) {
                         while (stack.Peek().StructureType > EdiStructureType.Message) {
                             stack.Pop();
                         }
@@ -148,8 +147,7 @@ namespace indice.Edi
                                         reader.Value));
                             }
                         }
-                    }
-                    else if (reader.TokenType == EdiToken.ElementStart) {
+                    } else if (reader.TokenType == EdiToken.ElementStart) {
                         TryCreateContainer(reader, stack, EdiStructureType.Element);
                     }
 
@@ -367,8 +365,8 @@ namespace indice.Edi
             if (newContainer == EdiStructureType.SegmentGroup || newContainer == EdiStructureType.Segment) {
                 stack.Peek().CachedReads.Clear();
             }
-            
-            if (newContainer == EdiStructureType.SegmentGroup && 
+
+            if (newContainer == EdiStructureType.SegmentGroup &&
                 stack.Peek().StructureType >= EdiStructureType.SegmentGroup) {
                 // strict hierarchy
                 while (stack.Peek().StructureType > newContainer) {
@@ -694,7 +692,7 @@ namespace indice.Edi
             structuralComparer = structuralComparer ?? new EdiPathComparer(writer.Grammar);
             var structure = stack.Peek();
             var properies = structure.GetOrderedProperties(structuralComparer);
-            
+
             foreach (var property in properies) {
 
                 var value = property.Info.GetValue(structure.Instance);
@@ -707,18 +705,20 @@ namespace indice.Edi
                     }
                     // the following loop handles the write of unmapped preceding elements/components to the one being writen 
                     // so that path progression stays intact even though we do not have all properties present on the model.
-                    // TODO: Potentialy this is related to compression.
 
                     while (structuralComparer.Compare(path, property.PathInfo.PathInternal) < 0) {
+                        if (path.ElementIndex != property.PathInfo.ElementIndex) {
+                            if (path.ElementIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)
+                                writer.WriteToken(EdiToken.Null);
+                            else
+                                writer.WriteToken(EdiToken.ElementStart);
+                        } else if (path.ComponentIndex != property.PathInfo.ComponentIndex) {
+                            if (path.ComponentIndex == 0 && writer.WriteState != WriteState.Component)
+                                writer.WriteToken(EdiToken.Null);
+                            else
+                                writer.WriteToken(EdiToken.ComponentStart);
+                        }
                         path = (EdiPath)writer.Path;
-                        if (path.ElementIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)
-                            writer.WriteToken(EdiToken.Null);
-                        else if (path.ElementIndex != property.PathInfo.ElementIndex)
-                            writer.WriteToken(EdiToken.ElementStart);
-                        else if (path.ComponentIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)
-                            writer.WriteToken(EdiToken.Null);
-                        else if (path.ComponentIndex != property.PathInfo.ComponentIndex)
-                            writer.WriteToken(EdiToken.ComponentStart);
                     }
                     writer.WriteValue(value, property.ValueInfo.Picture, property.ValueInfo.Format);
                 } else {

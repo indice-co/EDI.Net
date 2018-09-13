@@ -827,5 +827,16 @@ namespace indice.Edi.Tests
             Assert.Equal(4, interchange.Detail.ProductRows[0].PosRows.Count);
             Assert.Equal(3, interchange.Detail.ProductRows[1].PosRows.Count);
         }
+
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#110")]
+        public void SegmentGroup_Close_logic_Should_Iterate_Over_Parents() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EDIFact_D01B_IFCSUM);
+            using (var stream = Helpers.GetResourceStream("edifact.D01B.IFCSUM.EDI")) {
+                interchange = new EdiSerializer().Deserialize<EDIFact_D01B_IFCSUM>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
+        }
     }
 }

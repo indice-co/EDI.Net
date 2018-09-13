@@ -163,7 +163,7 @@ namespace indice.Edi
                 return EdiPosition.BuildPath(current != null ? stack.Concat(new[] { current.Value }) : _stack);
             }
         }
-        
+
 
         /// <summary>
         /// Indicates how Edi text output is formatted.
@@ -208,7 +208,7 @@ namespace indice.Edi
 
             CloseOutput = true;
         }
-        
+
         private void Push(EdiContainerType value) {
             if (_currentPosition.Type != EdiContainerType.None) {
                 if (_stack == null) {
@@ -220,7 +220,7 @@ namespace indice.Edi
                 } else {
                     _stack.Add(_currentPosition);
                 }
-            } 
+            }
             _currentPosition = new EdiPosition(value);
             if (_currentPosition.HasIndex)
                 _currentPosition.Position = 0;
@@ -313,7 +313,7 @@ namespace indice.Edi
                     break;
                 case EdiToken.ElementStart:
                     InternalWriteStart(EdiToken.ElementStart, EdiContainerType.Element);
-                    if(!EnableCompression) WriteElementDelimiter();
+                    if (!EnableCompression) WriteElementDelimiter();
                     break;
                 case EdiToken.ComponentStart:
                     InternalWriteStart(EdiToken.ComponentStart, EdiContainerType.Component);
@@ -508,14 +508,14 @@ namespace indice.Edi
         /// Writes an <see cref="EdiContainerType.Element"/> separator.
         /// </summary>
         protected virtual void WriteElementDelimiter() {
-            
+
         }
 
         /// <summary>
         /// Writes an <see cref="EdiContainerType.Component"/> separator.
         /// </summary>
         protected virtual void WriteComponentDelimiter() {
-            
+
         }
 
         internal void AutoComplete(EdiToken tokenBeingWritten) {

@@ -68,6 +68,25 @@ namespace indice.Edi.Tests
             }
             Assert.Equal(expected.ToString(), output.ToString());
         }
-        
+
+
+        [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#109")]
+        public void WriterProgressessThePathCorrectly_On_NullToken() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var expected = new StringBuilder().AppendLine("UNA:+.? '")
+                                              .AppendLine("PAC+1+:52+PK'");
+            var output = new StringBuilder();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
+                writer.WriteServiceStringAdvice();
+                writer.WriteToken(EdiToken.SegmentName, "PAC"); Assert.Equal("PAC",       writer.Path);
+                writer.WriteValue(1);                           Assert.Equal("PAC[0][0]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);       Assert.Equal("PAC[1]",    writer.Path);
+                writer.WriteToken(EdiToken.Null);               Assert.Equal("PAC[1][0]", writer.Path);
+                writer.WriteValue(52);                          Assert.Equal("PAC[1][1]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart);       Assert.Equal("PAC[2]",    writer.Path);
+                writer.WriteValue("PK");                        Assert.Equal("PAC[2][0]", writer.Path);
+            }
+            Assert.Equal(expected.ToString(), output.ToString());
+        }
     }
 }

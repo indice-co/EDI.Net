@@ -152,14 +152,25 @@ namespace indice.Edi.Tests
         }
         
         [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#109")]
-        public void SegmentGroup_Close_logic_Should_Iterate_Over_Parents() {
+        public void ValueAttributePath_Weird_behavior_Test() {
             var grammar = EdiGrammar.NewEdiFact();
-            var interchange = default(EDIFact_D01B_IFCSUM);
-            using (var stream = Helpers.GetResourceStream("edifact.D01B.IFCSUM.EDI")) {
-                interchange = new EdiSerializer().Deserialize<EDIFact_D01B_IFCSUM>(new StreamReader(stream), grammar);
+            var interchange = new ValueAttributePath_Weird_behavior {
+                Msg = new ValueAttributePath_Weird_behavior.Message {
+                    PAC = new ValueAttributePath_Weird_behavior.PAC_Segment {
+                        PackageCount = "1",
+                        PackageDetailLevel = "52",
+                        PackageType = "PK"
+                    }
+                }
+            };
+            string expected = "UNA:+.? '\r\nPAC+1+:52+PK";
+            string output = null;
+            using (var writer = new StringWriter()) {
+                new EdiSerializer() { EnableCompression = false }.Serialize(writer, grammar, interchange);
+                output = writer.ToString();
             }
 
-            Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
+            Assert.Equal(expected, output);
         }
     }
 }
