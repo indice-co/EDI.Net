@@ -401,6 +401,11 @@ namespace indice.Edi
                     while (stack.Peek() != clearUpTo) {
                         stack.Pop();
                     }
+
+                    var segmentName = stack.Peek().Descriptor.SegmentGroupInfo?.Members?.FirstOrDefault().Segment;
+                    if ((readerSegment as string) == segmentName) {
+                        stack.Pop();
+                    }
                 }
             } else {
                 // strict hierarchy
