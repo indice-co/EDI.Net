@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.7.1</VersionPrefix>
+    <VersionPrefix>1.8.0</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net40;net45;netstandard1.0;netstandard1.3;netstandard2.0</TargetFrameworks>
@@ -15,7 +15,10 @@
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
     <PackageReleaseNotes>
-      breaking EdiAttribute is not inherited. This makes easyer to override the attribute on an inherited member. 
+      breaking EdiAttribute is not inherited. This makes easyer to override the attribute on an inherited member.
+      Fixes:
+      - fixed bug that broke serializer insede the loop that handles the write of unmapped preceding elements/components to the one being writen. closes #109
+      - Segment group logic should iterate over parents. Potentialy fixes related #110
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
