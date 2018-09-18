@@ -138,6 +138,11 @@ namespace indice.Edi
                         ProcessCarriageReturn(false);
                         break;
                     case StringUtils.LineFeed:
+                        if (Grammar.SegmentTerminator == currentChar) {
+                            SetToken(EdiToken.SegmentStart);
+                            ProcessLineFeed();
+                            return true;
+                        }
                         ProcessLineFeed();
                         break;
                     default:
@@ -205,13 +210,18 @@ namespace indice.Edi
                     case StringUtils.CarriageReturn:
                         ProcessCarriageReturn(false);
                         break;
-                    case StringUtils.LineFeed:
-                        ProcessLineFeed();
-                        break;
                     case ' ':
                     case StringUtils.Tab:
                         // eat
                         _charPos++;
+                        break;
+                    case StringUtils.LineFeed:
+                        if (Grammar.SegmentTerminator == currentChar) {
+                            SetToken(EdiToken.SegmentStart);
+                            ProcessLineFeed();
+                            return true;
+                        }
+                        ProcessLineFeed();
                         break;
                     default:
                         if (Grammar.SegmentTerminator == currentChar) {
@@ -273,6 +283,11 @@ namespace indice.Edi
                         ProcessCarriageReturn(false);
                         break;
                     case StringUtils.LineFeed:
+                        if (Grammar.IsSpecial(currentChar)) {
+                            ParseString(true);
+                            ProcessLineFeed(forwardPosition: false);
+                            return true;
+                        }
                         ProcessLineFeed();
                         break;
                     default:
@@ -529,12 +544,17 @@ namespace indice.Edi
                     _charPos = charPos - 1;
                     ProcessCarriageReturn(true);
                     charPos = _charPos;
-                } else if (StringUtils.LineFeed == charAt) {
+                } else if (StringUtils.LineFeed == charAt && !Grammar.IsSpecial(_chars[charPos - 1])) {
                     _charPos = charPos - 1;
                     ProcessLineFeed();
                     charPos = _charPos;
                 } else if (Grammar.IsSpecial(_chars[charPos - 1])) {
-                    charPos--;
+                    if (StringUtils.LineFeed == charAt) {
+                        charPos--;
+                        ProcessLineFeed();
+                    } else {
+                        charPos--;
+                    }
                     if (initialPosition == lastWritePosition) {
                         _stringReference = new StringReference(_chars, initialPosition, charPos - initialPosition);
                     } else {
@@ -575,8 +595,9 @@ namespace indice.Edi
             return writeChar;
         }
 
-        private void ProcessLineFeed() {
-            _charPos++;
+        private void ProcessLineFeed(bool forwardPosition = true) {
+            if (forwardPosition)
+                _charPos++;
             OnNewLine(_charPos);
         }
 

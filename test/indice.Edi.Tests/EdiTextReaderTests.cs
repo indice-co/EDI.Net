@@ -838,5 +838,17 @@ namespace indice.Edi.Tests
 
             Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
         }
+
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#24"), Trait(Traits.Issue, "#19")]
+        public void EdiTextReader_NewLine_Terminator_support() {
+            var grammar = EdiGrammar.NewEdiFact();
+            grammar.SetAdvice(new[] { ':', '+', '.', '?', ' ', '\n' });
+            var interchange = default(EDIFact_D01B_IFCSUM);
+            using (var stream = Helpers.GetResourceStream("edifact.D01B.IFCSUM.NewLines.EDI")) {
+                interchange = new EdiSerializer().Deserialize<EDIFact_D01B_IFCSUM>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
+        }
     }
 }
