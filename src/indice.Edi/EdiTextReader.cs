@@ -135,6 +135,11 @@ namespace indice.Edi
                         _charPos++;
                         break;
                     case StringUtils.CarriageReturn:
+                        if (Grammar.SegmentTerminator == currentChar) {
+                            SetToken(EdiToken.SegmentStart);
+                            ProcessCarriageReturn(false);
+                            return true;
+                        }
                         ProcessCarriageReturn(false);
                         break;
                     case StringUtils.LineFeed:
@@ -207,13 +212,17 @@ namespace indice.Edi
                             _charPos++;
                         }
                         break;
-                    case StringUtils.CarriageReturn:
-                        ProcessCarriageReturn(false);
-                        break;
                     case ' ':
                     case StringUtils.Tab:
                         // eat
                         _charPos++;
+                        break;
+                    case StringUtils.CarriageReturn:
+                        if (Grammar.SegmentTerminator == currentChar) {
+                            SetToken(EdiToken.SegmentStart);
+                            ProcessCarriageReturn(false);
+                            return true;
+                        }
                         break;
                     case StringUtils.LineFeed:
                         if (Grammar.SegmentTerminator == currentChar) {
@@ -280,6 +289,11 @@ namespace indice.Edi
                         }
                         break;
                     case StringUtils.CarriageReturn:
+                        if (Grammar.IsSpecial(currentChar)) {
+                            ParseString(true);
+                            ProcessCarriageReturn(false, forwardPosition: false);
+                            return true;
+                        }
                         ProcessCarriageReturn(false);
                         break;
                     case StringUtils.LineFeed:
@@ -540,7 +554,7 @@ namespace indice.Edi
                     WriteCharToBuffer(buffer, writeChar, lastWritePosition, escapeStartPos);
 
                     lastWritePosition = charPos;
-                } else if (StringUtils.CarriageReturn == charAt) {
+                } else if (StringUtils.CarriageReturn == charAt && !Grammar.IsSpecial(_chars[charPos - 1])) {
                     _charPos = charPos - 1;
                     ProcessCarriageReturn(true);
                     charPos = _charPos;
@@ -596,14 +610,17 @@ namespace indice.Edi
         }
 
         private void ProcessLineFeed(bool forwardPosition = true) {
-            if (forwardPosition)
+            if (forwardPosition) { 
                 _charPos++;
+            }
             OnNewLine(_charPos);
         }
 
-        private void ProcessCarriageReturn(bool append) {
+        private void ProcessCarriageReturn(bool append, bool forwardPosition = true) {
+            if (!forwardPosition) { 
+                return;
+            }
             _charPos++;
-
             if (EnsureChars(1, append) && _chars[_charPos] == StringUtils.LineFeed)
                 _charPos++;
 
