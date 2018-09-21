@@ -891,8 +891,14 @@ namespace indice.Edi.Tests
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(input.ToString()))) {
                 interchange = new EdiSerializer().Deserialize<EDIFact_D01B_IFCSUM>(new StreamReader(stream), grammar);
             }
-
             Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
+
+            var output = new StringBuilder();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
+                new EdiSerializer().Serialize(writer, interchange);
+            }
+
+            Assert.Equal(input.ToString(), output.ToString());
         }
     }
 }

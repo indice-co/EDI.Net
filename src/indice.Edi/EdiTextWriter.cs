@@ -131,7 +131,16 @@ namespace indice.Edi
         /// Writes indent characters. Line terminator if allowed by the current <see cref="IEdiGrammar"/>.
         /// </summary>
         protected override void WriteNewLine() {
-            _writer.WriteLine();
+            switch (Grammar.SegmentTerminator) {
+                case StringUtils.CarriageReturn:
+                    _writer.Write(StringUtils.LineFeed);
+                    break;
+                case StringUtils.LineFeed:
+                    break;
+                default:
+                    _writer.WriteLine();
+                    break;
+            }
         }
 
         #region WriteValue methods
