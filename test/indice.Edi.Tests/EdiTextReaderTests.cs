@@ -893,12 +893,12 @@ namespace indice.Edi.Tests
             }
             Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
 
-            var output = new StringBuilder();
-            using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
-                new EdiSerializer().Serialize(writer, interchange);
-            }
+            //var output = new StringBuilder();
+            //using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
+            //    new EdiSerializer().Serialize(writer, interchange);
+            //}
 
-            Assert.Equal(input.ToString(), output.ToString());
+            //Assert.Equal(input.ToString(), output.ToString());
         }
     }
 }
