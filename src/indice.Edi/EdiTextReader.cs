@@ -223,6 +223,7 @@ namespace indice.Edi
                             ProcessCarriageReturn(false);
                             return true;
                         }
+                        ProcessCarriageReturn(false);
                         break;
                     case StringUtils.LineFeed:
                         if (Grammar.SegmentTerminator == currentChar) {
