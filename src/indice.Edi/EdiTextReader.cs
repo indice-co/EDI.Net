@@ -555,15 +555,15 @@ namespace indice.Edi
                     WriteCharToBuffer(buffer, writeChar, lastWritePosition, escapeStartPos);
 
                     lastWritePosition = charPos;
-                } else if (StringUtils.CarriageReturn == charAt && !Grammar.IsSpecial(_chars[charPos - 1])) {
+                } else if (StringUtils.CarriageReturn == charAt && !Grammar.IsSpecial(charAt)) {
                     _charPos = charPos - 1;
                     ProcessCarriageReturn(true);
                     charPos = _charPos;
-                } else if (StringUtils.LineFeed == charAt && !Grammar.IsSpecial(_chars[charPos - 1])) {
+                } else if (StringUtils.LineFeed == charAt && !Grammar.IsSpecial(charAt)) {
                     _charPos = charPos - 1;
                     ProcessLineFeed();
                     charPos = _charPos;
-                } else if (Grammar.IsSpecial(_chars[charPos - 1])) {
+                } else if (Grammar.IsSpecial(charAt)) {
                     if (StringUtils.LineFeed == charAt) {
                         ProcessLineFeed(forwardPosition: false);
                     }
