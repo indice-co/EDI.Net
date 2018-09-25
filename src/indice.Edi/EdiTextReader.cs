@@ -565,11 +565,9 @@ namespace indice.Edi
                     charPos = _charPos;
                 } else if (Grammar.IsSpecial(_chars[charPos - 1])) {
                     if (StringUtils.LineFeed == charAt) {
-                        charPos--;
-                        ProcessLineFeed();
-                    } else {
-                        charPos--;
+                        ProcessLineFeed(forwardPosition: false);
                     }
+                    charPos--;
                     if (initialPosition == lastWritePosition) {
                         _stringReference = new StringReference(_chars, initialPosition, charPos - initialPosition);
                     } else {

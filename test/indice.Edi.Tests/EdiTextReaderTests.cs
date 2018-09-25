@@ -853,51 +853,56 @@ namespace indice.Edi.Tests
 
         [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#24"), Trait(Traits.Issue, "#19")]
         public void EdiTextReader_NewLine_Terminator_CardridgeReturn_ShouldbeIgnored() {
+           
+            var getInput = new Func<string, StringBuilder>((terminator) => {
+                var input = new StringBuilder();
+                input.Append($"UNB+UNOA:1+5011408000007:14+5999999999952:14+180525:2030+2216+PASSWORD+IFCSUM{terminator}");
+                input.Append($"UNH+1+IFCSUM:D:01B:UN:EAN003{terminator}");
+                input.Append($"BGM+610+1000505549+9{terminator}");
+                input.Append($"DTM+137:20180525:102{terminator}");
+                input.Append($"DTM+11:20180525:102{terminator}");
+                input.Append($"CNT+10:5{terminator}");
+                input.Append($"CNT+7:25.784:KG{terminator}");
+                input.Append($"NAD+CZ+5011408000007.::9+UK2.{terminator}");
+                input.Append($"NAD+CA+5999999999950::9{terminator}");
+                input.Append($"TDT+20++10:SEA{terminator}");
+                input.Append($"CNI+1+311447177::I{terminator}");
+                input.Append($"DTM+2:201805290000:203{terminator}");
+                input.Append($"CNT+2:64:PA{terminator}");
+                input.Append($"CNT+11:1:PA{terminator}");
+                input.Append($"CNT+7:8.269:KG{terminator}");
+                input.Append($"TSR+3+++11{terminator}");
+                input.Append($"NAD+DP+PC+1919990312{terminator}");
+                input.Append($"RFF+DQ:5000706244{terminator}");
+                input.Append($"RFF+CR:TUESDAY 29TH MAY{terminator}");
+                input.Append($"GID+1+:350114081527920321:1:9+1:3600530124848:PK:9{terminator}");
+                input.Append($"PIA+1+B0918306:::91{terminator}");
+                input.Append($"FTX+AAA+++MAYB NAIL ForeverStrong 06 DeepRed 12{terminator}");
+                input.Append($"MEA+AAE+UCO:4+UN:3{terminator}");
+                input.Append($"GID+2+:350114081527920321:1:9+1:3600530521845:PK:9{terminator}");
+                input.Append($"PIA+1+B1297005:::91{terminator}");
+                input.Append($"FTX+AAA+++MAYB Found. Dream Satin Liquid Sand 30{terminator}");
+                input.Append($"MEA+AAE+UCO:4+UN:3{terminator}");
+                input.Append($"UNT+787+1{terminator}");
+                input.Append($"UNZ+1+2216{terminator}");
+                return input;
+            });
             var grammar = EdiGrammar.NewEdiFact();
-            var advice = new[] { ':', '+', '.', '?', ' ', '\r' };
-            grammar.SetAdvice(advice);
-            var terminator = "\r\n";
-            var input = new StringBuilder();
-            input.Append($"UNB+UNOA:1+5011408000007:14+5999999999952:14+180525:2030+2216+PASSWORD+IFCSUM{terminator}");
-            input.Append($"UNH+1+IFCSUM:D:01B:UN:EAN003{terminator}");
-            input.Append($"BGM+610+1000505549+9{terminator}");
-            input.Append($"DTM+137:20180525:102{terminator}");
-            input.Append($"DTM+11:20180525:102{terminator}");
-            input.Append($"CNT+10:5{terminator}");
-            input.Append($"CNT+7:25.784:KG{terminator}");
-            input.Append($"NAD+CZ+5011408000007.::9+UK2.{terminator}");
-            input.Append($"NAD+CA+5999999999950::9{terminator}");
-            input.Append($"TDT+20++10:SEA{terminator}");
-            input.Append($"CNI+1+311447177::I{terminator}");
-            input.Append($"DTM+2:201805290000:203{terminator}");
-            input.Append($"CNT+2:64:PA{terminator}");
-            input.Append($"CNT+11:1:PA{terminator}");
-            input.Append($"CNT+7:8.269:KG{terminator}");
-            input.Append($"TSR+3+++11{terminator}");
-            input.Append($"NAD+DP+PC+1919990312{terminator}");
-            input.Append($"RFF+DQ:5000706244{terminator}");
-            input.Append($"RFF+CR:TUESDAY 29TH MAY{terminator}");
-            input.Append($"GID+1+:350114081527920321:1:9+1:3600530124848:PK:9{terminator}");
-            input.Append($"PIA+1+B0918306:::91{terminator}");
-            input.Append($"FTX+AAA+++MAYB NAIL ForeverStrong 06 DeepRed 12{terminator}");
-            input.Append($"MEA+AAE+UCO:4+UN:3{terminator}");
-            input.Append($"GID+2+:350114081527920321:1:9+1:3600530521845:PK:9{terminator}");
-            input.Append($"PIA+1+B1297005:::91{terminator}");
-            input.Append($"FTX+AAA+++MAYB Found. Dream Satin Liquid Sand 30{terminator}");
-            input.Append($"MEA+AAE+UCO:4+UN:3{terminator}");
-            input.Append($"UNT+787+1{terminator}");
-            input.Append($"UNZ+1+2216{terminator}");
+            grammar.SetAdvice(new[] { ':', '+', '.', '?', ' ', '\r' });
             var interchange = default(EDIFact_D01B_IFCSUM);
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(input.ToString()))) {
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(getInput("\r\n").ToString()))) {
                 interchange = new EdiSerializer().Deserialize<EDIFact_D01B_IFCSUM>(new StreamReader(stream), grammar);
             }
             Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
-
+            grammar.SetAdvice(new[] { ':', '+', '.', '?', ' ', '\'' });
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(getInput("'\r\n").ToString()))) {
+                interchange = new EdiSerializer().Deserialize<EDIFact_D01B_IFCSUM>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(2, interchange.Messages[0].Consignments[0].Goods.Count);
             //var output = new StringBuilder();
             //using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
             //    new EdiSerializer().Serialize(writer, interchange);
             //}
-
             //Assert.Equal(input.ToString(), output.ToString());
         }
     }

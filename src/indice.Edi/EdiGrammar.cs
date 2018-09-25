@@ -168,7 +168,7 @@ namespace indice.Edi
             ReleaseCharacter = chars[3];
             Reserved = new[] { chars[4] };
             SegmentTerminator = chars[5];
-
+            _separators = null;
             //TODO: must figure this out to work both for EDIFact and X12. 
             // The above is only used by the former. http://stackoverflow.com/a/20112217/61577
         }
@@ -197,6 +197,7 @@ namespace indice.Edi
             Reserved = reserved.HasValue ? new[] { reserved.Value } : new char[0];
             DecimalMark = decimalMark;
             SegmentTerminator = segmentTerminator;
+            _separators = null;
         }
 
         /// <summary>

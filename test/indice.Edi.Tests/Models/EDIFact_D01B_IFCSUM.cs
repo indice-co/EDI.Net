@@ -13,6 +13,14 @@ namespace indice.Edi.Tests.Models
         [EdiMessage]
         public class Message
         {
+            public BeginingOfMessage BeginingOfMessage { get; set; }
+
+            [EdiCondition("10", Path = "CNT/0/0")]
+            public ControlTotal TotalNumberOfConsignments { get; set; }
+
+            [EdiCondition("7", Path = "CNT/0/0")]
+            public ControlTotal TotalGrossWeight { get; set; }
+
             [EdiCondition("137", Path = "DTM/0/0")]
             public Date Date { get; set; }
 
@@ -31,6 +39,57 @@ namespace indice.Edi.Tests.Models
             [EdiCondition("CA", Path = "NAD/0/0")]
             public NameAndAddress Carrier { get; set; }
             public List<Consignment> Consignments { get; set; }
+        }
+
+
+        [EdiSegment, EdiPath("BGM")]
+        public class BeginingOfMessage
+        {
+            public MessageName Name { get; set; }
+
+            public MessageIdentification Identification { get; set; }
+
+            public override string ToString() => $"{Name} {Identification}";
+
+            [EdiElement, EdiPath("BGM/0")]
+            public class MessageName
+            {
+                [EdiValue("X(3)", Path = "BGM/0/0")]
+                public string NameCode { get; set; }
+
+                [EdiValue("X(17)", Path = "BGM/0/1")]
+                public string IdentificationCode { get; set; }
+
+                [EdiValue("X(3)", Path = "BGM/0/2")]
+                public string ResponsibleAgencyCode { get; set; }
+
+                [EdiValue("X(35)", Path = "BGM/0/3")]
+                public string Name { get; set; }
+
+                public override string ToString() {
+                    return $"{NameCode} {Name}".Trim();
+                }
+            }
+
+            [EdiElement, EdiPath("BGM/1")]
+            public class MessageIdentification
+            {
+
+                [EdiValue("X(35)", Path = "BGM/1/0")]
+                public string DocumentId { get; set; }
+                [EdiValue("X(9)", Path = "BGM/1/1")]
+                public string VersionId { get; set; }
+                [EdiValue("X(6)", Path = "BGM/1/2")]
+                public string RevisionId { get; set; }
+                [EdiValue("X(3)", Path = "BGM/1/3")]
+                public string MessageFucntionCode { get; set; }
+                [EdiValue("X(3)", Path = "BGM/1/4")]
+                public string ResponseTypeCode { get; set; }
+                public override string ToString() {
+                    return $"{DocumentId}.{VersionId}.{RevisionId}";
+                }
+            }
+
         }
 
         [EdiSegment, EdiPath("CNT")]
