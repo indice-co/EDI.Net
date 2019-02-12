@@ -905,5 +905,18 @@ namespace indice.Edi.Tests
             //}
             //Assert.Equal(input.ToString(), output.ToString());
         }
+
+
+        [Fact, Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#122")]
+        public void X12_832_PriceSalesCatalogs() {
+            var grammar = EdiGrammar.NewX12();
+            var interchange = default(X12_832_PriceScalesCatalog);
+            using (var stream = Helpers.GetResourceStream("x12.832.edi")) {
+                interchange = new EdiSerializer().Deserialize<X12_832_PriceScalesCatalog>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(2, interchange.ItemDetails.Count);
+            Assert.Equal(3, interchange.ItemDetails[0].Descriptions.Count);
+            Assert.Equal('S', interchange.ItemDetails[0].Descriptions[0].ItemDescriptionType);
+        }
     }
 }

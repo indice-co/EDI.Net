@@ -1,0 +1,16 @@
+﻿ISA*00* *00* *01*999999999 *12*6309246701*060926*1242*U*00401*000000030*0*T*>~
+    GS*SC*999999999*6309246701T*20060926*1242*1*X*004010~
+        ST*832*2001~
+            BCT*RC*BISG*980112*******00~
+            N1*98*ABCManufacturerInc.*1*123-123456~
+            LIN*1*IB*0940016699*B7*Book Industry Study Group~
+            PID*S**BI*TI*X12 Implementation Guidelines for Electronic Data Interchange~
+            PID*S**BI*TI*X12 Implementation Guidelines for Electronic Data Interchange~
+            PID*S**BI*TI*X12 Implementation Guidelines for Electronic Data Interchange~
+            LIN*2*IB*0812976568*B7*The Gospel of the Flying Spaghetti Monster~
+            PID*S**BI*TI*Hello World~
+            CUR*SE*USD~
+            CTT*5~
+        SE*17*2001~
+    GE*1*1~
+IEA*1*000000030~
