@@ -18,16 +18,17 @@ namespace indice.Edi.Tests.Models
         [EdiSegment, EdiPath("ATR")]
         public class Attribute
         {
+            [EdiPath("ATR/*")]
             public List<Information> Infos { get; set; }
         }
 
         [EdiElement]
         public class Information
         {
-            [EdiValue("X(4)", Path = "ATR/*/0")]
+            [EdiValue("X(4)", Path = "*/*/0")]
             public string Code { get; set; }
 
-            [EdiValue("X(256)", Path = "ATR/*/1")]
+            [EdiValue("X(256)", Path = "*/*/1")]
             public string Value { get; set; }
         }
     }

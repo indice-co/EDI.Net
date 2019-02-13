@@ -91,17 +91,26 @@ namespace indice.Edi.Serialization
                 }
             }
             _Attributes = attributes.ToList();
-            _PathInfo = Attributes.OfType<EdiPathAttribute>().FirstOrDefault();
+            var structureType = Attributes.InferStructure();
+            var pathInfo = Attributes.OfType<EdiPathAttribute>().FirstOrDefault();
             var conditions = Attributes.OfType<EdiConditionAttribute>().ToArray();
             _Conditions = conditions.Length > 0 ? conditions : null;
             _ValueInfo = Attributes.OfType<EdiValueAttribute>().FirstOrDefault();
             _SegmentGroupInfo = Attributes.OfType<EdiSegmentGroupAttribute>().FirstOrDefault();
-            if (_ValueInfo != null && _ValueInfo.Path != null && _PathInfo == null) {
-                _PathInfo = new EdiPathAttribute(_ValueInfo.Path);
+            if (_ValueInfo != null && _ValueInfo.Path != null && pathInfo == null) {
+                pathInfo = new EdiPathAttribute(_ValueInfo.Path);
             }
-            if (_SegmentGroupInfo != null && _SegmentGroupInfo.StartInternal.Segment != null && _PathInfo == null) {
-                _PathInfo = new EdiPathAttribute(_SegmentGroupInfo.StartInternal.Segment);
+            if (_SegmentGroupInfo != null && _SegmentGroupInfo.StartInternal.Segment != null && pathInfo == null) {
+                pathInfo = new EdiPathAttribute(_SegmentGroupInfo.StartInternal.Segment);
             }
+            if (pathInfo == null && structureType == EdiStructureType.Element) {
+                pathInfo = info.DeclaringType.GetTypeInfo().GetCustomAttributes<EdiPathAttribute>().FirstOrDefault();
+                if (pathInfo != null) {
+                    pathInfo = new EdiPathAttribute(new EdiPath(new EdiPathFragment(pathInfo.Segment), new EdiPathFragment("*"), new EdiPathFragment("")));
+                }
+            }
+            _PathInfo = pathInfo;
+
             _ConditionStackMode = conditions.Length > 0 && Attributes.OfType<EdiAnyAttribute>().Any() ? EdiConditionStackMode.Any : EdiConditionStackMode.All;
         }
 

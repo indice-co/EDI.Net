@@ -178,7 +178,8 @@ namespace indice.Edi
                 var typeDescriptor = structure.Descriptor;
                 var valueProps = typeDescriptor.Properties
                                                .Where(p => p.ValueInfo != null &&
-                                                            (reader.Path == p.Path || structure.CachedReads.ContainsPath(p.Path))
+                                                           p.Path != null &&
+                                                            (((EdiPath)p.Path).Equals(reader.Path) || structure.CachedReads.ContainsPath(p.Path))
                                                            ).OrderBy(p => (EdiPath)p.Path, structuralComparer).ToArray();
 
                 for (var i = 0; i < valueProps.Length; i++) {
@@ -187,7 +188,7 @@ namespace indice.Edi
                     // Values must be read only once on first pass! 
                     // Otherwise the reader position moves forward 
                     // and the serializer gets out of sync.
-                    var useTheReader = current == structure && reader.TokenType == EdiToken.ComponentStart && reader.Path == descriptor.Path && i == 0;
+                    var useTheReader = current == structure && reader.TokenType == EdiToken.ComponentStart && ((EdiPath)descriptor.Path).Equals(reader.Path) && i == 0;
                     switch (ConvertUtils.GetTypeCode(descriptor.Info.PropertyType)) {
                         case PrimitiveTypeCode.Empty: break;
                         case PrimitiveTypeCode.Object:
@@ -497,7 +498,7 @@ namespace indice.Edi
             var property = default(EdiPropertyDescriptor);
             if (reader.TokenType == EdiToken.ElementStart || currentStructure.CachedReads.Count > 0) {
                 var elementPath = reader.TokenType == EdiToken.ElementStart ? reader.Path : ((EdiPath)currentStructure.CachedReads.Peek().Path).ToString("E");
-                var matches = candidates.Where(p => p.PathInfo.PathInternal.ToString("E").Equals(elementPath)).ToArray();
+                var matches = candidates.Where(p => p.PathInfo.PathInternal.Equals(elementPath)).ToArray();
                 if (matches.Length == 0) {
                     property = null;
                 } else if (matches.Length == 1 && matches[0].Conditions == null) {

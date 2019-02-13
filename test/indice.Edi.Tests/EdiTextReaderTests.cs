@@ -919,15 +919,17 @@ namespace indice.Edi.Tests
             Assert.Equal('S', interchange.ItemDetails[0].Descriptions[0].ItemDescriptionType);
         }
 
-        //[Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
-        //public void EdiFact_ElementList() {
-        //    var grammar = EdiGrammar.NewEdiFact();
-        //    var interchange = default(EdiFact_Issue121_ElementList);
-        //    using (var stream = Helpers.GetResourceStream("edifact.Issue121.ElementList.edi")) {
-        //        interchange = new EdiSerializer().Deserialize<EdiFact_Issue121_ElementList>(new StreamReader(stream), grammar);
-        //    }
-        //    Assert.Equal(3, interchange.Msg.Attributes.Count);
-        //    Assert.Equal(6, interchange.Msg.Attributes[2].Infos.Count);
-        //}
+        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
+        public void EdiFact_ElementList() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EdiFact_Issue121_ElementList);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue121.ElementList.edi")) {
+                interchange = new EdiSerializer().Deserialize<EdiFact_Issue121_ElementList>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(3, interchange.Msg.Attributes.Count);
+            Assert.Equal(6, interchange.Msg.Attributes[2].Infos.Count);
+            Assert.Equal("PRIL", interchange.Msg.Attributes[2].Infos[5].Code);
+            Assert.Equal("N", interchange.Msg.Attributes[2].Infos[5].Value);
+        }
     }
 }
