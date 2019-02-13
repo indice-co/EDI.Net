@@ -42,6 +42,16 @@ namespace indice.Edi.Tests
             Assert.Equal("B10[0][0]", path.ToString());
         }
 
+        [Trait(Traits.Tag, "Parser")]
+        [InlineData("B10[*][0]")]
+        [InlineData("B10/*/0")]
+        [InlineData("B10/*")]
+        [Theory]
+        public void ParseHandlesWildcards(string text) {
+            var path = EdiPath.Parse(text);
+            Assert.Equal("B10[*][0]", path.ToString());
+        }
+
         [Trait(Traits.Tag, "Writer")]
         [Fact]
         public void OrderByStructureTest() {

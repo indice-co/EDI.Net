@@ -154,7 +154,7 @@ namespace indice.Edi.Serialization
             Descriptor.Properties.Where(p => p.Attributes.OfType(sructureType).Any()).ToArray();
 
         public EdiPropertyDescriptor[] GetMatchingProperties(string segmentName) =>
-            Descriptor.Properties.Where(p => p.PathInfo?.PathInternal.Segment == segmentName).ToArray();
+            Descriptor.Properties.Where(p => p.PathInfo?.PathInternal.Segment.Equals(segmentName) == true).ToArray();
 
         public IEnumerable<EdiPropertyDescriptor> GetOrderedProperties(IEdiGrammar grammar) =>
             GetOrderedProperties(new EdiPathComparer(grammar));

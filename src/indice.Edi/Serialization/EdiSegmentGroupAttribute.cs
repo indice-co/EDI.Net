@@ -66,7 +66,7 @@ namespace indice.Edi.Serialization
             if (_Members.Length == 1) {
                 throw new InvalidOperationException("Cannot determine if a segment name is contained in the segment group since the group members are not populated");
             }
-            return _Members.Any(x => segmentName.Equals(x.Segment));
+            return _Members.Any(x => x.Segment.Equals(segmentName));
         }
 
         /// <summary>

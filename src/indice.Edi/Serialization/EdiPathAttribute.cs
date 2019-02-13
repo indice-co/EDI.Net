@@ -67,11 +67,11 @@ namespace indice.Edi.Serialization
         /// <summary>
         /// constructs the <see cref="EdiPathAttribute"/> given its position.
         /// </summary>
-        /// <param name="segment"></param>
-        /// <param name="elementIndex"></param>
-        /// <param name="componentIndex"></param>
-        public EdiPathAttribute(string segment, int elementIndex, int componentIndex) 
-            : this(new EdiPath(segment, elementIndex, componentIndex)) {
+        /// <param name="segmentPart"></param>
+        /// <param name="elementPart"></param>
+        /// <param name="componentPart"></param>
+        public EdiPathAttribute(string segmentPart, string elementPart, string componentPart) 
+            : this(new EdiPath(new EdiPathFragment(segmentPart), new EdiPathFragment(elementPart), new EdiPathFragment(componentPart))) {
 
         }
 

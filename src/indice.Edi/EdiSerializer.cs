@@ -379,7 +379,7 @@ namespace indice.Edi
                         continue;
                     var groupStart = level.GroupStart;
                     var sequenceEnd = level.SequenceEnd;
-                    if (readerSegment.Equals(groupStart.Segment)) {
+                    if (groupStart.Segment.Equals(readerSegment)) {
 
                         if (PositionMatchesStructure(reader, level, readerSegment as string) ||  // if new occurance of my level or sibling found
                             FindForCurrentSegment(reader, level, EdiStructureType.SegmentGroup) == null) { // if cannot advance either.
@@ -388,7 +388,7 @@ namespace indice.Edi
                             index = level.Index + 1;
                             continue;
                         }
-                    } else if (sequenceEnd.HasValue && readerSegment.Equals(sequenceEnd.Value.Segment)) {
+                    } else if (sequenceEnd.HasValue && sequenceEnd.Value.Segment.Equals(readerSegment)) {
                         level.Close(); // Close this level
                         continue;
                     } else if (level.GroupMembers.Length > 1 && !level.GroupContains(readerSegment as string)) {
@@ -477,7 +477,7 @@ namespace indice.Edi
             var property = default(EdiPropertyDescriptor);
             if (reader.TokenType == EdiToken.SegmentName || currentStructure.CachedReads.Count > 0) {
                 var segmentName = reader.TokenType == EdiToken.SegmentName ? reader.Value : ((EdiPath)currentStructure.CachedReads.Peek().Path).Segment;
-                var matches = candidates.Where(p => p.Segment.Equals(segmentName)).ToArray();
+                var matches = candidates.Where(p => segmentName.Equals(p.Segment)).ToArray();
                 if (matches.Length == 0) {
                     property = null;
                 } else if (matches.Length == 1 && matches[0].Conditions == null) {

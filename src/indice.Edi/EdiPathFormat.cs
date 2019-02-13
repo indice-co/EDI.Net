@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace indice.Edi
 {
     /// <summary>
-    /// An <see cref="IFormatProvider"/> for the <seealso cref="EdiPath"/> struct.
+    /// An <see cref="IFormatProvider"/> for the <seealso cref="EdiPath"/> struct. Available format masks are 
+    ///  "S", "E", "C", "s", "e", "c". They mean "segment" "element" "component". The upercase counterparts will print the path in array format.
     /// </summary>
     public class EdiPathFormat : IFormatProvider, ICustomFormatter
     {
@@ -77,7 +78,7 @@ namespace indice.Edi
                     mask = ALL_ARRAY_FORMAT;
                     break;
             }
-            return string.Format(mask, path.Segment, path.ElementIndex, path.ComponentIndex);
+            return string.Format(mask, path.Segment, path.Element.HasValue ? path.Element.Value : "0", path.Component.HasValue ? path.Component.Value : "0");
         }
         
         private string HandleOtherFormats(string format, object arg) {
