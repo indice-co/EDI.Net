@@ -15,11 +15,12 @@
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
     <PackageReleaseNotes>
-      SourceLink support. This enables one to debug into the source code straingt from the nugget package
+      - Refactored EdiPath. Paths now are composed of PathFragments. And each fragment can be either a name an index or the wildcard '*' character. Issue #123
+      - Added support for binding to collection of Elements and wildcard paths. Issues #5 #104 #121
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/indice-co/EDI.Net/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/indice-co/EDI.Net</RepositoryUrl>
     <Company>Indice</Company>
