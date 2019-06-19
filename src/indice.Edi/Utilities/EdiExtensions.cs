@@ -160,14 +160,34 @@ namespace indice.Edi.Utilities
                 throw new ArgumentOutOfRangeException(nameof(format));
 
             var wrapped = new StringBuilder(value);
+            var dayShift = false;
             if (format.Contains("HH")) {
                 var startIndex = format.IndexOf('H');
-                if (wrapped[startIndex] == '2' && wrapped[startIndex + 1] == '4')
+                if (wrapped[startIndex] == '2' && wrapped[startIndex + 1] == '4') {
                     wrapped[startIndex] = wrapped[startIndex + 1] = '0';
+                    dayShift = true;
+                }
+            }
+            if (format.Contains("ss") && format.Length > wrapped.Length) { // forgive the lack of the secconds.
+                var startIndex = format.IndexOf('s');
+                if (startIndex > wrapped.Length - 1) {
+                    wrapped.Append("00");
+                }
+            }
+            if (format.Contains("f") && format.Length > wrapped.Length) { // forgive the lack of a fraction of a seccond.
+                var startIndex = format.IndexOf('f');
+                var endIndex = format.LastIndexOf('f');
+                if (endIndex > wrapped.Length - 1) {
+                    for (var i = startIndex; i <= endIndex; i++) {
+                        if (wrapped.Length > i)
+                            continue;
+                        wrapped.Append('0');
+                    }
+                }
             }
             DateTime dt;
             if (DateTime.TryParseExact(wrapped.ToString(), format, culture ?? CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dt)) {
-                return wrapped.ToString() != value
+                return dayShift
                 ? dt.AddDays(1)
                 : dt;
             } 
