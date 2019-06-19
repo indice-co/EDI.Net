@@ -103,6 +103,12 @@ namespace indice.Edi.Serialization
             if (_SegmentGroupInfo != null && _SegmentGroupInfo.StartInternal.Segment != null && pathInfo == null) {
                 pathInfo = new EdiPathAttribute(_SegmentGroupInfo.StartInternal.Segment);
             }
+            if (pathInfo != null && structureType == EdiStructureType.None && pathInfo.PathInternal.Segment.IsWildcard) {
+                var parentPathInfo = info.DeclaringType.GetTypeInfo().GetCustomAttributes<EdiPathAttribute>().FirstOrDefault();
+                if (parentPathInfo != null) {
+                    pathInfo = new EdiPathAttribute(new EdiPath(new EdiPathFragment(parentPathInfo.Segment), pathInfo.PathInternal.Element, pathInfo.PathInternal.Component));
+                }
+            }
             if (pathInfo == null && structureType == EdiStructureType.Element) {
                 pathInfo = info.DeclaringType.GetTypeInfo().GetCustomAttributes<EdiPathAttribute>().FirstOrDefault();
                 if (pathInfo != null) {

@@ -931,5 +931,20 @@ namespace indice.Edi.Tests
             Assert.Equal("PRIL", interchange.Msg.Attributes[2].Infos[5].Code);
             Assert.Equal("N", interchange.Msg.Attributes[2].Infos[5].Value);
         }
+
+        /*
+        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
+        public void EdiFact_ElementList_WithConditions() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EdiFact_Issue121_ElementList_Conditions);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue121.ElementList.Conditions.edi")) {
+                interchange = new EdiSerializer().Deserialize<EdiFact_Issue121_ElementList_Conditions>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(3, interchange.Msg.Attributes.Count);
+            Assert.Equal(6, interchange.Msg.Attributes[2].Infos.Count);
+            Assert.Equal("PRIL", interchange.Msg.Attributes[2].Infos[5].Code);
+            Assert.Equal("N", interchange.Msg.Attributes[2].Infos[5].Value);
+        }
+        */
     }
 }
