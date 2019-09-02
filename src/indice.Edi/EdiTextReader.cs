@@ -620,9 +620,12 @@ namespace indice.Edi
                 return;
             }
             _charPos++;
-            if (EnsureChars(1, append) && _chars[_charPos] == StringUtils.LineFeed)
+            if (EnsureChars(1, append) && _chars[_charPos] == StringUtils.LineFeed) {
+                if (Grammar.IsSpecial(StringUtils.LineFeed)) {
+                    return;
+                }
                 _charPos++;
-
+            }
             OnNewLine(_charPos);
         }
 
