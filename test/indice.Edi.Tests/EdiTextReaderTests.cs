@@ -946,5 +946,16 @@ namespace indice.Edi.Tests
             Assert.Equal("N", interchange.Msg.Attributes[2].Infos[5].Value);
         }
         */
+
+        [Fact, Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#135")]
+        public void X12_DTM_Should_not_be_empty() {
+            var grammar = EdiGrammar.NewX12();
+            var interchange = default(PurchaseOrder_850);
+            using (var stream = Helpers.GetResourceStream("x12.850.issue135.edi")) {
+                interchange = new EdiSerializer().Deserialize<PurchaseOrder_850>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(interchange.Groups[0].Orders[0].Items[0].DeliveryRequestedDate);
+            Assert.NotNull(interchange.Groups[0].Orders[0].Items[0].ShipNoLaterDate);
+        }
     }
 }

@@ -210,6 +210,13 @@ namespace indice.Edi.Tests.Models
             [EdiCondition("067", Path = "DTM/0/0")]
             public DTM ArrivalDate  { get; set; }
 
+            [EdiCondition("002", Path = "DTM/0/0")]
+            public DTM DeliveryRequestedDate { get; set; }
+
+            [EdiCondition("038", Path = "DTM/0/0")]
+            public DTM ShipNoLaterDate { get; set; }
+
+
             [EdiValue(Path = "TC2/0", Description = "TC201 - Measurement Value")]
             public string TC201 { get; set; }
             public List<MSG> MSG { get; set; }
