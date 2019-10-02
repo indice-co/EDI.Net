@@ -15,7 +15,7 @@
     <PackageId>indice.Edi</PackageId>
     <PackageTags>EDI;EDIFact;Tradacoms;X12;Serializer;Parser</PackageTags>
     <PackageReleaseNotes>
-      - Added forgiving parsing for time part of the DateTime components #130
+      - Support deserializing message fragment without interchange #137
     </PackageReleaseNotes>
     <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
@@ -64,6 +64,6 @@
     <PackageReference Include="System.Runtime.Numerics" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
   </ItemGroup>
 </Project>

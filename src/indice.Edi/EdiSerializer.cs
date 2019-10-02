@@ -114,7 +114,11 @@ namespace indice.Edi
                     }
 
                     if (reader.IsStartMessage) {
-                        TryCreateContainer(reader, stack, EdiStructureType.Message);
+                        if (stack.Count == 0) {
+                            stack.Push(new EdiStructure(EdiStructureType.Message, Activator.CreateInstance(objectType)));
+                        } else { 
+                            TryCreateContainer(reader, stack, EdiStructureType.Message);
+                        }
                     } else if (reader.IsEndMessage) {
                         while (stack.Peek().StructureType > EdiStructureType.Message) {
                             stack.Pop();

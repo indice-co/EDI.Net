@@ -957,5 +957,15 @@ namespace indice.Edi.Tests
             Assert.NotNull(interchange.Groups[0].Orders[0].Items[0].DeliveryRequestedDate);
             Assert.NotNull(interchange.Groups[0].Orders[0].Items[0].ShipNoLaterDate);
         }
+
+        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#137")]
+        public void DeserializingMessage_without_Interchange() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var message = default(Message_D95B);
+            using (var stream = Helpers.GetResourceStream("edifact.D95B.Issue137.EDI")) {
+                message = new EdiSerializer().Deserialize<Message_D95B>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(message);
+        }
     }
 }
