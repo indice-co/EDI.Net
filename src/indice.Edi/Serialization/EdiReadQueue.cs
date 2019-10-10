@@ -66,6 +66,8 @@ namespace indice.Edi.Serialization
 
         public EdiToken Token { get; }
 
+        public bool HasValue { get { return Value != null; } }
+
         public override string ToString() {
             return $"{Path ?? "-"} {Value}";
         }

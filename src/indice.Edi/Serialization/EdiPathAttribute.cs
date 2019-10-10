@@ -82,6 +82,13 @@ namespace indice.Edi.Serialization
         public EdiPathAttribute(EdiPath path) {
             _Path = path;
         }
-        
+
+        /// <summary>
+        /// String representation for the <see cref="EdiPathAttribute"/>
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() {
+            return $"Path = {_Path.ToString("o")}";
+        }
     }
 }

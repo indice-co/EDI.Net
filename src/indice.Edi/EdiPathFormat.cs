@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace indice.Edi
 {
     /// <summary>
     /// An <see cref="IFormatProvider"/> for the <seealso cref="EdiPath"/> struct. Available format masks are 
-    ///  "S", "E", "C", "s", "e", "c". They mean "segment" "element" "component". The upercase counterparts will print the path in array format.
+    ///  "S", "E", "C", "s", "e", "c", "o". They mean "segment" "element" "component" and "original". The upercase counterparts will print the path in array format.
+    ///  Original stands for the actual input path configured.
     /// </summary>
     public class EdiPathFormat : IFormatProvider, ICustomFormatter
     {
@@ -17,7 +19,7 @@ namespace indice.Edi
         private const string SEGMENT_FORMAT = "{0}";
         private const string ELEMENT_URI_FORMAT = "{0}/{1}";
         private const string ELEMENT_ARRAY_FORMAT = "{0}[{1}]";
-        private static readonly string[] availableFormatStrings = { "S", "E", "C", "s", "e", "c" };
+        private static readonly string[] availableFormatStrings = { "S", "E", "C", "s", "e", "c", "o" };
 
         /// <summary>
         /// Gets the format provider for the given <paramref name="formatType"/>.
@@ -60,6 +62,15 @@ namespace indice.Edi
 
             var mask = "";
             switch (fmt) {
+                case "o":
+                    var pathText = new StringBuilder(path.Segment);
+                    if (path.Element.HasValue) {
+                        pathText.Append($"/{path.Element}");
+                        if (path.Component.HasValue) {
+                            pathText.Append($"/{path.Component}");
+                        }
+                    }
+                    return pathText.ToString();
                 case "S":
                 case "s":
                     mask = SEGMENT_FORMAT;
