@@ -133,7 +133,8 @@ namespace indice.Edi
                             stack.Pop();
                         }
                         value = stack.Peek().Instance;
-                    } else if (reader.TokenType == EdiToken.SegmentName) {
+                    } 
+                    if (reader.TokenType == EdiToken.SegmentName) {
                         while (true) {
                             if (TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)
                                 || TryCreateContainer(reader, stack, EdiStructureType.Segment)
