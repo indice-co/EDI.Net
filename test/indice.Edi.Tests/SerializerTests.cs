@@ -177,7 +177,7 @@ namespace indice.Edi.Tests
         public void Dont_write_segment_if_no_value_is_available_Test() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(EdiPaiement_Issue139);
-            using (var stream = Helpers.GetResourceStream("edifact.Paiement.Issue139.edi")) {
+            using (var stream = Helpers.GetResourceStream("edifact.Paiement.Issue139.EDI")) {
                 interchange = new EdiSerializer().Deserialize<EdiPaiement_Issue139>(new StreamReader(stream), grammar);
             }
             Assert.NotNull(interchange);
