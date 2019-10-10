@@ -18,7 +18,7 @@
       - Support deserializing message fragment without interchange #137
       - deserialize Functional group headers and trailers into a separate class #138
     </PackageReleaseNotes>
-    <PackageIconUrl>https://github.com/indice-co/EDI.Net/blob/master/design/icon-128.png?raw=true</PackageIconUrl>
+    <PackageIcon>icon-128.png</PackageIcon>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
@@ -52,6 +52,9 @@
     <AssemblyTitle>Edi.Net .NET Standard 2.0</AssemblyTitle>
     <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\design\icon-128.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0' OR '$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="Microsoft.CSharp" Version="4.0.1" />
     <PackageReference Include="NETStandard.Library" Version="1.6.0" />
