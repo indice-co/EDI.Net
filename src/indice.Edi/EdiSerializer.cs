@@ -152,8 +152,18 @@ namespace indice.Edi
                                         reader.Value));
                             }
                         }
-                    } else if (reader.TokenType == EdiToken.ElementStart) {
+                    }
+
+                    if (reader.TokenType == EdiToken.ElementStart) {
                         TryCreateContainer(reader, stack, EdiStructureType.Element);
+                    }
+                    else if (stack.Count > 0 && stack.Peek().CachedReads.Count > 0) {
+                        var allCachedReads = stack.Peek().CachedReads;
+                        while (allCachedReads.Count > 0 && TryCreateContainer(reader, stack, EdiStructureType.Element)) {
+                            if (stack.Peek().CachedReads.Any(x => x.HasValue)) {
+                                PopulateValue(reader, stack, ref structuralComparer);
+                            }
+                        }
                     }
 
                     if (reader.TokenType == EdiToken.ComponentStart || (stack.Count > 0 && stack.Peek().CachedReads.Count > 0 && reader.TokenType.IsPrimitiveToken())) {
@@ -419,7 +429,7 @@ namespace indice.Edi
 
             var current = stack.Peek();
             var property = default(EdiPropertyDescriptor);
-
+            var childCache = default(Queue<EdiEntry>);
             switch (newContainer) {
                 case EdiStructureType.SegmentGroup:
                     property = FindForCurrentSegment(reader, current, newContainer);
@@ -428,7 +438,7 @@ namespace indice.Edi
                     property = FindForCurrentSegment(reader, current, newContainer);
                     break;
                 case EdiStructureType.Element:
-                    property = FindForCurrentElement(reader, current, newContainer);
+                    property = FindForCurrentElement(reader, current, newContainer, out childCache);
                     break;
                 default:
                     property = FindForCurrentLogicalStructure(reader, current, newContainer);
@@ -471,7 +481,7 @@ namespace indice.Edi
                 }
                 propValue = item;
             }
-            stack.Push(new EdiStructure(newContainer, current, property, propValue, index, current.CachedReads));
+            stack.Push(new EdiStructure(newContainer, current, property, propValue, index, childCache ?? current.CachedReads));
             return true;
         }
 
@@ -495,7 +505,8 @@ namespace indice.Edi
             return property;
         }
 
-        private EdiPropertyDescriptor FindForCurrentElement(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType) {
+        private EdiPropertyDescriptor FindForCurrentElement(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType, out Queue<EdiEntry> elementReads) {
+            elementReads = null;
             var candidates = currentStructure.GetMatchingProperties(newContainerType);
             if (candidates.Length == 0) {
                 return null;
@@ -510,6 +521,18 @@ namespace indice.Edi
                     property = matches[0];
                 } else {
                     property = ConditionalMatch(reader, currentStructure, newContainerType, matches);
+                }
+                if (property != null) {
+                    elementReads = new Queue<EdiEntry>();
+                    var parentCache = currentStructure.CachedReads;
+                    while (parentCache.Count > 0 && elementPath == ((EdiPath)parentCache.Peek().Path).ToString("E")) {
+                        elementReads.Enqueue(parentCache.Dequeue());
+                    }
+                    //foreach (var item in currentStructure.CachedReads) {
+                    //    if (elementPath == ((EdiPath)item.Path).ToString("E")) { 
+                    //        elementReads.Enqueue(item);
+                    //    }
+                    //}
                 }
             }
             return property;

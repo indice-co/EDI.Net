@@ -122,10 +122,10 @@ namespace indice.Edi.Serialization
 
         public override string ToString() {
             if (ValueInfo != null) {
-                return $"Value @ {Path}";
+                return $"Value @ {_PathInfo?.PathInternal.ToString("o")}";
             }
             if (Attributes.Count > 0) {
-                return $"{Attributes.InferStructure()} @ {Path}";
+                return $"{Attributes.InferStructure()} @ {_PathInfo?.PathInternal.ToString("o")}";
             }
             return base.ToString();
         }

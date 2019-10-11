@@ -932,7 +932,7 @@ namespace indice.Edi.Tests
             Assert.Equal("N", interchange.Msg.Attributes[2].Infos[5].Value);
         }
 
-        /*
+
         [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
         public void EdiFact_ElementList_WithConditions() {
             var grammar = EdiGrammar.NewEdiFact();
@@ -944,8 +944,12 @@ namespace indice.Edi.Tests
             Assert.Equal(6, interchange.Msg.Attributes[2].Infos.Count);
             Assert.Equal("PRIL", interchange.Msg.Attributes[2].Infos[5].Code);
             Assert.Equal("N", interchange.Msg.Attributes[2].Infos[5].Value);
+            Assert.Single(interchange.Msg.Attributes1);
+            Assert.Equal(2, interchange.Msg.Attributes1[0].Infos.Count);
+            Assert.Equal("V", interchange.Msg.Attributes1[0].Infos[1].Code);
+            Assert.Equal("�2", interchange.Msg.Attributes1[0].LTS.Value);
         }
-        */
+
 
         [Fact, Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#135")]
         public void X12_DTM_Should_not_be_empty() {
