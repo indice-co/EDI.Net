@@ -717,31 +717,41 @@ namespace indice.Edi
             }
         }
 
+
+
         private static void SerializeStructure(EdiWriter writer, Stack<EdiStructure> stack, EdiPathComparer structuralComparer = null) {
             structuralComparer = structuralComparer ?? new EdiPathComparer(writer.Grammar);
             var structure = stack.Peek();
             var properies = structure.GetOrderedProperties(structuralComparer);
-
             foreach (var property in properies) {
-
                 var value = property.Info.GetValue(structure.Instance);
                 if (property.ValueInfo != null) {
                     var path = (EdiPath)writer.Path;
-                    if (path.Segment != property.PathInfo.Segment ||
-                        structuralComparer.Compare(path, property.PathInfo.PathInternal) > 0) {
-                        writer.WriteSegmentName(property.PathInfo.Segment);
+                    var propertyPath = property.PathInfo.PathInternal;
+                    var container = stack.Skip(1).FirstOrDefault();
+                    if (propertyPath.Segment.IsWildcard) {
+                        if (container.Descriptor.Path.HasValue && !container.Descriptor.Path.Value.Segment.IsWildcard) {
+                            propertyPath = new EdiPath(container.Descriptor.Path.Value.Segment, propertyPath.Element, propertyPath.Component);
+                        }
+                    }
+                    if (propertyPath.Element.IsWildcard) {
+                        propertyPath = new EdiPath(propertyPath.Segment, new EdiPathFragment(structure.Index.ToString()), propertyPath.Component);
+                    }
+                    if (path.Segment != propertyPath.Segment ||
+                        structuralComparer.Compare(path, propertyPath) > 0) {
+                        writer.WriteSegmentName(propertyPath.Segment);
                         path = (EdiPath)writer.Path;
                     }
                     // the following loop handles the write of unmapped preceding elements/components to the one being writen 
                     // so that path progression stays intact even though we do not have all properties present on the model.
 
-                    while (structuralComparer.Compare(path, property.PathInfo.PathInternal) < 0) {
-                        if (path.ElementIndex != property.PathInfo.ElementIndex) {
+                    while (structuralComparer.Compare(path, propertyPath) < 0) {
+                        if (!path.Element.Equals(propertyPath.Element)) {
                             if (path.ElementIndex == 0 && writer.WriteState != WriteState.Component && writer.WriteState != WriteState.Element)
                                 writer.WriteToken(EdiToken.Null);
                             else
                                 writer.WriteToken(EdiToken.ElementStart);
-                        } else if (path.ComponentIndex != property.PathInfo.ComponentIndex) {
+                        } else if (!path.Component.Equals(propertyPath.Component)) {
                             if (path.ComponentIndex == 0 && writer.WriteState != WriteState.Component)
                                 writer.WriteToken(EdiToken.Null);
                             else

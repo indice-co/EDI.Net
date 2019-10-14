@@ -150,7 +150,7 @@ namespace indice.Edi.Tests
             Assert.True(ElmPos >= 0);
             Assert.True(GrpPos < ElmPos);
         }
-        
+
         [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#109")]
         public void ValueAttributePath_Weird_behavior_Test() {
             var grammar = EdiGrammar.NewEdiFact();
@@ -203,6 +203,29 @@ namespace indice.Edi.Tests
             .AppendLine("UNT+000100+00001'")
             .AppendLine("UNE+000001+1'")
             .Append("UNZ+1+20191007120559").ToString();
+            string output = null;
+            using (var writer = new StringWriter()) {
+                new EdiSerializer().Serialize(writer, grammar, interchange);
+                output = writer.ToString();
+            }
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
+        public void Serialize_ElementList() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EdiFact_Issue121_ElementList_Conditions);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue121.ElementList.Conditions.edi")) {
+                interchange = new EdiSerializer().Deserialize<EdiFact_Issue121_ElementList_Conditions>(new StreamReader(stream), grammar);
+            }
+            string expected = new StringBuilder()
+            .AppendLine("UNA:+.? '")
+            .AppendLine("ATR+NEW+PRIO:N'")
+            .AppendLine("ATR+NEW+TGIC:465+TGNO:716073+TGPC:SVX'")
+            .AppendLine("ATR+NEW+ACCS:A+BGCL:Y+BRDP:KBP+OFFP:TSE+PRIL:N'")
+            .AppendLine("ATR++V'")
+            .Append("LTS+�2").ToString();
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer().Serialize(writer, grammar, interchange);
