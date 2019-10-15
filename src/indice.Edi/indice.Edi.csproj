@@ -17,7 +17,8 @@
     <PackageReleaseNotes>
       - Support deserializing message fragment without interchange #137
       - deserialize Functional group headers and trailers into a separate class #138
-      - Revisited Element List deserialization #121
+      - Revisited Element List deserialization and serialization #121
+      - Fixed paths with wildcard fragments (segment and element) now serialize fine.
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
