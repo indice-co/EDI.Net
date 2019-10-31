@@ -88,5 +88,20 @@ namespace indice.Edi.Tests
             }
             Assert.Equal(expected.ToString(), output.ToString());
         }
+
+        [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#141")]
+        public void WriterWrites_Boolean_Correctly() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var expected = new StringBuilder().AppendLine("AAA+1+:0'");
+            var output = new StringBuilder();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
+                writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);
+                writer.WriteValue(true); Assert.Equal("AAA[0][0]", writer.Path);
+                writer.WriteToken(EdiToken.ElementStart); Assert.Equal("AAA[1]", writer.Path);
+                writer.WriteToken(EdiToken.Null); Assert.Equal("AAA[1][0]", writer.Path);
+                writer.WriteValue(false); Assert.Equal("AAA[1][1]", writer.Path);
+            }
+            Assert.Equal(expected.ToString(), output.ToString());
+        }
     }
 }

@@ -346,7 +346,7 @@ namespace indice.Edi
         /// <param name="value">The <see cref="Boolean"/> value to write.</param>
         public override void WriteValue(bool value) {
             InternalWriteValue(EdiToken.Boolean);
-            _writer.Write(value ? 0 : 1);
+            _writer.Write(value ? 1 : 0);
         }
 
         /// <summary>

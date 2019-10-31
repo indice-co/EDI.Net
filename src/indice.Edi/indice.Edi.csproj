@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.9.4</VersionPrefix>
+    <VersionPrefix>1.9.5</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net40;net45;netstandard1.0;netstandard1.3;netstandard2.0</TargetFrameworks>
@@ -19,6 +19,7 @@
       - deserialize Functional group headers and trailers into a separate class #138
       - Revisited Element List deserialization and serialization #121
       - Fixed paths with wildcard fragments (segment and element) now serialize fine.
+      - Fixed writer serializing boolean values #141.
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
