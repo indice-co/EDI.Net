@@ -971,5 +971,16 @@ namespace indice.Edi.Tests
             }
             Assert.NotNull(message);
         }
+
+        [Fact, Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#140")]
+        public void Parsing_820_throws_an_error_at_GS() {
+            var grammar = EdiGrammar.NewX12();
+            grammar.SetAdvice('*', '*', '>', '\n',  null, null, '.');
+            var message = default(RemittanceAdvice_820);
+            using (var stream = Helpers.GetResourceStream("x12.820.issue140.edi")) {
+                message = new EdiSerializer().Deserialize<RemittanceAdvice_820>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(message);
+        }
     }
 }
