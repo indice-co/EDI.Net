@@ -44,9 +44,9 @@ namespace indice.Edi
         }
 
         internal static string BuildPath(IEnumerable<EdiPosition> positions) {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            foreach (EdiPosition state in positions) {
+            foreach (var state in positions) {
                 state.WriteTo(sb);
             }
 
@@ -72,6 +72,15 @@ namespace indice.Edi
             message += ".";
 
             return message;
+        }
+
+        public override string ToString() {
+            switch (Type) {
+                case EdiContainerType.Segment: return $"{SegmentName}" + (Position > -1 ? $"[{Position}]" : string.Empty);
+                case EdiContainerType.Element:
+                case EdiContainerType.Component:
+                default: return $"{Type}" + (Position > -1 ? $"[{Position}]" : string.Empty);
+            }
         }
     }
 }

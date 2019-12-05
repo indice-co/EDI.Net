@@ -227,7 +227,7 @@ namespace indice.Edi
         }
 
         private EdiContainerType Pop() {
-            EdiPosition oldPosition = _currentPosition;
+            var oldPosition = _currentPosition;
 
             if (_stack != null && _stack.Count > 0) {
                 _currentPosition = _stack[_stack.Count - 1];
