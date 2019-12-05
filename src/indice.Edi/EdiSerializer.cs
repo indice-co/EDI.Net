@@ -648,7 +648,9 @@ namespace indice.Edi
         /// <param name="grammar">The <see cref="IEdiGrammar"/> to use for reading from the text reader</param>
         /// <param name="value">The <see cref="object"/> to serialize.</param>
         public void Serialize(TextWriter textWriter, IEdiGrammar grammar, object value) {
-            Serialize(new EdiTextWriter(textWriter, grammar), value, null);
+            var ediTextWriter = new EdiTextWriter(textWriter, grammar);
+            Serialize(ediTextWriter, value, null);
+            ediTextWriter.Close();
         }
 
 
@@ -664,7 +666,9 @@ namespace indice.Edi
         /// Specifing the type is optional.
         /// </param>
         public void Serialize(TextWriter textWriter, IEdiGrammar grammar, object value, Type objectType) {
-            Serialize(new EdiTextWriter(textWriter, grammar), value, objectType);
+            var ediTextWriter = new EdiTextWriter(textWriter, grammar);
+            Serialize(ediTextWriter, value, objectType);
+            ediTextWriter.Close();
         }
 
         /// <summary>

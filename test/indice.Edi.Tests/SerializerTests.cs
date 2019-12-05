@@ -57,7 +57,7 @@ namespace indice.Edi.Tests
                 expected.AppendLine("PRI+CAL:21000'");
                 expected.AppendLine("UNS+S'");
                 expected.AppendLine("UNT+158+1'");
-                expected.AppendLine("UNZ+1+20101000064507'");
+                expected.Append("UNZ+1+20101000064507'");
             }
             #endregion
             else {
@@ -93,7 +93,7 @@ namespace indice.Edi.Tests
                 expected.AppendLine("PRI+CAL:21000:'");
                 expected.AppendLine("UNS+S'");
                 expected.AppendLine("UNT+158+1'");
-                expected.AppendLine("UNZ+1+20101000064507'");
+                expected.Append("UNZ+1+20101000064507'");
                 #endregion
             }
 
@@ -163,7 +163,7 @@ namespace indice.Edi.Tests
                     }
                 }
             };
-            string expected = "UNA:+.? '\r\nPAC+1+:52+PK";
+            var expected = "UNA:+.? '\r\nPAC+1+:52+PK'";
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer() { EnableCompression = false }.Serialize(writer, grammar, interchange);
@@ -188,7 +188,7 @@ namespace indice.Edi.Tests
 
             interchange.GroupesFonctionnels[0].Messages[0].Intervenants[1].Reference = null;
 
-            string expected = new StringBuilder().AppendLine(@"UNA:+,? '")
+            var expected = new StringBuilder().AppendLine(@"UNA:+,? '")
             .AppendLine("UNB+UNOL:3+35044551600023:5:I+7501751:146+191007:1205+20191007120559+++++TDT-PED-IN-DP1501/CVA19+1'")
             .AppendLine("UNG+INFENT+NON_SECURISE_NON_SIGNE+MULTI_DISTRIBUTION+191007:1205+1+UN+D:00B:PD1501'")
             .AppendLine("UNH+00001+INFENT:D:00B:UN:PD1501'")
@@ -202,7 +202,7 @@ namespace indice.Edi.Tests
             .AppendLine("NAD+FR+35044551600023:100:107++CEC_EDI_PAYE:CABINET D?'EXPERTISE COMPTABLE::::3+0016 ZI de 1?'Idustrie+BLOIS++41000'")
             .AppendLine("UNT+000100+00001'")
             .AppendLine("UNE+000001+1'")
-            .Append("UNZ+1+20191007120559").ToString();
+            .Append("UNZ+1+20191007120559'").ToString();
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer().Serialize(writer, grammar, interchange);
@@ -219,13 +219,13 @@ namespace indice.Edi.Tests
             using (var stream = Helpers.GetResourceStream("edifact.Issue121.ElementList.Conditions.edi")) {
                 interchange = new EdiSerializer().Deserialize<EdiFact_Issue121_ElementList_Conditions>(new StreamReader(stream), grammar);
             }
-            string expected = new StringBuilder()
+            var expected = new StringBuilder()
             .AppendLine("UNA:+.? '")
             .AppendLine("ATR+NEW+PRIO:N'")
             .AppendLine("ATR+NEW+TGIC:465+TGNO:716073+TGPC:SVX'")
             .AppendLine("ATR+NEW+ACCS:A+BGCL:Y+BRDP:KBP+OFFP:TSE+PRIL:N'")
             .AppendLine("ATR++V'")
-            .Append("LTS+�2").ToString();
+            .Append("LTS+�2'").ToString();
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer().Serialize(writer, grammar, interchange);

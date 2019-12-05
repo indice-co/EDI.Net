@@ -20,6 +20,7 @@ namespace indice.Edi
         private readonly bool[] _charEscapeFlags;
         private char[] _writeBuffer;
         private IArrayPool<char> _arrayPool;
+        private bool _closing;
 
         /// <summary>
         /// Gets or sets the writer's character array pool.
@@ -69,6 +70,7 @@ namespace indice.Edi
         /// Closes this stream and the underlying stream.
         /// </summary>
         public override void Close() {
+            _closing = true;
             base.Close();
 
             if (_writeBuffer != null) {
@@ -101,7 +103,7 @@ namespace indice.Edi
         /// </summary>
         public override void WriteSegmentTerminator() {
              _writer.Write(Grammar.SegmentTerminator); 
-            if (Formatting == Formatting.LinePerSegment) {
+            if (Formatting == Formatting.LinePerSegment && !_closing) {
                 WriteNewLine();
             }
         }
