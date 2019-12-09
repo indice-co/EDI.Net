@@ -763,6 +763,13 @@ namespace indice.Edi
                         }
                         path = (EdiPath)writer.Path;
                     }
+                    // handle auto generated values.
+                    if (property.AutoGenerationInfo != null) {
+                        // do stuff.
+                        // there should be plenty of things to work with inside the EdiWriter itself. 
+                        // We are already keeping keeping track of current position with an index.
+                        // But it may need to track more stuff in order for this to happen.
+                    }
                     writer.WriteValue(value, property.ValueInfo.Picture, property.ValueInfo.Format);
                 } else {
                     // this is somekind of structure. Group/Message/Segment/SegmentGroup/Element

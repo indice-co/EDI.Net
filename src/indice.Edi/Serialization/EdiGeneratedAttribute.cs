@@ -24,14 +24,14 @@ namespace indice.Edi.Serialization
         /// <summary>
         /// Gives the current index instide a container. Its meaning is contextual and is related to the <seealso cref="EdiStructureType"/>.
         /// </summary>
-        Index = 1,
+        Index = 2,
     }
 
     /// <summary>
     /// Use <see cref="EdiGeneratedAttribute"/> for any value that the serializer should be generating. Usualy these are counts or indices.
     /// </summary>
     /// <remarks>Used in conjunction with <see cref="EdiValueAttribute"/>. Will be used only upon serialization.</remarks>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public sealed class EdiGeneratedAttribute : EdiAttribute
     {
         private readonly EdiStructureType _Scope;
@@ -59,6 +59,21 @@ namespace indice.Edi.Serialization
         public EdiGeneratedAttribute(EdiGeneratedType type, EdiStructureType scope) {
             _Type = type;
             _Scope = scope;
+        }
+
+        /// <summary>
+        /// String representation of <see cref="EdiGeneratedAttribute"/> settings.
+        /// </summary>
+        /// <returns>The string rerpesentation</returns>
+        public override string ToString() {
+            string stopWord;
+            switch (Type) {
+                case EdiGeneratedType.Count: stopWord = "of"; break;
+                case EdiGeneratedType.Position: stopWord = "in"; break;
+                case EdiGeneratedType.Index: stopWord = "in"; break;
+                default: stopWord = string.Empty; break;
+            }
+            return $"{Type} {stopWord} {Scope}";
         }
     }
 }

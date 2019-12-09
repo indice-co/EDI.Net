@@ -27,7 +27,7 @@ namespace indice.Edi.Tests.Models
         public List<UtilityBill> Invoices { get; set; }
 
         [EdiSegment, EdiPath("MHD")]
-        public class MessageHeader
+        public class MessageBase
         {
             [EdiValue("9(1)", Path = "*/0/0"), EdiGenerated(EdiGeneratedType.Position, EdiStructureType.Interchange)]
             public int Position { get; set; }
@@ -42,12 +42,17 @@ namespace indice.Edi.Tests.Models
 
             [EdiValue("9(1)", Path = "*/*/1")]
             public int Version { get; set; }
+
+            public override string ToString() {
+                if (!string.IsNullOrWhiteSpace(Name))
+                    return $"{Name} v{Version}";
+                return base.ToString();
+            }
         }
 
         [EdiMessage, EdiCondition("UTLHDR", Path = "MHD/1")]
-        public class InterchangeHeader
+        public class InterchangeHeader : MessageBase
         {
-            public MessageHeader Head { get; set; }
 
             [EdiValue("9(4)"), EdiPath("TYP")]
             public string TransactionCode { get; set; }
@@ -57,15 +62,14 @@ namespace indice.Edi.Tests.Models
         }
 
         [EdiMessage, EdiCondition("UTLTLR", Path = "MHD/1")]
-        public class InterchangeTrailer
+        public class InterchangeTrailer : MessageBase
         {
-            public MessageHeader Head { get; set; }
+
         }
 
         [EdiMessage, EdiCondition("UVATLR", Path = "MHD/1")]
-        public class InterchangeVatSummary
+        public class InterchangeVatSummary : MessageBase
         {
-            public MessageHeader Head { get; set; }
 
             [EdiValue("9(4)"), EdiPath("TYP")]
             public string TransactionCode { get; set; }
@@ -74,7 +78,7 @@ namespace indice.Edi.Tests.Models
         [EdiMessage, EdiCondition("UTLBIL", Path = "MHD/1")]
         public class UtilityBill
         {
-            public MessageHeader Head { get; set; }
+            public MessageBase Head { get; set; }
 
             [EdiValue("X(17)", Path = "BCD/2/0", Description = "INVN - Date")]
             public string InvoiceNumber { get; set; }
