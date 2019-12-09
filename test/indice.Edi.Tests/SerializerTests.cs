@@ -212,7 +212,7 @@ namespace indice.Edi.Tests
             Assert.Equal(expected, output);
         }
 
-        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#121")]
         public void Serialize_ElementList() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(EdiFact_Issue121_ElementList_Conditions);

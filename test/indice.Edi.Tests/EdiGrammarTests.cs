@@ -8,6 +8,7 @@ namespace indice.Edi.Tests
     public class EdiGrammarTests
     {
         [Fact]
+        [Trait(Traits.Tag, "Grammar")]
         public void EdiGrammarSetAdvice_ChangesSpecialCharacters() {
 
             var grammar = EdiGrammar.NewEdiFact();

@@ -11,7 +11,7 @@ namespace indice.Edi.Tests
     public class EdiTextReaderTests
     {
         [Fact]
-        [Trait(Traits.Tag, "TRADACOMS")]
+        [Trait(Traits.Tag, "Tradacoms")]
         public void ReaderTest() {
             var msgCount = 0;
             var grammar = EdiGrammar.NewTradacoms();
@@ -27,7 +27,7 @@ namespace indice.Edi.Tests
         }
         
         [Fact]
-        [Trait(Traits.Tag, "TRADACOMS")]
+        [Trait(Traits.Tag, "Tradacoms")]
         public void DeserializeTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
@@ -38,7 +38,7 @@ namespace indice.Edi.Tests
         }
 
         [Fact]
-        [Trait(Traits.Tag, "TRADACOMS")]
+        [Trait(Traits.Tag, "Tradacoms")]
         public void EscapeCharactersTest() {
             var grammar = EdiGrammar.NewTradacoms();
             var interchange = default(Interchange);
@@ -919,7 +919,7 @@ namespace indice.Edi.Tests
             Assert.Equal('S', interchange.ItemDetails[0].Descriptions[0].ItemDescriptionType);
         }
 
-        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#121")]
         public void EdiFact_ElementList() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(EdiFact_Issue121_ElementList);
@@ -933,7 +933,7 @@ namespace indice.Edi.Tests
         }
 
 
-        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#121")]
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#121")]
         public void EdiFact_ElementList_WithConditions() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(EdiFact_Issue121_ElementList_Conditions);
@@ -962,7 +962,7 @@ namespace indice.Edi.Tests
             Assert.NotNull(interchange.Groups[0].Orders[0].Items[0].ShipNoLaterDate);
         }
 
-        [Fact, Trait(Traits.Tag, "EdiFact"), Trait(Traits.Issue, "#137")]
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#137")]
         public void DeserializingMessage_without_Interchange() {
             var grammar = EdiGrammar.NewEdiFact();
             var message = default(Message_D95B);
