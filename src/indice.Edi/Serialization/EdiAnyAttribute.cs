@@ -28,7 +28,7 @@ namespace indice.Edi.Serialization
     /// By default all stacked conditions must be satisfied for a binding to take place. This attribute changes the behavior to at least one.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
-    public class EdiAnyAttribute : EdiAttribute
+    public sealed class EdiAnyAttribute : EdiAttribute
     {
     }
 }
