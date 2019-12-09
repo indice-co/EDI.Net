@@ -29,7 +29,7 @@ namespace indice.Edi.Tests.Models
         [EdiSegment, EdiPath("MHD")]
         public class MessageHeader
         {
-            [EdiValue("9(1)", Path = "*/0/0")]
+            [EdiValue("9(1)", Path = "*/0/0"), EdiGenerated(EdiGeneratedType.Position, EdiStructureType.Interchange)]
             public int Position { get; set; }
             public MessageType Type { get; set; }
         }

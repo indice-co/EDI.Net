@@ -15,6 +15,7 @@ namespace indice.Edi.Serialization
         private readonly EdiPathAttribute _PathInfo;
         private readonly EdiConditionAttribute[] _Conditions;
         private readonly EdiValueAttribute _ValueInfo;
+        private readonly EdiGeneratedAttribute _AutoGenerationInfo;
         private readonly EdiSegmentGroupAttribute _SegmentGroupInfo;
         private readonly EdiConditionStackMode _ConditionStackMode;
 
@@ -64,6 +65,11 @@ namespace indice.Edi.Serialization
                 return _SegmentGroupInfo;
             }
         }
+        public EdiGeneratedAttribute AutoGenerationInfo {
+            get {
+                return _AutoGenerationInfo;
+            }
+        }
 
         public bool MarksSegmentGroup {
             get {
@@ -97,6 +103,7 @@ namespace indice.Edi.Serialization
             _Conditions = conditions.Length > 0 ? conditions : null;
             _ValueInfo = Attributes.OfType<EdiValueAttribute>().FirstOrDefault();
             _SegmentGroupInfo = Attributes.OfType<EdiSegmentGroupAttribute>().FirstOrDefault();
+            _AutoGenerationInfo = Attributes.OfType<EdiGeneratedAttribute>().FirstOrDefault();
             if (_ValueInfo != null && _ValueInfo.Path != null && pathInfo == null) {
                 pathInfo = new EdiPathAttribute(_ValueInfo.Path);
             }
