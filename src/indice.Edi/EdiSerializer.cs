@@ -680,6 +680,7 @@ namespace indice.Edi
         public void Serialize(EdiWriter ediWriter, object value) {
             ediWriter.EnableCompression = EnableCompression;
             SerializeInternal(ediWriter, value, null);
+            ediWriter.Close();
         }
 
         /// <summary>
@@ -695,6 +696,7 @@ namespace indice.Edi
         public void Serialize(EdiWriter ediWriter, object value, Type objectType) {
             ediWriter.EnableCompression = EnableCompression;
             SerializeInternal(ediWriter, value, objectType);
+            ediWriter.Close();
         }
 
         #region Write internals
