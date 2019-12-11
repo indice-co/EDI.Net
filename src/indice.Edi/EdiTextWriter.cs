@@ -103,7 +103,7 @@ namespace indice.Edi
         /// </summary>
         public override void WriteSegmentTerminator() {
              _writer.Write(Grammar.SegmentTerminator); 
-            if (Formatting == Formatting.LinePerSegment && !_closing) {
+            if (Formatting == Formatting.LinePerSegment) {
                 WriteNewLine();
             }
         }

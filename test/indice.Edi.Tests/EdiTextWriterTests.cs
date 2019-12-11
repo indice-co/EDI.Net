@@ -27,7 +27,7 @@ namespace indice.Edi.Tests
             var grammar = EdiGrammar.NewEdiFact();
             var expected = new StringBuilder().AppendLine("UNA:+.? '")
                                               .AppendLine("UNB+UNOC:3+1234567891123:14+7080005059275:14:SPOTMARKED+101012:1104+HBQ001++++1'")
-                                              .Append("UNH+1+QUOTES:D:96A:UN:EDIEL2+S'");
+                                              .AppendLine("UNH+1+QUOTES:D:96A:UN:EDIEL2+S'");
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
                 writer.WriteServiceStringAdvice();
@@ -74,7 +74,7 @@ namespace indice.Edi.Tests
         public void WriterProgressessThePathCorrectly_On_NullToken() {
             var grammar = EdiGrammar.NewEdiFact();
             var expected = new StringBuilder().AppendLine("UNA:+.? '")
-                                              .Append("PAC+1+:52+PK'");
+                                              .AppendLine("PAC+1+:52+PK'");
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
                 writer.WriteServiceStringAdvice();
@@ -92,7 +92,7 @@ namespace indice.Edi.Tests
         [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#141")]
         public void WriterWrites_Boolean_Correctly() {
             var grammar = EdiGrammar.NewEdiFact();
-            var expected = new StringBuilder().Append("AAA+1+:0'");
+            var expected = new StringBuilder().Append("AAA+1+:0'\r\n");
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
                 writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);

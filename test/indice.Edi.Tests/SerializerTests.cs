@@ -57,7 +57,7 @@ namespace indice.Edi.Tests
                 expected.AppendLine("PRI+CAL:21000'");
                 expected.AppendLine("UNS+S'");
                 expected.AppendLine("UNT+158+1'");
-                expected.Append("UNZ+1+20101000064507'");
+                expected.AppendLine("UNZ+1+20101000064507'");
             }
             #endregion
             else {
@@ -93,7 +93,7 @@ namespace indice.Edi.Tests
                 expected.AppendLine("PRI+CAL:21000:'");
                 expected.AppendLine("UNS+S'");
                 expected.AppendLine("UNT+158+1'");
-                expected.Append("UNZ+1+20101000064507'");
+                expected.AppendLine("UNZ+1+20101000064507'");
                 #endregion
             }
 
@@ -163,7 +163,7 @@ namespace indice.Edi.Tests
                     }
                 }
             };
-            var expected = "UNA:+.? '\r\nPAC+1+:52+PK'";
+            var expected = "UNA:+.? '\r\nPAC+1+:52+PK'\r\n";
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer() { EnableCompression = false }.Serialize(writer, grammar, interchange);
@@ -202,7 +202,7 @@ namespace indice.Edi.Tests
             .AppendLine("NAD+FR+35044551600023:100:107++CEC_EDI_PAYE:CABINET D?'EXPERTISE COMPTABLE::::3+0016 ZI de 1?'Idustrie+BLOIS++41000'")
             .AppendLine("UNT+000100+00001'")
             .AppendLine("UNE+000001+1'")
-            .Append("UNZ+1+20191007120559'").ToString();
+            .AppendLine("UNZ+1+20191007120559'").ToString();
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer().Serialize(writer, grammar, interchange);
@@ -225,7 +225,7 @@ namespace indice.Edi.Tests
             .AppendLine("ATR+NEW+TGIC:465+TGNO:716073+TGPC:SVX'")
             .AppendLine("ATR+NEW+ACCS:A+BGCL:Y+BRDP:KBP+OFFP:TSE+PRIL:N'")
             .AppendLine("ATR++V'")
-            .Append("LTS+�2'").ToString();
+            .AppendLine("LTS+�2'").ToString();
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer().Serialize(writer, grammar, interchange);
