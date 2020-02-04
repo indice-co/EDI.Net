@@ -250,5 +250,33 @@ namespace indice.Edi.Tests
             }
 
         }
+
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#149")]
+        public void SegmentGroups_WithSingleSegment_ShouldEscape() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EdiFact_Issue149_SegmentGroups);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue149.SegmentGroups.edi")) {
+                interchange = new EdiSerializer().Deserialize<EdiFact_Issue149_SegmentGroups>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(interchange);
+            Assert.NotNull(interchange.Message);
+            Assert.NotNull(interchange.Message.SG15);
+            Assert.Equal("ZZZ", interchange.Message.SG15.AJT1);
+            Assert.Equal("35", interchange.Message.SG15.AJT2);
+            Assert.NotNull(interchange.Message.SG25);
+            Assert.Single(interchange.Message.SG25.SG26);
+            Assert.Equal("1", interchange.Message.SG25.SG26[0].PAI1);
+            Assert.Equal("1", interchange.Message.SG25.SG26[0].PAI2);
+            Assert.Equal("1", interchange.Message.SG25.SG26[0].PAI3);
+            Assert.NotNull(interchange.Message.SG25.SG26[0].MOA);
+            Assert.Equal("ZZZ", interchange.Message.SG25.SG26[0].MOA.MOA1);
+            Assert.Equal(9, interchange.Message.SG25.SG26[0].MOA.MOA2);
+            Assert.Equal("XXX", interchange.Message.SG25.SG26[0].MOA.MOA3);
+            Assert.Single(interchange.Message.SG25.SG26[0].References);
+            Assert.Equal("AAA", interchange.Message.SG25.SG26[0].References[0].RFF1);
+            Assert.Equal("X", interchange.Message.SG25.SG26[0].References[0].RFF2);
+            Assert.Equal("4", interchange.Message.SG25.TAX1);
+            Assert.Equal("D", interchange.Message.UNS1);
+        }
     }
 }

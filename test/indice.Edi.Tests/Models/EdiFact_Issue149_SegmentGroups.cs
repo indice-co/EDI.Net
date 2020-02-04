@@ -35,7 +35,7 @@ namespace indice.Edi.Tests.Models
     }
 
     //[EdiSegmentGroup("AJT", "FTX")] // Adding one more random segment "fixes" the issue since level.GroupMembers.Length > 1 becomes true and deserializer closes this level when finds other segments.
-    [EdiSegmentGroup("AJT")]
+    [EdiSegment, EdiPath("AJT")]
     public class EdiFact_Issue149_SegmentGroups_SG15
     {
         [EdiValue("X(3)", Path = "AJT/0", Mandatory = true)]
@@ -55,7 +55,14 @@ namespace indice.Edi.Tests.Models
     }
 
     [EdiSegmentGroup("PAI", "RFF", "MOA")]
-    public class EdiFact_Issue149_SegmentGroups_SG26
+    public class EdiFact_Issue149_SegmentGroups_SG26 : EdiFact_Issue149_PAI
+    {
+        public EdiFact_Issue149_MOA MOA { get; set; }
+        public List<EdiFact_Issue149_SegmentGroups_SG26_RFF> References { get; set; }
+    }
+
+    [EdiSegment, EdiPath("PAI")]
+    public class EdiFact_Issue149_PAI
     {
         [EdiValue("X(3)", Path = "PAI/0/2")]
         public string PAI1 { get; set; }
@@ -65,9 +72,11 @@ namespace indice.Edi.Tests.Models
 
         [EdiValue("X(2)", Path = "PAI/0/4", Mandatory = true)]
         public string PAI3 { get; set; }
+    }
 
-        public List<EdiFact_Issue149_SegmentGroups_SG26_RFF> References { get; set; }
-
+    [EdiSegment, EdiPath("MOA")]
+    public class EdiFact_Issue149_MOA
+    {
         [EdiValue("X(3)", Path = "MOA/0/0", Mandatory = true)]
         public string MOA1 { get; set; }
 
