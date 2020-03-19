@@ -105,7 +105,8 @@ namespace indice.Edi.Tests.Models
         [EdiSegmentGroup("TVL", "PDI", "APD")]
         public class TVL_SG : TVL
         {
-
+            public PDI PersonDemographicInformation { get; set; }
+            public APD AdditionalTransportDetails { get; set; }
         }
 
         /// <summary>
@@ -177,11 +178,11 @@ namespace indice.Edi.Tests.Models
         {
             [EdiValue("X(3)", Path = "*/*/0")]
             public string MaritalStatusDescriptionCode  { get; set; }
-            [EdiValue("X(17)", Path = "*/*/0")]
+            [EdiValue("X(17)", Path = "*/*/1")]
             public string CodeListIdentificationCode { get; set; }
-            [EdiValue("X(3)", Path = "*/*/0")]
+            [EdiValue("X(3)", Path = "*/*/2")]
             public string CodeListResponsibleAgencyCode { get; set; }
-            [EdiValue("X(35)", Path = "*/*/0")]
+            [EdiValue("X(35)", Path = "*/*/3")]
             public string MaritalStatusDescription { get; set; }
         }
 
@@ -193,11 +194,11 @@ namespace indice.Edi.Tests.Models
         {
             [EdiValue("X(3)", Path = "*/*/0")]
             public string ReligionNameCode { get; set; }
-            [EdiValue("X(17)", Path = "*/*/0")]
+            [EdiValue("X(17)", Path = "*/*/1")]
             public string CodeListIdentificationCode { get; set; }
-            [EdiValue("X(3)", Path = "*/*/0")]
+            [EdiValue("X(3)", Path = "*/*/2")]
             public string CodeListResponsibleAgencyCode { get; set; }
-            [EdiValue("X(35)", Path = "*/*/0")]
+            [EdiValue("X(35)", Path = "*/*/3")]
             public string ReligionName { get; set; }
         }
 
