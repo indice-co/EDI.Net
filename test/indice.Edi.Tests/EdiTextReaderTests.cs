@@ -982,5 +982,16 @@ namespace indice.Edi.Tests
             }
             Assert.NotNull(message);
         }
+
+
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#152")]
+        public void EmptySegment_Withought_A_segmentname_separator_should_parse() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EdiFact_Issue152_Wikipedia_Transmission);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue152.Wikipedia.edi")) {
+                interchange = new EdiSerializer().Deserialize<EdiFact_Issue152_Wikipedia_Transmission>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(interchange);
+        }
     }
 }

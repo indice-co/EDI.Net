@@ -267,7 +267,7 @@ namespace indice.Edi
             }
             EatWhitespace(false);
 
-            if (Grammar.SegmentNameDelimiter != _chars[_charPos])
+            if (Grammar.SegmentNameDelimiter != _chars[_charPos] && Grammar.SegmentTerminator != _chars[_charPos])
                 throw EdiReaderException.Create(this, "Invalid character after parsing segment name. Expected '{1}' but got: {0}.".FormatWith(CultureInfo.InvariantCulture, _chars[_charPos], string.Join("', '", Grammar.DataElementSeparator)));
             
             SetToken(EdiToken.SegmentName, segmentName);

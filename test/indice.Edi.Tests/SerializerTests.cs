@@ -278,5 +278,6 @@ namespace indice.Edi.Tests
             Assert.Equal("4", interchange.Message.SG25.TAX1);
             Assert.Equal("D", interchange.Message.UNS1);
         }
+
     }
 }
