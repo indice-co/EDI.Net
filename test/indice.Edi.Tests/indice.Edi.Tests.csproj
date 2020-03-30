@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Samples\**\*.edi" />
+    <None Update="SamplesBig\**\*.edi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

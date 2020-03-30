@@ -20,5 +20,11 @@ namespace indice.Edi.Tests
         public static MemoryStream StreamFromString(string value) {
             return new MemoryStream(Encoding.UTF8.GetBytes(value ?? ""));
         }
+
+        public static Stream GetBigSampleStream(string fileName) {
+            var path = Path.Combine(Path.GetDirectoryName(_assembly.Location), "SamplesBig", fileName);
+            Stream stream = File.OpenRead(path);
+            return stream;
+        }
     }
 }
