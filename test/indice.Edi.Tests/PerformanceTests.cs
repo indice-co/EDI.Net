@@ -17,6 +17,8 @@ namespace indice.Edi.Tests
             using (var stream = Helpers.GetBigSampleStream("edifact.Issue154.Perf.edi")) {
                 interchange = new EdiSerializer().Deserialize<EdiFact_Issue154_Transmission>(new StreamReader(stream), grammar);
             }
+
+            Assert.Equal(78880, interchange.Messages.Count);
             Assert.NotNull(interchange);
         }
     }
