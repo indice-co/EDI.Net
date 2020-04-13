@@ -114,7 +114,7 @@ namespace indice.Edi.Tests
                 }
             };
 
-            var expected = "UNA:+.? '\r\nTSR+++270'";
+            var expected = $"UNA:+.? '{Environment.NewLine}TSR+++270'";
             var output = new StringBuilder();
             var grammar = EdiGrammar.NewEdiFact();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
@@ -163,7 +163,7 @@ namespace indice.Edi.Tests
                     }
                 }
             };
-            var expected = "UNA:+.? '\r\nPAC+1+:52+PK'\r\n";
+            var expected = $"UNA:+.? '{Environment.NewLine}PAC+1+:52+PK'{Environment.NewLine}";
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer() { EnableCompression = false }.Serialize(writer, grammar, interchange);

@@ -92,7 +92,7 @@ namespace indice.Edi.Tests
         [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#141")]
         public void WriterWrites_Boolean_Correctly() {
             var grammar = EdiGrammar.NewEdiFact();
-            var expected = new StringBuilder().Append("AAA+1+:0'\r\n");
+            var expected = new StringBuilder().Append($"AAA+1+:0'{Environment.NewLine}");
             var output = new StringBuilder();
             using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
                 writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);
