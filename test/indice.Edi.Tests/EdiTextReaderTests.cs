@@ -993,5 +993,19 @@ namespace indice.Edi.Tests
             }
             Assert.NotNull(interchange);
         }
+
+
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#157")]
+        public void BadEscapeSequenseErrorCanbeSuppressed() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EdiFact_Issue152_Wikipedia_Transmission);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue157.Wikipedia.edi")) {
+                interchange = new EdiSerializer() { 
+                    SuppressBadEscapeSequenceErrors = true
+                }.Deserialize<EdiFact_Issue152_Wikipedia_Transmission>(new StreamReader(stream), grammar);
+            }
+            Assert.NotNull(interchange);
+            Assert.Equal("XYZCOMPANY AVAILABILITY", interchange.AvailabilityRequest.Description[0].Text);
+        }
     }
 }

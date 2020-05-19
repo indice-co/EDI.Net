@@ -16,7 +16,7 @@ namespace indice.Edi.Tests.Models
         public class Message
         {
             public MSG MessageType { get; set; }
-            public IFT Description { get; set; }
+            public List<IFT> Description { get; set; }
             public ERC ErrorCode { get; set; }
             public ODI ODI { get; set; }
             public List<TVL_SG> Legs { get; set; }

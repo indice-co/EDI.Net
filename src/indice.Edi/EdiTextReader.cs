@@ -545,8 +545,10 @@ namespace indice.Edi
                         writeChar = currentChar;
                     } else {
                         charPos++;
-                        _charPos = charPos;
-                        throw EdiReaderException.Create(this, "Bad EDI escape sequence: {0}{1}.".FormatWith(CultureInfo.InvariantCulture, Grammar.ReleaseCharacter, currentChar));
+                        _charPos = charPos; 
+                        writeChar = currentChar;
+                        if (!SuppressBadEscapeSequenceErrors)
+                            throw EdiReaderException.Create(this, "Bad EDI escape sequence: {0}{1}.".FormatWith(CultureInfo.InvariantCulture, Grammar.ReleaseCharacter, currentChar));
                     }
                     
                     if (buffer == null)

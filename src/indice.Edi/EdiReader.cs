@@ -97,6 +97,11 @@ namespace indice.Edi
         private string _Path;
 
         /// <summary>
+        /// If true will suppress any exceptions thrown due to bad escape sequences.By default is set to false.
+        /// </summary>
+        public bool SuppressBadEscapeSequenceErrors { get; set; }
+
+        /// <summary>
         /// Gets the current reader state.
         /// </summary>
         /// <value>The current reader state.</value>

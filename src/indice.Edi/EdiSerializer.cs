@@ -26,6 +26,11 @@ namespace indice.Edi
         public bool EnableCompression { get; set; } = true;
 
         /// <summary>
+        /// If true will suppress any exceptions thrown due to bad escape sequences. Sets the internal <see cref="EdiReader.SuppressBadEscapeSequenceErrors"/>. By default is set to false.
+        /// </summary>
+        public bool SuppressBadEscapeSequenceErrors { get; set; }
+
+        /// <summary>
         /// Deserializes the EDI structure contained by the specified <see cref="EdiReader"/>.
         /// </summary>
         /// <param name="reader">The <see cref="EdiReader"/> that contains the EDI structure to deserialize.</param>
@@ -83,6 +88,8 @@ namespace indice.Edi
         #region Read internals
 
         internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
+            reader.SuppressBadEscapeSequenceErrors = SuppressBadEscapeSequenceErrors;
+
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
