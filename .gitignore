@@ -257,3 +257,5 @@ typings/
 /**/wwwroot/dist
 /**/wwwroot/app/**/*.js
 /**/wwwroot/app/**/*.map
+
+SamplesBig
