@@ -109,14 +109,6 @@ namespace indice.Edi
         public char[] Reserved { get; protected set; }
 
         /// <summary>
-        /// <para>
-        /// These characters will be escaped by the serializer. This list should only include non default (additional) characters to be escaped.
-        /// </para>
-        /// </summary>
-        /// <value>An array of additioal escape characters.</value>
-        public string EscapeCharacters { get; protected set; }
-
-        /// <summary>
         /// Segment terminator indicates the end of a message segment.
         /// </summary>
         public char SegmentTerminator { get; protected set; }
@@ -206,16 +198,6 @@ namespace indice.Edi
             DecimalMark = decimalMark;
             SegmentTerminator = segmentTerminator;
             _separators = null;
-        }
-
-        /// <summary>
-        /// Adds an character to the list of escape chars.
-        /// </summary>
-        /// <param name="characterToEscape">The character to escape</param>
-        public void AddEscapeCharacter(char characterToEscape) {
-            if (EscapeCharacters == null)
-                EscapeCharacters = string.Empty;
-            EscapeCharacters += characterToEscape;
         }
 
         /// <summary>

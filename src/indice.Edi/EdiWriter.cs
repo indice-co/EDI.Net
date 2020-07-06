@@ -192,6 +192,11 @@ namespace indice.Edi
         /// </summary>
         public bool EnableCompression { get; set; }
 
+        /// <summary>
+        /// Escape decimal mark when encountered in text.
+        /// </summary>
+        public bool EscapeDecimalMarkInText { get; set; }
+
         internal bool LastWriteNull { get; set; }
         internal int UnwrittenComponents { get; set; }
         internal int UnwrittenElements { get; set; }
@@ -205,7 +210,7 @@ namespace indice.Edi
             _grammar = grammar;
             _currentState = State.Start;
             _formatting = Formatting.LinePerSegment;
-
+            EscapeDecimalMarkInText = true;
             CloseOutput = true;
         }
 

@@ -108,15 +108,15 @@ namespace indice.Edi.Tests
         public void WriterWrites_Precision_Correctly() {
             var grammar = EdiGrammar.NewEdiFact();
             grammar.SetAdvice('+', '+', ':', '\'', '?', null, ',');
-            grammar.AddEscapeCharacter(',');
-            var expected = new StringBuilder().Append($"AAA+10?,42+:234?,46'{Environment.NewLine}");
+            var expected = new StringBuilder().Append($"AAA+10,42+:234,46:234?,45563'{Environment.NewLine}");
             var output = new StringBuilder();
-            using (var writer = new EdiTextWriter(new StringWriter(output), grammar)) {
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar) { EscapeDecimalMarkInText = true }) {
                 writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);
                 writer.WriteValue(10.42345, (Picture)"9(1)V9(2)"); Assert.Equal("AAA[0][0]", writer.Path);
                 writer.WriteToken(EdiToken.ElementStart); Assert.Equal("AAA[1]", writer.Path);
                 writer.WriteToken(EdiToken.Null); Assert.Equal("AAA[1][0]", writer.Path);
                 writer.WriteValue(234.45563, (Picture)"9(1)V9(2)"); Assert.Equal("AAA[1][1]", writer.Path);
+                writer.WriteValue("234,45563"); Assert.Equal("AAA[1][2]", writer.Path);
             }
             Assert.Equal(expected.ToString(), output.ToString());
         }

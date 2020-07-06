@@ -56,10 +56,8 @@ namespace indice.Edi
                 _charEscapeFlags[Grammar.SegmentNameDelimiter] =
                 _charEscapeFlags[Grammar.SegmentTerminator] =
                 _charEscapeFlags[Grammar.ReleaseCharacter.Value] = true;
-                if (Grammar.EscapeCharacters != null)
-                foreach (var c in Grammar.EscapeCharacters) {
-                    _charEscapeFlags[c] = true;
-                }
+                if (EscapeDecimalMarkInText && Grammar.DecimalMark.HasValue)
+                    _charEscapeFlags[Grammar.DecimalMark.Value] = true;
             }
         }
 
@@ -305,7 +303,7 @@ namespace indice.Edi
         /// <param name="picture"></param>
         public override void WriteValue(float value, Picture? picture) {
             InternalWriteValue(EdiToken.Float);
-            WriteEscapedString(value.ToEdiString(picture, Grammar.DecimalMark));
+            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
         }
 
         /// <summary>
@@ -318,7 +316,7 @@ namespace indice.Edi
                 WriteNull();
             } else {
                 InternalWriteValue(EdiToken.Float);
-                WriteEscapedString(value.ToEdiString(picture, Grammar.DecimalMark));
+                _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
             }
         }
 
@@ -329,7 +327,7 @@ namespace indice.Edi
         /// <param name="picture"></param>
         public override void WriteValue(double value, Picture? picture = null) {
             InternalWriteValue(EdiToken.Float);
-            WriteEscapedString(value.ToEdiString(picture, Grammar.DecimalMark));
+            _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
         }
 
         /// <summary>
@@ -342,7 +340,7 @@ namespace indice.Edi
                 WriteNull();
             } else {
                 InternalWriteValue(EdiToken.Float);
-                WriteEscapedString(value.ToEdiString(picture, Grammar.DecimalMark));
+                _writer.Write(value.ToEdiString(picture, Grammar.DecimalMark));
             }
         }
 
