@@ -311,19 +311,30 @@ namespace indice.Edi.Utilities
             if (!value.HasValue)
                 return null;
             var provider = NumberFormatInfo.InvariantInfo;
-             if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && picture.Value.HasPrecision) {
+            if (decimalMark.HasValue) {
+                if (provider.NumberDecimalSeparator != decimalMark.ToString()) {
+                    provider = provider.Clone() as NumberFormatInfo;
+                    provider.NumberDecimalSeparator = decimalMark.Value.ToString();
+                }
+                if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && picture.Value.HasPrecision) {
+                    var integerMask = new string(Enumerable.Range(0, picture.Value.Scale - picture.Value.Precision).Select(i => '0').ToArray());
+                    if (integerMask.Length == 0) {
+                        integerMask = "#";
+                    }
+                    var precisionMask = new string(Enumerable.Range(0, picture.Value.Precision).Select(i => '0').ToArray());
+                    if (precisionMask.Length == 0) {
+                        precisionMask = "#";
+                    }
+                    return value.Value.ToString($"{integerMask}.{precisionMask}", provider);
+                }
+                return value.Value.ToString(provider);
+            } else if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric && picture.Value.HasPrecision) {
                 var pic = picture.Value;
                 var number = value.Value;
                 var integer = (int)(number * (decimal)Math.Pow(10.0, pic.Precision));
                 var padding = new string(Enumerable.Range(0, pic.Scale).Select(i => '0').ToArray());
                 var result = integer.ToString(padding);
                 return result;
-            } else if (decimalMark.HasValue) {
-                if (provider.NumberDecimalSeparator != decimalMark.ToString()) {
-                    provider = provider.Clone() as NumberFormatInfo;
-                    provider.NumberDecimalSeparator = decimalMark.Value.ToString();
-                }
-                return value.Value.ToString(provider);
             } else if (picture.HasValue && picture.Value.Kind == PictureKind.Numeric) {
                 var pic = picture.Value;
                 var number = value.Value;

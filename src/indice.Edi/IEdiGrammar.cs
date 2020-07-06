@@ -47,6 +47,14 @@ namespace indice.Edi
         char[] Reserved { get; }
 
         /// <summary>
+        /// <para>
+        /// These characters will be escaped by the serializer. This list should only include non default (additional) characters to be escaped.
+        /// </para>
+        /// </summary>
+        /// <value>An array of additioal escape characters.</value>
+        string EscapeCharacters { get; }
+
+        /// <summary>
         /// Segment terminator indicates the end of a message segment.
         /// </summary>
         char SegmentTerminator { get; }
@@ -75,7 +83,7 @@ namespace indice.Edi
         /// The segment name that marks the Message Trailer.
         /// </summary>
         string MessageTrailerTag { get; }
-        
+
         /// <summary>
         /// The segment name that marks the Functional Group Trailer.
         /// </summary>
@@ -111,10 +119,16 @@ namespace indice.Edi
         /// <param name="decimalMark">populates <see cref="DecimalMark"/> character</param>
         void SetAdvice(char segmentNameDelimiter,
                        char dataElementSeparator,
-                       char componentDataElementSeparator, 
+                       char componentDataElementSeparator,
                        char segmentTerminator,
                        char? releaseCharacter,
                        char? reserved,
                        char? decimalMark);
+
+        /// <summary>
+        /// Adds an character to the list of escape chars.
+        /// </summary>
+        /// <param name="characterToEscape">The character to escape</param>
+        void AddEscapeCharacter(char characterToEscape);
     }
 }
