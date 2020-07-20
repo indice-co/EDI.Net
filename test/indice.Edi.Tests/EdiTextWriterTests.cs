@@ -104,13 +104,16 @@ namespace indice.Edi.Tests
             Assert.Equal(expected.ToString(), output.ToString());
         }
 
-        [Fact, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#160")]
-        public void WriterWrites_Precision_Correctly() {
+        [Theory, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#160"), Trait(Traits.Issue, "#162")]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void WriterWrites_Precision_Correctly(bool escapeDecimalMarkInText) {
             var grammar = EdiGrammar.NewEdiFact();
             grammar.SetAdvice('+', '+', ':', '\'', '?', null, ',');
-            var expected = new StringBuilder().Append($"AAA+10,42+:234,46:234?,45563'{Environment.NewLine}");
+            var escapeChar = escapeDecimalMarkInText ? "?" : ""; 
+            var expected = new StringBuilder().Append($"AAA+10,42+:234,46:234{escapeChar},45563'{Environment.NewLine}");
             var output = new StringBuilder();
-            using (var writer = new EdiTextWriter(new StringWriter(output), grammar) { EscapeDecimalMarkInText = true }) {
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar) { EscapeDecimalMarkInText = escapeDecimalMarkInText }) {
                 writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);
                 writer.WriteValue(10.42345, (Picture)"9(1)V9(2)"); Assert.Equal("AAA[0][0]", writer.Path);
                 writer.WriteToken(EdiToken.ElementStart); Assert.Equal("AAA[1]", writer.Path);

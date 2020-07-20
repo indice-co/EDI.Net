@@ -38,6 +38,20 @@ namespace indice.Edi
 
 
         /// <summary>
+        /// Escape decimal mark when encountered in text.
+        /// </summary>
+        public override bool EscapeDecimalMarkInText {
+            get {
+                return Grammar.DecimalMark.HasValue && _charEscapeFlags[Grammar.DecimalMark.Value];
+            }
+            set {
+                if (Grammar.DecimalMark.HasValue) {
+                    _charEscapeFlags[Grammar.DecimalMark.Value] = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates an instance of the <c>EdiWriter</c> class using the specified <see cref="TextWriter"/>. 
         /// </summary>
         /// <param name="textWriter">The <c>TextWriter</c> to write to.</param>
@@ -56,8 +70,6 @@ namespace indice.Edi
                 _charEscapeFlags[Grammar.SegmentNameDelimiter] =
                 _charEscapeFlags[Grammar.SegmentTerminator] =
                 _charEscapeFlags[Grammar.ReleaseCharacter.Value] = true;
-                if (EscapeDecimalMarkInText && Grammar.DecimalMark.HasValue)
-                    _charEscapeFlags[Grammar.DecimalMark.Value] = true;
             }
         }
 
