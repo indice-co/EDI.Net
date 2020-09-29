@@ -31,6 +31,9 @@ namespace indice.Edi.Tests
         [InlineData("2", 2.0, "9(0)", ',')]
         [InlineData("0", 0.0, "9(0)", ',')]
         [InlineData("0", 0.0, "9(1)", ',')]
+        [InlineData("2,00", 2.0, "9(1)V9(2)", ',')]
+        [InlineData("2,23", 2.23, "9(1)", ',')]
+        [InlineData("2,2", 2.2, "9(1)", ',')]
         public void FloatToStringTest(string expectedValue, decimal value, string picture, char? decimalMark) {
             Assert.Equal(expectedValue, EdiExtensions.ToEdiString(value, (Picture)picture, decimalMark));
         }
