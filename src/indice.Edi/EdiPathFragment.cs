@@ -197,7 +197,7 @@ namespace indice.Edi
     /// </summary>
     /// <returns></returns>
     public override string ToString() {
-        return IsWildcard ? "*" : Value;
+        return Value;
     }
 
     /// <summary>

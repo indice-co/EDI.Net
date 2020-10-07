@@ -51,6 +51,17 @@ namespace indice.Edi.Tests
             var path = EdiPath.Parse(text);
             Assert.Equal("B10[*][0]", path.ToString());
         }
+        
+        [Trait(Traits.Tag, "Parser")]
+        [InlineData("B10[1..*][0]")]
+        [InlineData("B10/1..*/0")]
+        [InlineData("B10/1..*")]
+        [Theory]
+        public void ParseHandlesRangeStyleFragments(string text) {
+            var path = EdiPath.Parse(text);
+            Assert.True(path.Element.IsRange);
+            Assert.Equal("B10[1..*][0]", path.ToString());
+        }
 
         [Trait(Traits.Tag, "Writer")]
         [Fact]
