@@ -68,30 +68,34 @@ UNZ+1+00336'
         }
 
         [Theory]
-        [InlineData("20170726", "2034", "2017-07-26T20:34:00Z")]
-        [InlineData("20170726", "20341", "2017-07-26T00:00:00Z")] // this should fail to parse the time part thus showing 00:00:00
-        [InlineData("20170726", "203406", "2017-07-26T20:34:06Z")]
-        [InlineData("20170726", "1558123", "2017-07-26T15:58:12.3Z")]
-        [InlineData("20170726", "15581234", "2017-07-26T15:58:12.34Z")]
+        [InlineData("20170726", "2034", "2017-07-26T20:34:00Z", "011", "08")]
+        [InlineData("20170726", "20341", "2017-07-26T00:00:00Z", "011", "08")] // this should fail to parse the time part thus showing 00:00:00
+        [InlineData("20170726", "203406", "2017-07-26T20:34:06Z", "011", "08")]
+        [InlineData("20170726", "1558123", "2017-07-26T15:58:12.3Z", "011", "08")]
+        [InlineData("20170726", "15581234", "2017-07-26T15:58:12.34Z", "011", "08")]
         [Trait(Traits.Issue, "#130")]
-        public void DateTimeFromStringTestMiliseconds(string dateText, string timeText, string output) {
-            var expected = DateTime.Parse(output, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+        [Trait(Traits.Issue, "#172")]
+        public void DateTimeFromStringTestMiliseconds(string dateText, string timeText, string expectedISODate, string intText, string longText) {
+            var expected = DateTime.Parse(expectedISODate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
             var grammar = EdiGrammar.NewX12();
             var edi = $@"ISA*00*          *00*          *01*000123456      *ZZ*TEST2      *090827*0936*U*00401*000000055*0*T*>~
 	GS*PO*000123456*TEST2*20090827*1041*2*X*004010~
 		ST*850*0001~
-			DTM*011*{dateText}*{timeText}*08~
+			DTM*{intText}*{dateText}*{timeText}*{longText}~
 		SE*50*0001~
 	GE*1*2~
 IEA*1*000000001~
 ";
 
-            var interchange = default(Interchange_Issue130);
+            var interchange = default(ParseComponentValues_Interchange);
             using (var stream = Helpers.StreamFromString(edi)) {
-                interchange = new EdiSerializer().Deserialize<Interchange_Issue130>(new StreamReader(stream), grammar);
+                interchange = new EdiSerializer().Deserialize<ParseComponentValues_Interchange>(new StreamReader(stream), grammar);
             }
 
             Assert.Equal(expected, interchange.Msg.DateTime);
+            Assert.Equal(int.Parse(intText), interchange.Msg.Integer);
+            Assert.Equal(long.Parse(longText), interchange.Msg.Long);
         }
+
     }
 }

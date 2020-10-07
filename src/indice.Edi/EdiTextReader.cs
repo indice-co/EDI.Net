@@ -72,6 +72,14 @@ namespace indice.Edi
         }
 
         /// <summary>
+        /// Reads the next EDI token from the stream as a <see cref="Nullable{Int64}"/>.
+        /// </summary>
+        /// <returns>A <see cref="Nullable{Int64}"/>. This method will return <c>null</c> at the end of an array.</returns>
+        public override long? ReadAsInt64() {
+            return ReadAsInt64Internal();
+        }
+
+        /// <summary>
         /// Reads the next EDI token from the stream as a <see cref="String"/>.
         /// </summary>
         /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>

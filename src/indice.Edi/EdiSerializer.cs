@@ -224,6 +224,10 @@ namespace indice.Edi
                         case PrimitiveTypeCode.BooleanNullable:
                             PopulateBooleanValue(reader, structure, descriptor, useTheReader);
                             break;
+                        case PrimitiveTypeCode.Byte: break;
+                        case PrimitiveTypeCode.ByteNullable: break;
+                        case PrimitiveTypeCode.UInt32: break;
+                        case PrimitiveTypeCode.UInt32Nullable: break;
                         case PrimitiveTypeCode.SByte: break;
                         case PrimitiveTypeCode.SByteNullable: break;
                         case PrimitiveTypeCode.Int16: break;
@@ -234,14 +238,12 @@ namespace indice.Edi
                         case PrimitiveTypeCode.Int32Nullable:
                             PopulateInt32Value(reader, structure, descriptor, useTheReader);
                             break;
-                        case PrimitiveTypeCode.Byte: break;
-                        case PrimitiveTypeCode.ByteNullable: break;
-                        case PrimitiveTypeCode.UInt32: break;
-                        case PrimitiveTypeCode.UInt32Nullable: break;
-                        case PrimitiveTypeCode.Int64: break;
-                        case PrimitiveTypeCode.Int64Nullable: break;
-                        case PrimitiveTypeCode.UInt64: break;
-                        case PrimitiveTypeCode.UInt64Nullable: break;
+                        case PrimitiveTypeCode.UInt64:
+                        case PrimitiveTypeCode.UInt64Nullable:
+                        case PrimitiveTypeCode.Int64:
+                        case PrimitiveTypeCode.Int64Nullable:
+                            PopulateInt64Value(reader, structure, descriptor, useTheReader);
+                            break;
                         case PrimitiveTypeCode.Single:
                         case PrimitiveTypeCode.SingleNullable:
                         case PrimitiveTypeCode.Double:
@@ -327,6 +329,23 @@ namespace indice.Edi
             if (!descriptor.Info.PropertyType.IsEnum()) {
                 var integer = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsInt32(valueInfo.Path, reader.Culture) :
                                                             read ? reader.ReadAsInt32() : (int?)reader.Value;
+                if (integer.HasValue) {
+                    descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
+                }
+            } else {
+                var enumValueString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
+                                                                    read ? reader.ReadAsString() : (string)reader.Value;
+                if (!string.IsNullOrEmpty(enumValueString)) {
+                    descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(enumValueString, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
+                }
+            }
+        }
+        internal static void PopulateInt64Value(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+            var cache = structure.CachedReads;
+            var valueInfo = descriptor.ValueInfo;
+            if (!descriptor.Info.PropertyType.IsEnum()) {
+                var integer = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsInt64(valueInfo.Path, reader.Culture) :
+                                                            read ? reader.ReadAsInt64() : (int?)reader.Value;
                 if (integer.HasValue) {
                     descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
                 }

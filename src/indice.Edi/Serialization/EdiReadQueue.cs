@@ -43,6 +43,21 @@ namespace indice.Edi.Serialization
             return integer;
         }
 
+        public static long? ReadAsInt64(this Queue<EdiEntry> queue, string path, CultureInfo culture = null) {
+            var text = ReadAsString(queue, path);
+            if (text != null) {
+                text = text.TrimStart('Z'); // Z suppresses leading zeros
+            }
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            var integer = default(long);
+            if (!long.TryParse(text, NumberStyles.Integer, culture ?? CultureInfo.InvariantCulture, out integer)) {
+                throw new EdiException("Cannot parse int from string '{0}'. Path {1}".FormatWith(culture, text, path));
+            }
+            return integer;
+        }
+
         public static decimal? ReadAsDecimal(this Queue<EdiEntry> queue, string path, Picture? picture, char? decimalMark) {
             var text = ReadAsString(queue, path);
             if (string.IsNullOrEmpty(text))

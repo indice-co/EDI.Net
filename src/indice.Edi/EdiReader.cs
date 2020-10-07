@@ -350,6 +350,12 @@ namespace indice.Edi
         public abstract int? ReadAsInt32();
 
         /// <summary>
+        /// Reads the next EDI token from the stream as a <see cref="Nullable{Int64}"/>.
+        /// </summary>
+        /// <returns>A <see cref="Nullable{Int64}"/>. This method will return <c>null</c> at the end of an array.</returns>
+        public abstract long? ReadAsInt64();
+
+        /// <summary>
         /// Reads the next EDI token from the stream as a <see cref="String"/>.
         /// </summary>
         /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>
@@ -430,6 +436,35 @@ namespace indice.Edi
                 throw EdiReaderException.Create(this, "Could not convert string to integer: {0}.".FormatWith(CultureInfo.InvariantCulture, Value));
             }
             throw EdiReaderException.Create(this, "Error reading integer. Unexpected token: {0}.".FormatWith(CultureInfo.InvariantCulture, TokenType));
+        }
+
+        internal long? ReadAsInt64Internal() {
+            EdiToken t;
+            if (!ReadInternal()) {
+                SetToken(EdiToken.None);
+                return null;
+            } else {
+                t = TokenType;
+            }
+            if (t == EdiToken.Null)
+                return null;
+            long i;
+            if (t == EdiToken.String) {
+                string s = (string)Value;
+                if (s != null) {
+                    s = s.TrimStart('Z'); // Z suppresses leading zeros
+                }
+                if (string.IsNullOrEmpty(s)) {
+                    SetToken(EdiToken.Null);
+                    return null;
+                }
+                if (long.TryParse(s, NumberStyles.Integer, Culture, out i)) {
+                    SetToken(EdiToken.Integer, i, false);
+                    return i;
+                }
+                throw EdiReaderException.Create(this, "Could not convert string to Int64: {0}.".FormatWith(CultureInfo.InvariantCulture, Value));
+            }
+            throw EdiReaderException.Create(this, "Error reading Int64. Unexpected token: {0}.".FormatWith(CultureInfo.InvariantCulture, TokenType));
         }
 
         internal string ReadAsStringInternal() {
