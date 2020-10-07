@@ -8,6 +8,7 @@ namespace indice.Edi
     /// </summary>
     public struct EdiPathFragment : IComparable, IEquatable<EdiPathFragment>
     {
+        private static Regex _RangePattern = new Regex(@"^(\d+|\*)\.\.(\d+|\*)$");
         private readonly string _Value;
 
         /// <summary>
@@ -43,12 +44,62 @@ namespace indice.Edi
         }
 
         /// <summary>
+        /// Converts the value to a zero based index.
+        /// </summary>
+        public int Min {
+            get {
+                if (!IsRange) return Index;
+                if ("*..*".Equals(Value))
+                    throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to range. Use * instead", Value));
+                var min = _RangePattern.Match(Value).Groups[1].Value;
+                if ("*".Equals(min)) {
+                    return 0;
+                }
+                var index = 0;
+                if (int.TryParse(min, out index)) {
+                    return index;
+                }
+                throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to range. Minimum must be the * or a positive integer", Value));
+            }
+        }
+
+        /// <summary>
+        /// Converts the value to a zero based index.
+        /// </summary>
+        public int Max {
+            get {
+                if (!IsRange) return Index; 
+                if ("*..*".Equals(Value))
+                    throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to range. Use * instead", Value));
+                var max = _RangePattern.Match(Value).Groups[2].Value;
+                if ("*".Equals(max)) {
+                    return int.MaxValue;
+                }
+                var index = 0;
+                if (int.TryParse(max, out index)) {
+                    return index;
+                }
+                throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to range. Maximum must be the * or a positive integer", Value));
+            }
+        }
+
+        /// <summary>
         /// If the <see cref="IsWildcard"/> is true then the current path fragment can hold any type of value.
         /// This means any type of name in case of the segment name fragment OR any positive <see cref="int"/> for the element and component indices.
         /// </summary>
         public bool IsWildcard {
             get {
                 return "*".Equals(Value);
+            }
+        }
+
+        /// <summary>
+        /// If the <see cref="IsRange"/> is true then the current path fragment can hold a range of possible indexes.
+        /// This means any type of name in case of the segment name fragment OR any positive <see cref="int"/> for the element and component indices.
+        /// </summary>
+        public bool IsRange {
+            get {
+                return Value?.Contains("..") == true;
             }
         }
 
@@ -104,7 +155,15 @@ namespace indice.Edi
         /// <param name="other">The object to check equality with</param>
         /// <returns></returns>
         public bool Equals(EdiPathFragment other) {
-            return IsWildcard || other.IsWildcard || (HasIndex && Index.Equals(other.Index)) || Value.Equals(other.Value);
+            bool eq = IsWildcard || other.IsWildcard || (HasIndex && Index.Equals(other.Index)) || Value.Equals(other.Value);
+
+            if (!eq && (IsRange || other.HasIndex)) {
+                return Min <= other.Index && Max >= other.Index;
+            }
+            else if (!eq && (HasIndex || other.IsRange)) {
+                return other.Min <= Index && other.Max >= Index;
+            }
+            return eq;
         }
 
         /// <summary>

@@ -1007,5 +1007,20 @@ namespace indice.Edi.Tests
             Assert.NotNull(interchange);
             Assert.Equal("XYZCOMPANY AVAILABILITY", interchange.AvailabilityRequest.Description[0].Text);
         }
+
+
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#170")]
+        public void EdiFact_ElementList_PathAnnotation_ShouldWork_OnClass() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(EdiFact_Issue170_ElementList);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue170.ElementList.edi")) {
+                interchange = new EdiSerializer().Deserialize<EdiFact_Issue170_ElementList>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(3, interchange.Msg.InteractiveFreeTexts.Count);
+            Assert.Equal(3, interchange.Msg.InteractiveFreeTexts[2].Texts.Count);
+            Assert.Equal("This is the first", interchange.Msg.InteractiveFreeTexts[0].ToString());
+            Assert.Equal("And this is the seccond", interchange.Msg.InteractiveFreeTexts[1].ToString());
+            Assert.Equal("while this should come third", interchange.Msg.InteractiveFreeTexts[2].ToString());
+        }
     }
 }
