@@ -430,10 +430,9 @@ namespace indice.Edi
                             var canAdvance = FindForCurrentSegment(reader, level, EdiStructureType.SegmentGroup) != null;
                             if (canAdvance) {
                                 break;
-                            } else { 
-                                level.Close(); // Close this level
-                                index = level.Index + 1;
-                            }
+                            } 
+                            level.Close(); // Close this level
+                            index = level.Index + 1;
                             continue;
                         }
                     } else if (sequenceEnd.HasValue && sequenceEnd.Value.Segment.Equals(readerSegment)) {
