@@ -130,7 +130,12 @@ namespace indice.Edi.Serialization
         }
 
         public EdiStructure(EdiStructureType structureType, EdiStructure parent, EdiPropertyDescriptor property, object instance)
-            : this(structureType, parent, property, instance, 0, new Queue<EdiEntry>()) {
+            : this(structureType, 
+                   parent, 
+                   property, 
+                   instance, 
+                   (structureType == EdiStructureType.Element && property.PathInfo.PathInternal.Element.HasIndex) ? property.PathInfo.PathInternal.Element.Index : 0, 
+                   new Queue<EdiEntry>()) {
         }
 
         public EdiStructure(EdiStructureType structureType, EdiStructure parent, EdiPropertyDescriptor property, object instance, int index, Queue<EdiEntry> cache) {

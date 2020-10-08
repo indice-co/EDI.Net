@@ -340,6 +340,7 @@ namespace indice.Edi
                 }
             }
         }
+        
         internal static void PopulateInt64Value(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
             var cache = structure.CachedReads;
             var valueInfo = descriptor.ValueInfo;
