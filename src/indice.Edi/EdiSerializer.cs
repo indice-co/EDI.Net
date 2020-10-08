@@ -811,6 +811,10 @@ namespace indice.Edi
                         } else {
                             itemType = property.Info.PropertyType.GetGenericArguments().First();
                         }
+                        int range_offset = 0;
+                        if (container == EdiStructureType.Element && property.PathInfo.PathInternal.Element.IsRange) {
+                            range_offset = property.PathInfo.PathInternal.Element.Min;
+                        }
                         for (var i = 0; i < collection.Count; i++) {
                             var item = collection[i];
                             if (stack.Count == 0) {
@@ -819,7 +823,7 @@ namespace indice.Edi
                             while (stack.Peek().StructureType >= container) {
                                 var previous = stack.Pop();
                             }
-                            stack.Push(new EdiStructure(container, stack.Peek(), property, item, i, null));
+                            stack.Push(new EdiStructure(container, stack.Peek(), property, item, range_offset + i, null));
                             SerializeStructure(writer, stack, structuralComparer);
                         }
                     } else {
