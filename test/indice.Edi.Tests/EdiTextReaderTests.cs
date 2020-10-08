@@ -1022,5 +1022,34 @@ namespace indice.Edi.Tests
             Assert.Equal("And this is the seccond", interchange.Msg.InteractiveFreeTexts[1].ToString());
             Assert.Equal("while this should come third", interchange.Msg.InteractiveFreeTexts[2].ToString());
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "X12")]
+        [Trait(Traits.Issue, "#172")]
+        public void X12_SegmentGroups_Nesting_SameSegment_MultipleLevels() {
+            var grammar = EdiGrammar.NewX12();
+
+            var interchange = default(Interchange_Issue172);
+            using (var stream = Helpers.GetResourceStream("x12.Issue172.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue172>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(1, interchange.Msg.HighLevelNames.Count);
+            Assert.Equal("NAME 1", interchange.Msg.HighLevelNames[0].Name);
+            Assert.Equal("ADDITIONAL NAME 1", interchange.Msg.HighLevelNames[0].OtherName.OtherName);
+
+            Assert.NotNull(interchange.Msg.HighLevelNames[0].MidLevelNames);
+            Assert.Equal(2, interchange.Msg.HighLevelNames[0].MidLevelNames.Count);
+            Assert.Equal("NAME 2", interchange.Msg.HighLevelNames[0].MidLevelNames[0].Name);
+            Assert.Equal("ADDITIONAL NAME 2", interchange.Msg.HighLevelNames[0].MidLevelNames[0].OtherName.OtherName);
+
+            Assert.NotNull(interchange.Msg.HighLevelNames[0].MidLevelNames[0].LowLevelNames);
+            Assert.Equal(1, interchange.Msg.HighLevelNames[0].MidLevelNames[0].LowLevelNames.Count);
+            Assert.Equal("NAME 3", interchange.Msg.HighLevelNames[0].MidLevelNames[0].LowLevelNames[0].Name);
+            Assert.Equal("ADDITIONAL NAME 3", interchange.Msg.HighLevelNames[0].MidLevelNames[0].LowLevelNames[0].OtherName.OtherName);
+            
+            Assert.Equal("NAME 4", interchange.Msg.HighLevelNames[0].MidLevelNames[1].Name);
+            Assert.Equal("ADDITIONAL NAME 4", interchange.Msg.HighLevelNames[0].MidLevelNames[1].OtherName.OtherName);
+        }
+
     }
 }
