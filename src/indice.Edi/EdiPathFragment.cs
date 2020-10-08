@@ -48,7 +48,7 @@ namespace indice.Edi
         /// </summary>
         public int Min {
             get {
-                if (!IsRange) return Index;
+                if (!IsRange) return HasIndex ? Index : 0;
                 if ("*..*".Equals(Value))
                     throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to range. Use * instead", Value));
                 var min = _RangePattern.Match(Value).Groups[1].Value;
@@ -68,7 +68,7 @@ namespace indice.Edi
         /// </summary>
         public int Max {
             get {
-                if (!IsRange) return Index; 
+                if (!IsRange) return HasIndex ? Index : 0; 
                 if ("*..*".Equals(Value))
                     throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to range. Use * instead", Value));
                 var max = _RangePattern.Match(Value).Groups[2].Value;

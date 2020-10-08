@@ -422,12 +422,18 @@ namespace indice.Edi
                     var groupStart = level.GroupStart;
                     var sequenceEnd = level.SequenceEnd;
                     if (groupStart.Segment.Equals(readerSegment)) {
-
-                        if (PositionMatchesStructure(reader, level, readerSegment as string) ||  // if new occurance of my level or sibling found
-                            FindForCurrentSegment(reader, level, EdiStructureType.SegmentGroup) == null) { // if cannot advance either.
-
+                        if (PositionMatchesStructure(reader, level, readerSegment as string)) { // if new occurance of my level or sibling found
                             level.Close(); // Close this level
                             index = level.Index + 1;
+                            continue;
+                        } else {
+                            var canAdvance = FindForCurrentSegment(reader, level, EdiStructureType.SegmentGroup) != null;
+                            if (canAdvance) {
+                                break;
+                            } else { 
+                                level.Close(); // Close this level
+                                index = level.Index + 1;
+                            }
                             continue;
                         }
                     } else if (sequenceEnd.HasValue && sequenceEnd.Value.Segment.Equals(readerSegment)) {
@@ -614,6 +620,8 @@ namespace indice.Edi
             if (matchingProperties == null || matchingProperties.Length == 0)
                 return false;
             foreach (var prop in matchingProperties) {
+                if (!prop.MarksSegmentGroup)
+                    continue;
                 // if there is simply a matching sibling with no conditions return ok.
                 if (prop.Conditions == null)
                     return true;
