@@ -328,5 +328,93 @@ namespace indice.Edi.Tests
             Assert.Equal("D", interchange.Message.UNS1);
         }
 
+        [Fact(Skip = "Work in progress"), Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#168")]
+        public void Serialize_MSG_Issue_168() {
+            var eightFifty = new PurchaseOrder_850();
+
+            var order = new PurchaseOrder_850.Order();
+            eightFifty.Groups = new List<PurchaseOrder_850.FunctionalGroup>();
+            var group = new PurchaseOrder_850.FunctionalGroup();
+            group.Orders = new List<PurchaseOrder_850.Order>();
+            var order1 = new PurchaseOrder_850.Order();
+            order1.Items = new List<PurchaseOrder_850.OrderDetail>();
+            group.Orders.Add(order1);
+
+            eightFifty.Groups.Add(group);
+            eightFifty.Groups[0].Orders.Add(order);
+
+            int orderIndex = eightFifty.Groups[0].Orders.Count - 1;
+
+            eightFifty.Groups[0].FunctionalIdentifierCode = "PO";
+            eightFifty.Groups[0].ApplicationSenderCode = "test";
+            eightFifty.Groups[0].ApplicationReceiverCode = "test";
+            eightFifty.Groups[0].Date = DateTime.Now;
+            eightFifty.Groups[0].GroupControlNumber = 1000 + 1000;
+            eightFifty.Groups[0].GroupTrailerControlNumber = eightFifty.Groups[0].GroupControlNumber;
+            eightFifty.Groups[0].AgencyCode = "X";
+            eightFifty.Groups[0].Version = "test";
+
+            var detail = new PurchaseOrder_850.OrderDetail();
+            detail.OrderLineNumber = "001";
+            detail.QuantityOrdered = 1;
+            detail.UnitPrice = 10;
+
+            var msg1 = new PurchaseOrder_850.MSG();
+            msg1.MessageText = "aaa1";
+            var msg2 = new PurchaseOrder_850.MSG();
+            msg2.MessageText = "bbb2";
+            var msg3 = new PurchaseOrder_850.MSG();
+            msg3.MessageText = "ccc3";
+
+            detail.MSG = new List<PurchaseOrder_850.MSG>();
+            detail.MSG.Add(msg1);
+            detail.MSG.Add(msg2);
+            detail.MSG.Add(msg3);
+
+            eightFifty.Groups[0].Orders[0].Items.Add(detail);
+
+            var grammar = EdiGrammar.NewX12();
+
+            var expected = new StringBuilder()
+            .AppendLine("ISA*00********010101*0000**00000*000000000~")
+            .AppendLine("GS*PO*test*test*20201008*2256*000002000*X*test~")
+            .AppendLine("ST*~")
+            .AppendLine("BEG*~")
+            .AppendLine("CUR*~")
+            .AppendLine("REF*~")
+            .AppendLine("FOB*~")
+            .AppendLine("ITD*~")
+            .AppendLine("TD5*~")
+            .AppendLine("MSG*~")
+            .AppendLine("PO1*001*1**10~")
+            .AppendLine("PID*~")
+            .AppendLine("MEA***0~")
+            .AppendLine("TC2*~")
+            .AppendLine("MSG*aaa1~")
+            .AppendLine("MSG*bbb2~")
+            .AppendLine("MSG*ccc3~")
+            .AppendLine("AMT*~")
+            .AppendLine("SE*0~")
+            .AppendLine("ST*~")
+            .AppendLine("BEG*~")
+            .AppendLine("CUR*~")
+            .AppendLine("REF*~")
+            .AppendLine("FOB*~")
+            .AppendLine("ITD*~")
+            .AppendLine("TD5*~")
+            .AppendLine("MSG*~")
+            .AppendLine("AMT*~")
+            .AppendLine("SE*0~")
+            .AppendLine("GE*0*000002000~")
+            .AppendLine("IEA*0*000000000~").ToString();
+            string output = null;
+            using (var writer = new StringWriter()) {
+                new EdiSerializer().Serialize(writer, grammar, eightFifty);
+                output = writer.ToString();
+            }
+
+            Assert.Equal(expected, output);
+        }
+
     }
 }

@@ -216,9 +216,9 @@ namespace indice.Edi.Tests.Models
             [EdiCondition("038", Path = "DTM/0/0")]
             public DTM ShipNoLaterDate { get; set; }
 
-
             [EdiValue(Path = "TC2/0", Description = "TC201 - Measurement Value")]
             public string TC201 { get; set; }
+
             public List<MSG> MSG { get; set; }
 
         }
@@ -255,7 +255,7 @@ namespace indice.Edi.Tests.Models
             public DateTime Date { get; set; }
         }
 
-        [EdiElement, EdiPath("MSG/0")]
+        [EdiSegment, EdiPath("MSG")]
         public class MSG
         {
 
