@@ -1023,7 +1023,7 @@ namespace indice.Edi.Tests
             Assert.Equal("while this should come third", interchange.Msg.InteractiveFreeTexts[2].ToString());
         }
 
-        [Fact]
+        [Fact(Skip = "Not supported")]
         [Trait(Traits.Tag, "X12")]
         [Trait(Traits.Issue, "#172")]
         public void X12_SegmentGroups_Nesting_SameSegment_MultipleLevels() {
