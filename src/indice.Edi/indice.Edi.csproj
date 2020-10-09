@@ -28,7 +28,7 @@
       - Added new path fragment notation for ranges. This allows for element ranges inside of a segment to be mapped to one structure while others to be mapped to  #170.
       - Bug fix related to nested segment group structures with the same segment name  #172.
       - Bug fix for Wildcard paths working only for collections #170.
-      - Fix for segment collection serialization. When some collection items where being serialized as elements istead #168.
+      - Fix for segment collection serialization. When some collection items where being serialized as elements instead #168.
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
