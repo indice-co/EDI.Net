@@ -778,7 +778,7 @@ namespace indice.Edi
                         propertyPath = new EdiPath(propertyPath.Segment, new EdiPathFragment(structure.Index.ToString()), propertyPath.Component);
                     }
                     if (path.Segment != propertyPath.Segment ||
-                        structuralComparer.Compare(path, propertyPath) > 0) {
+                        structuralComparer.Compare(path, propertyPath) >= 0) {
                         writer.WriteSegmentName(propertyPath.Segment);
                         path = (EdiPath)writer.Path;
                     }

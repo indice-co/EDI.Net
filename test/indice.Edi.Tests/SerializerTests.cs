@@ -328,7 +328,7 @@ namespace indice.Edi.Tests
             Assert.Equal("D", interchange.Message.UNS1);
         }
 
-        [Fact(Skip = "Work in progress"), Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#168")]
+        [Fact, Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#168")]
         public void Serialize_MSG_Issue_168() {
             var eightFifty = new PurchaseOrder_850();
 
@@ -348,7 +348,7 @@ namespace indice.Edi.Tests
             eightFifty.Groups[0].FunctionalIdentifierCode = "PO";
             eightFifty.Groups[0].ApplicationSenderCode = "test";
             eightFifty.Groups[0].ApplicationReceiverCode = "test";
-            eightFifty.Groups[0].Date = DateTime.Now;
+            eightFifty.Groups[0].Date = new DateTime(2020, 10, 08, 22, 56, 00);
             eightFifty.Groups[0].GroupControlNumber = 1000 + 1000;
             eightFifty.Groups[0].GroupTrailerControlNumber = eightFifty.Groups[0].GroupControlNumber;
             eightFifty.Groups[0].AgencyCode = "X";
