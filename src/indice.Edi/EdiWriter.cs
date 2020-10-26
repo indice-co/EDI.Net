@@ -180,6 +180,15 @@ namespace indice.Edi
         }
 
         /// <summary>
+        /// The number of segments inside the transmition
+        /// </summary>
+        public int SegmentCount {
+            get {
+                return (_stack?.Count > 0 ? _stack[0].Position : _currentPosition.Position) + 1;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the culture used when writing Edi. Defaults to <see cref="CultureInfo.InvariantCulture"/>.
         /// </summary>
         public CultureInfo Culture {
@@ -219,7 +228,7 @@ namespace indice.Edi
                     _stack = new List<EdiPosition>();
                 }
                 if (_currentPosition.Type == value && _currentPosition.HasIndex) {
-                    _currentPosition.Position++;
+                    _currentPosition.Advance(Grammar);
                     return;
                 } else {
                     _stack.Add(_currentPosition);

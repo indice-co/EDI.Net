@@ -11,6 +11,9 @@ namespace indice.Edi
 
         internal EdiContainerType Type;
         internal int Position;
+        internal int FunctionalGroupCount;
+        internal int MessageCount;
+        internal int SegmentCount;
         internal string SegmentName;
         internal bool HasIndex;
 
@@ -18,6 +21,9 @@ namespace indice.Edi
             Type = type;
             HasIndex = TypeHasIndex(type);
             Position = -1;
+            FunctionalGroupCount = 0;
+            MessageCount = 0;
+            SegmentCount = 0;
             SegmentName = null;
         }
 
@@ -80,6 +86,21 @@ namespace indice.Edi
                 case EdiContainerType.Element:
                 case EdiContainerType.Component:
                 default: return $"{Type}" + (Position > -1 ? $"[{Position}]" : string.Empty);
+            }
+        }
+
+        internal void Advance(IEdiGrammar grammar) {
+            Position++;
+            if (Type == EdiContainerType.Segment) {
+                if (SegmentName == grammar.FunctionalGroupHeaderTag) {
+                    FunctionalGroupCount++;
+                    MessageCount = 0;
+                    SegmentCount = 0;
+                } else if (SegmentName == grammar.MessageHeaderTag) {
+                    MessageCount++;
+                    SegmentCount = 0;
+                }
+                SegmentCount++;
             }
         }
     }

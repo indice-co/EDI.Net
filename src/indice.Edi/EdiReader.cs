@@ -102,6 +102,15 @@ namespace indice.Edi
         public bool SuppressBadEscapeSequenceErrors { get; set; }
 
         /// <summary>
+        /// The number of segments inside the transmition
+        /// </summary>
+        public int SegmentCount {
+            get {
+                return (_stack?.Count > 0 ? _stack[0].Position : _currentPosition.Position) + 1;
+            }
+        }
+
+        /// <summary>
         /// Gets the current reader state.
         /// </summary>
         /// <value>The current reader state.</value>
