@@ -1051,5 +1051,14 @@ namespace indice.Edi.Tests
             Assert.Equal("ADDITIONAL NAME 4", interchange.Msg.HighLevelNames[0].MidLevelNames[1].OtherName.OtherName);
         }
 
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#174")]
+        public void EdiFact_Issue174() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(Interchange_Issue174);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue174.edi")) {
+                interchange = new EdiSerializer().Deserialize<Interchange_Issue174>(new StreamReader(stream), grammar);
+            }
+            Assert.Equal(3, interchange.Msg.VehicleRecord.GIR_List.Count);
+        }
     }
 }
