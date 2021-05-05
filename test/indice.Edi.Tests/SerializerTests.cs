@@ -416,5 +416,29 @@ namespace indice.Edi.Tests
             Assert.Equal(expected, output);
         }
 
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#190")]
+        public void Serialize_RangeError_Issue190() {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            var ok = new EdiFact_Issue190.TIF
+            {
+                Names = new List<EdiFact_Issue190.GivenName> {"Hello", "World"}
+            };
+            var okResult = Serialize(ok);
+            Assert.Equal("UNA:+.? '\nTIF++Hello+World'\n", okResult);
+
+            var bad = new EdiFact_Issue190.BUGGEDTIF {
+                Category = "ADT",
+                Names = new List<EdiFact_Issue190.GivenName> {"Hello", "World"}
+            };
+            var badResult = Serialize(bad);
+            Assert.Equal("UNA:+.? '\nTIF+ADT+Hello+World'\n", badResult);
+            
+            string Serialize<T>(T data) {
+                using var writer = new StringWriter();
+                new EdiSerializer().Serialize(writer, grammar, data);
+                return writer.ToString();
+            }
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace indice.Edi
                 if (int.TryParse(Value, out index)) {
                     return index;
                 }
-                throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to an Index. Must be a positive indeger", Value));
+                throw new InvalidCastException(string.Format("Cannot convert the fragment value \"{0}\" to an Index. Must be a positive integer", Value));
             }
         }
 
