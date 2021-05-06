@@ -425,14 +425,16 @@ namespace indice.Edi.Tests
                 Names = new List<EdiFact_Issue190.GivenName> {"Hello", "World"}
             };
             var okResult = Serialize(ok);
-            Assert.Equal("UNA:+.? '\nTIF++Hello+World'\n", okResult);
+            var okExpected = new StringBuilder().AppendLine("UNA:+.? '").AppendLine("TIF++Hello+World'").ToString();
+            Assert.Equal(okExpected, okResult);
 
             var bad = new EdiFact_Issue190.BUGGEDTIF {
                 Category = "ADT",
                 Names = new List<EdiFact_Issue190.GivenName> {"Hello", "World"}
             };
             var badResult = Serialize(bad);
-            Assert.Equal("UNA:+.? '\nTIF+ADT+Hello+World'\n", badResult);
+            var badExpected = new StringBuilder().AppendLine("UNA:+.? '").AppendLine("TIF+ADT+Hello+World'").ToString();
+            Assert.Equal(badExpected, badResult);
             
             string Serialize<T>(T data) {
                 using var writer = new StringWriter();
