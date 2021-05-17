@@ -155,7 +155,7 @@ namespace indice.Edi
         /// <param name="other">The object to check equality with</param>
         /// <returns></returns>
         public bool Equals(EdiPathFragment other) {
-            bool eq = IsWildcard || other.IsWildcard || (HasIndex && Index.Equals(other.Index)) || Value.Equals(other.Value);
+            bool eq = IsWildcard || other.IsWildcard || (HasIndex && other.HasIndex && Index.Equals(other.Index)) || Value.Equals(other.Value);
 
             if (!eq && (IsRange || other.HasIndex)) {
                 return Min <= other.Index && Max >= other.Index;
@@ -185,6 +185,14 @@ namespace indice.Edi
                     return 0;
                 } else if (other.HasIndex && HasIndex) {
                     return Index.CompareTo(other.Index);
+                } else if (other.HasIndex && IsRange) {
+                    return Max < other.Index ? -1 :
+                           Min > other.Index ? 1 :
+                           0;
+                } else if (other.IsRange && HasIndex) {
+                    return Index < other.Min ? -1 :
+                           Index > other.Max ? 1 :
+                           0;
                 } else {
                     return string.Compare(Value, other.Value, StringComparison.OrdinalIgnoreCase);
                 }

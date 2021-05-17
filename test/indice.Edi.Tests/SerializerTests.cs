@@ -433,7 +433,7 @@ namespace indice.Edi.Tests
                 Names = new List<EdiFact_Issue190.GivenName> {"Hello", "World"}
             };
             var badResult = Serialize(bad);
-            var badExpected = new StringBuilder().AppendLine("UNA:+.? '").AppendLine("TIF+ADT+Hello+World'").ToString();
+            var badExpected = new StringBuilder().AppendLine("UNA:+.? '").AppendLine("TIF+:ADT+Hello+World'").ToString();
             Assert.Equal(badExpected, badResult);
             
             string Serialize<T>(T data) {
