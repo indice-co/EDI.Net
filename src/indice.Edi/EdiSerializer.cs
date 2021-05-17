@@ -662,7 +662,7 @@ namespace indice.Edi
                             reader.Read();
                             cache.Enqueue(new EdiEntry(reader.Path, reader.TokenType, reader.Value as string));
                         }
-                    } while (!found || reader.TokenType != EdiToken.SegmentStart);
+                    } while (!found && reader.TokenType != EdiToken.SegmentStart);
 
                 if (found) {
                     searchResults[path] = value;

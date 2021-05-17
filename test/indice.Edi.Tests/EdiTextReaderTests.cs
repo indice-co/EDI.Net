@@ -1061,22 +1061,19 @@ namespace indice.Edi.Tests
             Assert.Equal(3, interchange.Msg.VehicleRecord.GIR_List.Count);
         }
 
-        [Fact(Skip = "This test will eat all your memory. Change the Path on the two EdiCondition attributes to UNH/1/0, and it works.")]
+        [Fact]
         [Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#188")]
-        public void EdiFact_Issue188() {
+        public void EdiFact_MissingPath_On_Condition_Doesnot_enter_InfiniteLoop_Issue188() {
             var grammar = EdiGrammar.NewEdiFact();
             var interchange = default(Models.Interchange_Issue188);
             using (var stream = Helpers.GetResourceStream("edifact.Issue188.edi")) {
                 interchange = new EdiSerializer().Deserialize<Interchange_Issue188>(new StreamReader(stream), grammar);
             }
+            // This test originally would eat all your memory.
+            // There is a misconfiguration made in order to trigger the bug that makes the SearchForward function to enter into an infinite loop.
+            // The correct configuration to change the Path on the two EdiCondition attributes to UNH/1/0, and it works.
 
-            Assert.Equal(2, interchange.IftminMessages.Count);
-            Assert.Equal("20210319", interchange.IftminMessages[0].DTMs[0].Value);
-            Assert.Equal("20210320", interchange.IftminMessages[1].DTMs[0].Value);
-
-            Assert.Equal(2, interchange.InvoiceMessages.Count);
-            Assert.Equal("20210322", interchange.InvoiceMessages[0].DTMs[0].Value);
-            Assert.Equal("20210323", interchange.InvoiceMessages[1].DTMs[0].Value);
+            Assert.Equal(0, interchange.IftminMessages.Count);
         }
     }
 }
