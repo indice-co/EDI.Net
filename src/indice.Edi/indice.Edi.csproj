@@ -3,10 +3,10 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.9.18</VersionPrefix>
+    <VersionPrefix>1.10.0</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
-    <TargetFrameworks>net40;net45;netstandard1.0;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net451;netstandard1.0;netstandard1.3;netstandard2.0;net60</TargetFrameworks>
     <AssemblyName>indice.Edi</AssemblyName>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -45,7 +45,7 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
     <DefineConstants>$(DefineConstants);NET45</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40'">
