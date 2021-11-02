@@ -6,7 +6,7 @@ before_build:
 - cmd: >-
     Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1'-OutFile 'dotnet-install.ps1';
 
-    install.ps1 -Channel 6.0.1xx -Quality preview -InstallDir '~/.dotnet';
+    ./dotnet-install.ps1 -Channel 6.0.1xx -Quality preview -InstallDir '~/.dotnet';
 
     dotnet restore
 build:
