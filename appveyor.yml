@@ -1,14 +1,12 @@
 version: 1.10.0.{build}
 image: Visual Studio 2019
+install:
+  - pwsh: Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
+  - pwsh: ./dotnet-install.ps1  -Channel 6.0.1xx -Quality preview -JsonFile global.json
 configuration: Release
 platform: Any CPU
 before_build:
 - pwsh: >-
-    Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1'-OutFile 'dotnet-install.ps1';
-
-    ./dotnet-install.ps1 -Channel 6.0.1xx -Quality preview -InstallDir '~/.dotnet';
-
     dotnet restore
 build:
-  publish_core_console: true
   verbosity: minimal
