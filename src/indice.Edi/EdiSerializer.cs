@@ -406,7 +406,7 @@ namespace indice.Edi
                 return false;
 
             // clear once upon segment start. This is done here in order to keep any findings for future use
-            if (newContainer == EdiStructureType.SegmentGroup || newContainer == EdiStructureType.Segment) {
+            if ((newContainer == EdiStructureType.SegmentGroup || newContainer == EdiStructureType.Segment) && reader.TokenType == EdiToken.SegmentName) {
                 stack.Peek().CachedReads.Clear();
             }
 

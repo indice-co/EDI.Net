@@ -1090,5 +1090,28 @@ namespace indice.Edi.Tests
             Assert.Equal(5, interchange.EDIFACT_INVOICS4.SG6.Count);
             Assert.Equal(1, interchange.EDIFACT_INVOICS4.UNS.SG52.Count);
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "EDIFact"), Trait(Traits.Bug, "#196")]
+        public void EdiFact_SameSegment_With_Condition_Issue196() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(Models.EdiFact_Issue196_delfor);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue196.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.EdiFact_Issue196_delfor>(new StreamReader(stream), grammar);
+            }
+            // Failing to deserialize when segments and segment group begin with the same segment and use condition.
+
+            Assert.NotNull(interchange.Messages);
+            Assert.Single(interchange.Messages);
+            Assert.NotNull(interchange.Messages[0].BuyerData);
+            Assert.Equal("BY", interchange.Messages[0].BuyerData.PartyQualifier);
+            Assert.NotNull(interchange.Messages[0].InvoicePartyData);
+            Assert.Equal("IV", interchange.Messages[0].InvoicePartyData.PartyQualifier);
+            Assert.NotNull(interchange.Messages[0].SellerData);
+            Assert.Equal("SE", interchange.Messages[0].SellerData.PartyQualifier);
+            Assert.Single(interchange.Messages[0].Details);
+            Assert.Equal("CN", interchange.Messages[0].Details[0].PartyQualifier);
+        }
+
     }
 }

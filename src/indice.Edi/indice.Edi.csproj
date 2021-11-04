@@ -31,6 +31,7 @@
       - Fix for segment collection serialization. When some collection items where being serialized as elements instead #168.
       - Fix missing path (non existing) on condition attirute should not enter infinite loop #188
       - Fix whith the EdiFragment IComparer implementation. When there is an index vs a range. #190
+      - Fix Failing to deserialize when segments and segment group begin with the same segment and use condition. #196
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
