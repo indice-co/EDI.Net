@@ -3,7 +3,7 @@
     <Description>Edi.Net Class Library</Description>
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
-    <VersionPrefix>1.10.0</VersionPrefix>
+    <VersionPrefix>1.10.1</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>net451;netstandard1.0;netstandard1.3;netstandard2.0;net60</TargetFrameworks>
@@ -34,6 +34,7 @@
       - Fix Failing to deserialize when segments and segment group begin with the same segment and use condition. #196
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/indice-co/EDI.Net</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
@@ -69,6 +70,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\design\icon-256.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="..\..\README.md" Pack="true" Visible="false"  PackagePath=""/>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0' OR '$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="Microsoft.CSharp" Version="4.0.1" />

@@ -1,4 +1,4 @@
-# EDI.Net ![alt text](design/logo-64.png "Edi Net logo")
+# EDI.Net ![alt text](https://raw.githubusercontent.com/indice-co/EDI.Net/master/design/logo-64.png "Edi Net logo")
 
 [![Build status](https://ci.appveyor.com/api/projects/status/8tqewqqey5vim3ul?svg=true)](https://ci.appveyor.com/project/cleftheris/edi-net) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/indice.Edi.svg)](https://www.nuget.org/packages/indice.Edi/)
