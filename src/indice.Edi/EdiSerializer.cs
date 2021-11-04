@@ -18,6 +18,7 @@ namespace indice.Edi
         /// <summary>
         /// Gets or sets a value indicating whether segment groups should automatically end when a non-matching segment is found. 
         /// </summary>
+        [Obsolete("Please do not use it has sideffects. If you have a SegmentGroup issue try to explicitly declare the list of segments that take part in order for it to close normally.")]
         public bool AutoEndSegmentGroups { get; set; }
 
         /// <summary>
