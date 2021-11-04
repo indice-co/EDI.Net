@@ -1075,5 +1075,20 @@ namespace indice.Edi.Tests
 
             Assert.Equal(0, interchange.IftminMessages.Count);
         }
+
+        [Fact]
+        [Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#203")]
+        public void EdiFact_EdiCondition_how_to_Issue203() {
+            var grammar = EdiGrammar.NewEdiFact();
+            var interchange = default(Models.Edifact_Issue203);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue203.edi")) {
+                interchange = new EdiSerializer().Deserialize<Models.Edifact_Issue203>(new StreamReader(stream), grammar);
+            }
+            //I want to create condition to check if TAX is already behind UNS
+
+            Assert.NotNull(interchange.EDIFACT_INVOICS4);
+            Assert.Equal(5, interchange.EDIFACT_INVOICS4.SG6.Count);
+            Assert.Equal(1, interchange.EDIFACT_INVOICS4.UNS.SG52.Count);
+        }
     }
 }

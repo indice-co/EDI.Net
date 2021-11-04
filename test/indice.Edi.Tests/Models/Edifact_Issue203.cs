@@ -26,17 +26,11 @@ namespace indice.Edi.Tests.Models
 
             [JsonProperty("SG6")]
             [XmlElement(ElementName = "SG6")]
-            public List<SG6> SG6 { get; set; }
+            public List<TAX_Group> SG6 { get; set; }
 
             [JsonProperty("UNS")]
             [XmlElement(ElementName = "UNS")]
-            public UNS UNS { get; set; }
-
-
-            [JsonProperty("SG52")]
-            [XmlElement(ElementName = "SG52")]
-            public List<SG52> SG52 { get; set; }
-
+            public UNS_Group UNS { get; set; }
 
         }
 
@@ -366,26 +360,20 @@ namespace indice.Edi.Tests.Models
         #endregion
 
 
-        #region SG6
-        [EdiSegmentGroup("TAX", "MOA", SequenceEnd = "UNS")]
-        public class SG6 : SG6_TAX
+        [EdiSegmentGroup("TAX", "MOA")]
+        public class TAX_Group : TAX
         {
-            // [JsonProperty("TAX")]
-            // [XmlElement(ElementName = "TAX")]
-            //  public SG6_TAX SG6_TAX { get; set; }
-
             [JsonProperty("MOA")]
             [XmlElement(ElementName = "MOA")]
-            public SG6_MOA SG6_MOA { get; set; }
+            public MOA MOA { get; set; }
         }
 
-        #region SG6_TAX
 
         /// <summary>
         /// Duty/tax/fee details
         /// </summary>
         [EdiSegment, EdiPath("TAX")]
-        public class SG6_TAX
+        public class TAX
         {
             /// <summary>
             /// Duty or tax or fee function code qualifier
@@ -400,14 +388,14 @@ namespace indice.Edi.Tests.Models
             /// </summary>
             [JsonProperty("C241")]
             [XmlElement(ElementName = "C241")]
-            public SG6_C241 SG6_C241 { get; set; }
+            public C241 SG6_C241 { get; set; }
 
             /// <summary>
             /// DUTY/TAX/FEE ACCOUNT DETAIL
             /// </summary>
             [JsonProperty("C533")]
             [XmlElement(ElementName = "C533")]
-            public SG6_C533 SG6_C533 { get; set; }
+            public C533 C533 { get; set; }
 
             /// <summary>
             /// Duty or tax or fee assessment basis value
@@ -422,7 +410,7 @@ namespace indice.Edi.Tests.Models
             /// </summary>
             [JsonProperty("C243")]
             [XmlElement(ElementName = "C243")]
-            public SG6_C243 SG6_C243 { get; set; }
+            public C243 C243 { get; set; }
 
             /// <summary>
             /// Duty or tax or fee category code
@@ -453,7 +441,7 @@ namespace indice.Edi.Tests.Models
         /// DUTY/TAX/FEE TYPE
         /// </summary>
         [EdiElement, EdiPath("*/1")]
-        public class SG6_C241
+        public class C241
         {
             /// <summary>
             /// Duty or tax or fee type name code
@@ -492,7 +480,7 @@ namespace indice.Edi.Tests.Models
         /// DUTY/TAX/FEE ACCOUNT DETAIL
         /// </summary>
         [EdiElement, EdiPath("*/2")]
-        public class SG6_C533
+        public class C533
         {
             /// <summary>
             /// Duty or tax or fee account code
@@ -523,7 +511,7 @@ namespace indice.Edi.Tests.Models
         /// DUTY/TAX/FEE DETAIL
         /// </summary>
         [EdiElement, EdiPath("*/4")]
-        public class SG6_C243
+        public class C243
         {
             /// <summary>
             /// Duty or tax or fee rate code
@@ -582,25 +570,22 @@ namespace indice.Edi.Tests.Models
             public string x_3055_2 { get; set; }
         }
 
-        #endregion
-
-        #region SG6_MOA
         [EdiSegment, EdiPath("MOA")]
-        public class SG6_MOA
+        public class MOA
         {
             /// <summary>
             /// MONETARY AMOUNT
             /// </summary>
             [JsonProperty("C516")]
             [XmlElement(ElementName = "C516")]
-            public SG6_C516 SG6_C516 { get; set; }
+            public C516 C516 { get; set; }
         }
 
         /// <summary>
         /// MONETARY AMOUNT
         /// </summary>
         [EdiElement, EdiPath("*/0")]
-        public class SG6_C516
+        public class C516
         {
             /// <summary>
             /// Monetary amount type code qualifier
@@ -643,12 +628,6 @@ namespace indice.Edi.Tests.Models
             public string x_4405 { get; set; }
         }
 
-        #endregion
-
-        #endregion
-
-
-        #region UNS
         [EdiSegment, EdiPath("UNS")]
         public class UNS
         {
@@ -661,293 +640,14 @@ namespace indice.Edi.Tests.Models
             public string x_0081 { get; set; }
         }
 
-        #endregion
-
-        //TODO
-        #region SG52
-        [EdiSegmentGroup("TAX", "MOA", SequenceEnd = "UNT"), EdiCondition("all")]
-        public class SG52 : SG52_TAX
+        [EdiSegmentGroup("UNS", "CNT", "MOA", "RFF", "DTM","TAX","ALC")]
+        public class UNS_Group : UNS 
         {
-            //  [JsonProperty("TAX")]
-            //  [XmlElement(ElementName = "TAX")]
-            //  public SG52_TAX SG52_TAX { get; set; }
-
-            [JsonProperty("MOA")]
-            [XmlElement(ElementName = "MOA")]
-            public List<SG52_MOA> SG52_MOA { get; set; }
+            [JsonProperty("SG52")]
+            [XmlElement(ElementName = "SG52")]
+            public List<TAX_Group> SG52 { get; set; }
         }
 
-        #region SG52_TAX
-
-        /// <summary>
-        /// Duty/tax/fee details
-        /// </summary>
-        [EdiSegment, EdiPath("TAX")]
-        public class SG52_TAX
-        {
-            /// <summary>
-            /// Duty or tax or fee function code qualifier
-            /// </summary>
-            [JsonProperty("E5283")]
-            [XmlElement(ElementName = "E5283")]
-            [EdiValue("9(99)", Path = "*/0/0")]
-            public string x_5283 { get; set; }
-
-            /// <summary>
-            /// DUTY/TAX/FEE TYPE
-            /// </summary>
-            [JsonProperty("C241")]
-            [XmlElement(ElementName = "C241")]
-            public SG52_C241 SG52_C241 { get; set; }
-
-            /// <summary>
-            /// DUTY/TAX/FEE ACCOUNTDETAIL
-            /// </summary>
-            [JsonProperty("C533")]
-            [XmlElement(ElementName = "C533")]
-            public SG52_C533 SG52_C533 { get; set; }
-
-            /// <summary>
-            /// Duty or tax or fee assessment basis value
-            /// </summary>
-            [JsonProperty("E5286")]
-            [XmlElement(ElementName = "E5286")]
-            [EdiValue("9(99)", Path = "*/3/0")]
-            public string x_5286 { get; set; }
-
-            /// <summary>
-            /// DUTY/TAX/FEE DETAIL
-            /// </summary>
-            [JsonProperty("C243")]
-            [XmlElement(ElementName = "C243")]
-            public SG52_C243 SG52_C243 { get; set; }
-
-            /// <summary>
-            /// Duty or tax or fee category code
-            /// </summary>
-            [JsonProperty("E5305")]
-            [XmlElement(ElementName = "E5305")]
-            [EdiValue("9(99)", Path = "*/5/0")]
-            public string x_5305 { get; set; }
-
-            /// <summary>
-            /// Party tax identifier
-            /// </summary>
-            [JsonProperty("E3446")]
-            [XmlElement(ElementName = "E3446")]
-            [EdiValue("9(99)", Path = "*/6/0")]
-            public string x_3446 { get; set; }
-
-            /// <summary>
-            /// Calculation sequence code
-            /// </summary>
-            [JsonProperty("E1227")]
-            [XmlElement(ElementName = "E1227")]
-            [EdiValue("9(99)", Path = "*/7/0")]
-            public string x_1227 { get; set; }
-        }
-
-        /// <summary>
-        /// DUTY/TAX/FEE TYPE 
-        /// </summary>
-        [EdiElement, EdiPath("*/1")]
-        public class SG52_C241
-        {
-            /// <summary>
-            /// Duty or tax or fee type name code
-            /// </summary>
-            [JsonProperty("E5153")]
-            [XmlElement(ElementName = "E5153")]
-            [EdiValue("9(99)", Path = "*/*/0")]
-            public string x_5153 { get; set; }
-
-            /// <summary>
-            /// Code list identification code 
-            /// </summary>
-            [JsonProperty("E1131")]
-            [XmlElement(ElementName = "E1131")]
-            [EdiValue("9(99)", Path = "*/*/1")]
-            public string x_1131 { get; set; }
-
-            /// <summary>
-            ///Code list responsible agency code
-            /// </summary>
-            [JsonProperty("E3055")]
-            [XmlElement(ElementName = "E3055")]
-            [EdiValue("9(99)", Path = "*/*/2")]
-            public string x_3055 { get; set; }
-
-            /// <summary>
-            /// Duty or tax or fee type name 
-            /// </summary>
-            [JsonProperty("E5152")]
-            [XmlElement(ElementName = "E5152")]
-            [EdiValue("9(99)", Path = "*/*/3")]
-            public string x_5152 { get; set; }
-        }
-
-        /// <summary>
-        /// DUTY/TAX/FEE ACCOUNT DETAIL
-        /// </summary>
-        [EdiElement, EdiPath("*/2")]
-        public class SG52_C533
-        {
-            /// <summary>
-            /// Duty or tax or fee account code
-            /// </summary>
-            [JsonProperty("E5289")]
-            [XmlElement(ElementName = "E5289")]
-            [EdiValue("9(99)", Path = "*/*/0")]
-            public string x_5289 { get; set; }
-
-            /// <summary>
-            /// Code list identification code 
-            /// </summary>
-            [JsonProperty("E1131")]
-            [XmlElement(ElementName = "E1131")]
-            [EdiValue("9(99)", Path = "*/*/1")]
-            public string x_1131 { get; set; }
-
-            /// <summary>
-            ///Code list responsible agency code
-            /// </summary>
-            [JsonProperty("E3055")]
-            [XmlElement(ElementName = "E3055")]
-            [EdiValue("9(99)", Path = "*/*/2")]
-            public string x_3055 { get; set; }
-        }
-
-        /// <summary>
-        ///  DUTY/TAX/FEE DETAIL
-        /// </summary>
-        [EdiElement, EdiPath("*/4")]
-        public class SG52_C243
-        {
-            /// <summary>
-            /// Duty or tax or fee rate code 
-            /// </summary>
-            [JsonProperty("E5279")]
-            [XmlElement(ElementName = "E5279")]
-            [EdiValue("9(99)", Path = "*/*/0")]
-            public string x_5279 { get; set; }
-
-            /// <summary>
-            /// Code list identification code 
-            /// </summary>
-            [JsonProperty("E1131")]
-            [XmlElement(ElementName = "E1131")]
-            [EdiValue("9(99)", Path = "*/*/1")]
-            public string x_1131 { get; set; }
-
-            /// <summary>
-            /// Code list responsible agency code
-            /// </summary>
-            [JsonProperty("E3055")]
-            [XmlElement(ElementName = "E3055")]
-            [EdiValue("9(99)", Path = "*/*/2")]
-            public string x_3055 { get; set; }
-
-            /// <summary>
-            /// Duty or tax or fee rate
-            /// </summary>
-            [JsonProperty("E5278")]
-            [XmlElement(ElementName = "E5278")]
-            [EdiValue("9(99)", Path = "*/*/3")]
-            public string x_5278 { get; set; }
-
-            /// <summary>
-            /// Duty or tax or fee rate basis code
-            /// </summary>
-            [JsonProperty("E5273")]
-            [XmlElement(ElementName = "E5273")]
-            [EdiValue("9(99)", Path = "*/*/4")]
-            public string x_5273 { get; set; }
-
-            /// <summary>
-            /// Code list identification code 
-            /// </summary>
-            [JsonProperty("E1131")]
-            [XmlElement(ElementName = "E1131")]
-            [EdiValue("9(99)", Path = "*/*/5")]
-            public string x_1131_2 { get; set; }
-
-            /// <summary>
-            /// Code list responsible agency code
-            /// </summary>
-            [JsonProperty("E3055")]
-            [XmlElement(ElementName = "E3055")]
-            [EdiValue("9(99)", Path = "*/*/6")]
-            public string x_3055_2 { get; set; }
-        }
-
-        #endregion
-
-        #region SG52_MOA
-
-        /// <summary>
-        /// Monetary amount
-        /// </summary>
-        [EdiSegment, EdiPath("MOA")]
-        public class SG52_MOA
-        {
-            /// <summary>
-            /// MONETARY AMOUNT
-            /// </summary>
-            [JsonProperty("C516")]
-            [XmlElement(ElementName = "C516")]
-            public SG52_C516 SG52_C516 { get; set; }
-        }
-
-        /// <summary>
-        /// MONETARY AMOUNT
-        /// </summary>
-        [EdiElement, EdiPath("*/0")]
-        public class SG52_C516
-        {
-            /// <summary>
-            ///  Monetary amount type code qualifier
-            /// </summary>
-            [JsonProperty("E5025")]
-            [XmlElement(ElementName = "E5025")]
-            [EdiValue("9(99)", Path = "*/*/0")]
-            public string x_5025 { get; set; }
-
-            /// <summary>
-            /// Monetary amount
-            /// </summary>
-            [JsonProperty("E5004")]
-            [XmlElement(ElementName = "E5004")]
-            [EdiValue("9(99)", Path = "*/*/1")]
-            public string x_5004 { get; set; }
-
-            /// <summary>
-            /// Currency identification code 
-            /// </summary>
-            [JsonProperty("E6345")]
-            [XmlElement(ElementName = "E6345")]
-            [EdiValue("9(99)", Path = "*/*/2")]
-            public string x_6345 { get; set; }
-
-            /// <summary>
-            /// Currency type code qualifier
-            /// </summary>
-            [JsonProperty("E6343")]
-            [XmlElement(ElementName = "E6343")]
-            [EdiValue("9(99)", Path = "*/*/3")]
-            public string x_6343 { get; set; }
-
-            /// <summary>
-            /// Status description code 
-            /// </summary>
-            [JsonProperty("E4405")]
-            [XmlElement(ElementName = "E4405")]
-            [EdiValue("9(99)", Path = "*/*/4")]
-            public string x_4405 { get; set; }
-        }
-
-
-        #endregion
-
-        #endregion
-
+        
     }
+}
