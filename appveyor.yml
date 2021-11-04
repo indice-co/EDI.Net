@@ -3,9 +3,9 @@ version: 1.10.0.{build}
 image: Visual Studio 2019
 
 install:
-  - pwsh: Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
+  - ps: Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
   #- pwsh: ./dotnet-install.ps1  -Channel 6.0.1xx -Quality preview
-  - pwsh: ./dotnet-install.ps1 -JsonFile global.json
+  - ps: ./dotnet-install.ps1 -JsonFile global.json
 
 init:
 - git config --global core.autocrlf true
