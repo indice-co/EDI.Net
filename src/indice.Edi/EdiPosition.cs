@@ -14,17 +14,19 @@ namespace indice.Edi
         internal int FunctionalGroupCount;
         internal int MessageCount;
         internal int SegmentCount;
+        internal int SegmentCountCache;
         internal string SegmentName;
         internal bool HasIndex;
 
-        public EdiPosition(EdiContainerType type) {
+        public EdiPosition(EdiContainerType type, EdiPosition? parent = null) {
             Type = type;
             HasIndex = TypeHasIndex(type);
             Position = -1;
-            FunctionalGroupCount = 0;
-            MessageCount = 0;
-            SegmentCount = 0;
-            SegmentName = null;
+            FunctionalGroupCount = parent?.FunctionalGroupCount ?? 0;
+            MessageCount = parent?.MessageCount ?? 0;
+            SegmentCount = parent?.SegmentCount ?? 0;
+            SegmentName = parent?.SegmentName;
+            SegmentCountCache = 0;
         }
 
         internal void WriteTo(StringBuilder sb) {
@@ -89,17 +91,23 @@ namespace indice.Edi
             }
         }
 
-        internal void Advance(IEdiGrammar grammar) {
-            Position++;
-            if (Type == EdiContainerType.Segment) {
-                if (SegmentName == grammar.FunctionalGroupHeaderTag) {
-                    FunctionalGroupCount++;
-                    MessageCount = 0;
-                    SegmentCount = 0;
-                } else if (SegmentName == grammar.MessageHeaderTag) {
-                    MessageCount++;
-                    SegmentCount = 0;
-                }
+        internal void CacheContrlCount(IEdiGrammar grammar) {
+            if (SegmentName == grammar.FunctionalGroupTrailerTag) {
+                SegmentCount += SegmentCountCache;
+                SegmentCountCache = 0;
+            } else if (SegmentName == grammar.MessageTrailerTag) {
+                SegmentCountCache = SegmentCount;
+            }
+        }
+        internal void AdvanceContrlCount(IEdiGrammar grammar) {
+            if (SegmentName == grammar.FunctionalGroupHeaderTag) {
+                FunctionalGroupCount++;
+                MessageCount = 0;
+                SegmentCount = 1;
+            } else if (SegmentName == grammar.MessageHeaderTag) {
+                MessageCount++;
+                SegmentCount = 1;
+            } else {
                 SegmentCount++;
             }
         }

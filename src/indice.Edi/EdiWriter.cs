@@ -223,20 +223,23 @@ namespace indice.Edi
         }
 
         private void Push(EdiContainerType value) {
-            if (_currentPosition.Type != EdiContainerType.None) {
-                if (_stack == null) {
-                    _stack = new List<EdiPosition>();
-                }
-                if (_currentPosition.Type == value && _currentPosition.HasIndex) {
-                    _currentPosition.Advance(Grammar);
-                    return;
-                } else {
-                    _stack.Add(_currentPosition);
-                }
+            if (value == EdiContainerType.None) {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Unexpected container type.");
             }
-            _currentPosition = new EdiPosition(value);
-            if (_currentPosition.HasIndex)
+            if (_stack == null) {
+                _stack = new List<EdiPosition>();
+            }
+            if (_currentPosition.Type == value) {
+                _currentPosition.Position++;
+            } else if (_currentPosition.HasIndex) {
+                EdiPosition oldPosition = _currentPosition;
+                _stack.Add(oldPosition);
+                _currentPosition = new EdiPosition(value, oldPosition);
                 _currentPosition.Position = 0;
+            } else {
+                _currentPosition = new EdiPosition(value);
+                _currentPosition.Position = 0;
+            }
         }
 
         private EdiContainerType Pop() {
@@ -1219,7 +1222,9 @@ namespace indice.Edi
         }
 
         internal void InternalWriteSegmentName(string name) {
+            _currentPosition.CacheContrlCount(Grammar);
             _currentPosition.SegmentName = name;
+            _currentPosition.AdvanceContrlCount(Grammar);
         }
 
         internal void InternalWriteRaw() {

@@ -301,7 +301,7 @@ namespace indice.Edi
                 _currentPosition = new EdiPosition(value);
             } else {
                 _stack.Add(_currentPosition);
-                _currentPosition = new EdiPosition(value);
+                _currentPosition = new EdiPosition(value, _currentPosition);
 
                 // this is a little hacky because Depth increases when first property/value is written but only testing here is faster/simpler
                 if (_maxDepth != null && Depth + 1 > _maxDepth && !_hasExceededMaxDepth) {
