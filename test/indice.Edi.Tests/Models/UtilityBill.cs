@@ -20,11 +20,10 @@ namespace indice.Edi.Tests.Models
 
         public InterchangeHeader Head { get; set; }
 
+        public List<UtilityBill> Invoices { get; set; }
         public InterchangeVatSummary Vat { get; set; }
 
         public InterchangeTrailer Summary { get; set; }
-
-        public List<UtilityBill> Invoices { get; set; }
     }
 
 
@@ -98,13 +97,13 @@ namespace indice.Edi.Tests.Models
     public class ConsumptionChargeCharge
     {
         
-        [EdiValue("9(10)", Path = "CCD/0")]
+        [EdiValue("9(1)", Path = "CCD/0")]
         public int SequenceNumber { get; set; }
 
-        [EdiValue("X(3)", Path = "CCD/1")]
+        [EdiValue("X(1)", Path = "CCD/1")]
         public ChargeIndicator? ChargeIndicator { get; set; }
 
-        [EdiValue("9(13)", Path = "CCD/1/1")]
+        [EdiValue("9(1)", Path = "CCD/1/1")]
         public int? ArticleNumber { get; set; }
 
         [EdiValue("X(3)", Path = "CCD/1/2")]
