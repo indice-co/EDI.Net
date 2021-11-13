@@ -1222,7 +1222,6 @@ namespace indice.Edi
         }
 
         internal void InternalWriteSegmentName(string name) {
-            _currentPosition.CacheContrlCount(Grammar);
             _currentPosition.SegmentName = name;
             _currentPosition.AdvanceContrlCount(Grammar);
         }

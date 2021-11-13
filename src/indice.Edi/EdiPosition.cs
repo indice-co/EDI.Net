@@ -26,7 +26,7 @@ namespace indice.Edi
             MessageCount = parent?.MessageCount ?? 0;
             SegmentCount = parent?.SegmentCount ?? 0;
             SegmentName = parent?.SegmentName;
-            SegmentCountCache = 0;
+            SegmentCountCache = parent?.SegmentCount ?? 0;
         }
 
         internal void WriteTo(StringBuilder sb) {
@@ -91,21 +91,20 @@ namespace indice.Edi
             }
         }
 
-        internal void CacheContrlCount(IEdiGrammar grammar) {
-            if (SegmentName == grammar.FunctionalGroupTrailerTag) {
-                SegmentCount += SegmentCountCache;
-                SegmentCountCache = 0;
-            } else if (SegmentName == grammar.MessageTrailerTag) {
-                SegmentCountCache = SegmentCount;
-            }
-        }
         internal void AdvanceContrlCount(IEdiGrammar grammar) {
-            if (SegmentName == grammar.FunctionalGroupHeaderTag) {
+            if (SegmentName == grammar.FunctionalGroupTrailerTag) {
+                SegmentCount +=2; // take into account one more - the header
+            }
+            else if (SegmentName == grammar.InterchangeTrailerTag) {
+                SegmentCount += SegmentCountCache;
+            } else if (SegmentName == grammar.FunctionalGroupHeaderTag) {
                 FunctionalGroupCount++;
                 MessageCount = 0;
+                SegmentCountCache += SegmentCount;
                 SegmentCount = 1;
             } else if (SegmentName == grammar.MessageHeaderTag) {
-                MessageCount++;
+                MessageCount++; 
+                SegmentCountCache += SegmentCount;
                 SegmentCount = 1;
             } else {
                 SegmentCount++;
