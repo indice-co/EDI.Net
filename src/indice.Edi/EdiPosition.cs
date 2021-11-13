@@ -93,7 +93,7 @@ namespace indice.Edi
 
         internal void AdvanceContrlCount(IEdiGrammar grammar) {
             if (SegmentName == grammar.FunctionalGroupTrailerTag) {
-                SegmentCount +=2; // take into account one more - the header
+                SegmentCount +=2; // take into account one more (the header)
             }
             else if (SegmentName == grammar.InterchangeTrailerTag) {
                 SegmentCount += SegmentCountCache;
