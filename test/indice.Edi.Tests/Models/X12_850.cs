@@ -60,6 +60,7 @@ namespace indice.Edi.Tests.Models
         public char? Component_Element_Separator { get; set; }
 
         [EdiValue("9(1)", Path = "IEA/0", Description = "IEA01 - Num of Included Functional Grps")]
+        [EdiCount(EdiCountScope.Groups)]
         public int GroupsCount { get; set; }
 
         [EdiValue("9(9)", Path = "IEA/1", Description = "IEA02 - Interchange Control Number")]
@@ -99,6 +100,7 @@ namespace indice.Edi.Tests.Models
 
 
             [EdiValue("9(1)", Path = "GE/0", Description = "97 Number of Transaction Sets Included")]
+            [EdiCount(EdiCountScope.Messages)]
             public int TransactionsCount { get; set; }
 
             [EdiValue("9(9)", Path = "GE/1", Description = "28 Group Control Number")]
@@ -117,7 +119,8 @@ namespace indice.Edi.Tests.Models
             public string TransactionSetControlNumber { get; set; }
 
             [EdiValue(Path = "SE/0", Description = "SE01 - Number of included segments")]
-            public int SegmentsCouts { get; set; }
+            [EdiCount(EdiCountScope.Segments)]
+            public int SegmentsCounts { get; set; }
 
             [EdiValue("X(9)", Path = "SE/1", Description = "SE02 - Transaction set control number (same as ST02)")]
             public string TrailerTransactionSetControlNumber { get; set; } 

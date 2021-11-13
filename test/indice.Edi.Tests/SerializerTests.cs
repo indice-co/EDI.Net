@@ -328,7 +328,7 @@ namespace indice.Edi.Tests
             Assert.Equal("D", interchange.Message.UNS1);
         }
 
-        [Fact, Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#168")]
+        [Fact, Trait(Traits.Tag, "X12"), Trait(Traits.Issue, "#168"), Trait(Traits.Issue, "#17")]
         public void Serialize_MSG_Issue_168() {
             var eightFifty = new PurchaseOrder_850();
 
@@ -394,7 +394,7 @@ namespace indice.Edi.Tests
             .AppendLine("MSG*bbb2~")
             .AppendLine("MSG*ccc3~")
             .AppendLine("AMT*~")
-            .AppendLine("SE*0~")
+            .AppendLine("SE*17~")
             .AppendLine("ST*~")
             .AppendLine("BEG*~")
             .AppendLine("CUR*~")
@@ -404,9 +404,9 @@ namespace indice.Edi.Tests
             .AppendLine("TD5*~")
             .AppendLine("MSG*~")
             .AppendLine("AMT*~")
-            .AppendLine("SE*0~")
-            .AppendLine("GE*0*000002000~")
-            .AppendLine("IEA*0*000000000~").ToString();
+            .AppendLine("SE*10~")
+            .AppendLine("GE*2*000002000~")
+            .AppendLine("IEA*1*000000000~").ToString();
             string output = null;
             using (var writer = new StringWriter()) {
                 new EdiSerializer().Serialize(writer, grammar, eightFifty);

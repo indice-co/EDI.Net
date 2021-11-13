@@ -11,7 +11,7 @@ namespace indice.Edi
 
         internal EdiContainerType Type;
         internal int Position;
-        internal int FunctionalGroupCount;
+        internal int GroupCount;
         internal int MessageCount;
         internal int SegmentCount;
         internal int SegmentCountCache;
@@ -22,7 +22,7 @@ namespace indice.Edi
             Type = type;
             HasIndex = TypeHasIndex(type);
             Position = -1;
-            FunctionalGroupCount = parent?.FunctionalGroupCount ?? 0;
+            GroupCount = parent?.GroupCount ?? 0;
             MessageCount = parent?.MessageCount ?? 0;
             SegmentCount = parent?.SegmentCount ?? 0;
             SegmentName = parent?.SegmentName;
@@ -98,7 +98,7 @@ namespace indice.Edi
             else if (SegmentName == grammar.InterchangeTrailerTag) {
                 SegmentCount += SegmentCountCache;
             } else if (SegmentName == grammar.FunctionalGroupHeaderTag) {
-                FunctionalGroupCount++;
+                GroupCount++;
                 MessageCount = 0;
                 SegmentCountCache += SegmentCount;
                 SegmentCount = 1;

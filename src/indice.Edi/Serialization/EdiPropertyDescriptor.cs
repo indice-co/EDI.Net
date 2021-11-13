@@ -15,7 +15,7 @@ namespace indice.Edi.Serialization
         private readonly EdiPathAttribute _PathInfo;
         private readonly EdiConditionAttribute[] _Conditions;
         private readonly EdiValueAttribute _ValueInfo;
-        private readonly EdiGeneratedAttribute _AutoGenerationInfo;
+        private readonly EdiCountAttribute _CountInfo;
         private readonly EdiSegmentGroupAttribute _SegmentGroupInfo;
         private readonly EdiConditionStackMode _ConditionStackMode;
 
@@ -65,9 +65,9 @@ namespace indice.Edi.Serialization
                 return _SegmentGroupInfo;
             }
         }
-        public EdiGeneratedAttribute AutoGenerationInfo {
+        public EdiCountAttribute CountInfo {
             get {
-                return _AutoGenerationInfo;
+                return _CountInfo;
             }
         }
 
@@ -103,7 +103,7 @@ namespace indice.Edi.Serialization
             _Conditions = conditions.Length > 0 ? conditions : null;
             _ValueInfo = Attributes.OfType<EdiValueAttribute>().FirstOrDefault();
             _SegmentGroupInfo = Attributes.OfType<EdiSegmentGroupAttribute>().FirstOrDefault();
-            _AutoGenerationInfo = Attributes.OfType<EdiGeneratedAttribute>().FirstOrDefault();
+            _CountInfo = Attributes.OfType<EdiCountAttribute>().FirstOrDefault();
             if (_ValueInfo != null && _ValueInfo.Path != null && pathInfo == null) {
                 pathInfo = new EdiPathAttribute(_ValueInfo.Path);
             }

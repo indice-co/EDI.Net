@@ -180,12 +180,33 @@ namespace indice.Edi
         }
 
         /// <summary>
-        /// The number of segments inside the transmition
+        /// Absolute number of segments inside the transmition
         /// </summary>
-        public int SegmentCount {
+        public int AbsoluteSegmentCount {
             get {
                 return (_stack?.Count > 0 ? _stack[0].Position : _currentPosition.Position) + 1;
             }
+        }
+
+        /// <summary>
+        /// The number of segments contextual.
+        /// </summary>
+        public int SegmentCount {
+            get { return _currentPosition.SegmentCount; }
+        }
+
+        /// <summary>
+        /// The number of messages contextual.
+        /// </summary>
+        public int MessageCount {
+            get { return _currentPosition.MessageCount; }
+        }
+
+        /// <summary>
+        /// The number of messages contextual.
+        /// </summary>
+        public int GroupCount {
+            get { return _currentPosition.GroupCount; }
         }
 
         /// <summary>
