@@ -1113,5 +1113,33 @@ namespace indice.Edi.Tests
             Assert.Equal("CN", interchange.Messages[0].Details[0].PartyQualifier);
         }
 
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#223")]
+        public void EdiFact_Issue223() {
+            var grammar = EdiGrammar.NewEdiFact();
+            // This is the abridged version of the original message that is causing the error
+            var edifactWithError = default(EdiFact_Issue223.Message);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue223.edi")) {
+                edifactWithError = new EdiSerializer().Deserialize<EdiFact_Issue223.Message>(new StreamReader(stream), grammar);
+            }
+
+            // This is the abridged version of the original message where additional delimiters have been added
+            // (s. line 7 in edifact.Issue223_AdditionalDelimiters.edi)
+            var edifactWithAddtionalDelimiter = default(EdiFact_Issue223.Message);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue223_AdditionalDelimiters.edi")) {
+                edifactWithAddtionalDelimiter = new EdiSerializer().Deserialize<EdiFact_Issue223.Message>(new StreamReader(stream), grammar);
+            }
+
+            // This is the same message as the first case but the model has been changed.
+            // The difference is there is only one attribute in the new segment group (compare Z02SegmentGroup and
+            // Z02SegmentGroupWithSinglePathValue in EdiFace_Issue223.cs
+            var edifactWithSinglePathValue = default(EdiFact_Issue223.MessageWithSinglePathValue);
+            using (var stream = Helpers.GetResourceStream("edifact.Issue223.edi")) {
+                edifactWithSinglePathValue = new EdiSerializer().Deserialize<EdiFact_Issue223.MessageWithSinglePathValue>(new StreamReader(stream), grammar);
+            }
+
+            Assert.Equal("Z17", edifactWithAddtionalDelimiter.MessageSection.Transactions[0].Z02Segment[0].Attribute1.CCIAttribute1);
+            Assert.Equal("Z17", edifactWithSinglePathValue.MessageSection.Transactions[0].Z02Segment[0].Attribute1.CCIAttribute1);
+            Assert.Equal("Z17", edifactWithError.MessageSection.Transactions[0].Z02Segment[0].Attribute1.CCIAttribute1);
+        }
     }
 }
