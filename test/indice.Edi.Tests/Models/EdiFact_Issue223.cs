@@ -150,33 +150,18 @@ namespace indice.Edi.Tests.Models
     [EdiSegment, EdiPath("CAV")]
     public class CAV_Complete
     {
-        /// <summary>
-        /// 7111 Merkmalswert, Code
-        /// </summary>
         [EdiValue("X(3)", Mandatory = true, Path = "CAV/0/0")]
         public string CAVAttribute1 { get; set; }
 
-        /// <summary>
-        /// 1131 Codeliste, Code
-        /// </summary>
         [EdiValue("X(17)", Mandatory = false, Path = "CAV/0/1")]
         public string CAVAttribute2 { get; set; }
 
-        /// <summary>
-        /// 3055 Verantwortliche Stelle für die Codepflege, Code
-        /// </summary>
         [EdiValue("X(3)", Mandatory = false, Path = "CAV/0/2")]
         public string CAVAttribute3 { get; set; }
 
-        /// <summary>
-        /// 7110 Merkmalswert
-        /// </summary>
         [EdiValue("X(35)", Mandatory = false, Path = "CAV/0/3")]
         public string CAVAttribute4 { get; set; }
 
-        /// <summary>
-        /// 7110 Merkmalswert Teil 2
-        /// </summary>
         [EdiValue("X(35)", Mandatory = false, Path = "CAV/0/4")]
         public string CAVAttribute5 { get; set; }
     }
