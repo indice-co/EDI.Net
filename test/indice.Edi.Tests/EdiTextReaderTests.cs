@@ -1113,5 +1113,32 @@ namespace indice.Edi.Tests
             Assert.Equal("CN", interchange.Messages[0].Details[0].PartyQualifier);
         }
 
+        [Fact]
+        [Trait(Traits.Tag, "X12")]
+        [Trait(Traits.Issue, "#225")]
+        public void Test() {
+            var grammar = EdiGrammar.NewX12();
+
+            var interchange = default(X12_834_Issue225);
+            using (var stream = Helpers.GetResourceStream("x12.834.issue225.edi")) {
+                interchange = new EdiSerializer().Deserialize<X12_834_Issue225>(new StreamReader(stream), grammar);
+            }
+
+            //This works ok
+            Assert.NotNull(interchange
+                .FunctionalGroups.First()
+                .TransactionSetHeaders.First()
+                .INSLoop.First()
+                .REF);
+
+            //But this fails
+            Assert.NotNull(interchange
+                .FunctionalGroups.First()
+                .TransactionSetHeaders.First()
+                .INSLoop.First()
+                .NM1Loop.First()
+                .PER);
+        }
+
     }
 }
