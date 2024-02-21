@@ -193,17 +193,26 @@ namespace indice.Edi
         /// <param name="picture"></param>
         public override void WriteValue(string value, Picture? picture) {
             InternalWriteValue(EdiToken.String);
-            WriteEscapedString(value);
+            WriteEscapedString(value, picture);
         }
 
-        private void WriteEscapedString(string value) {
+        private void WriteEscapedString(string value, Picture? picture) {
             EnsureWriteBuffer();
             var bufferPool = _arrayPool;
 
             if (value != null) {
                 int lastWritePosition = 0;
+                int valueLength = value.Length;
 
-                for (int i = 0; i < value.Length; i++) {
+                if (Grammar.StrictAlphanumericCharLimit) {
+                    var validPicture = picture != null && picture.Value.Kind == PictureKind.Alphanumeric && picture.Value.Scale > 0;
+                    var limitMaximumLength = validPicture && valueLength > 0 && valueLength > picture.Value.Scale;
+                    if (limitMaximumLength) {
+                        valueLength = picture.Value.Scale;
+                    }
+                }
+                
+                for (int i = 0; i < valueLength; i++) {
                     var c = value[i];
 
                     if (c < _charEscapeFlags.Length && !_charEscapeFlags[c]) {
@@ -245,10 +254,10 @@ namespace indice.Edi
                 }
 
                 if (lastWritePosition == 0) {
-                    // no escaped text, write entire string
-                    _writer.Write(value);
+                    // no escaped text, write string of Maximum Length when Alphanumeric
+                    _writer.Write(value.Substring(0, valueLength));
                 } else {
-                    int length = value.Length - lastWritePosition;
+                    int length = valueLength - lastWritePosition;
 
                     if (_writeBuffer == null || _writeBuffer.Length < length) {
                         _writeBuffer = BufferUtils.EnsureBufferSize(bufferPool, length, _writeBuffer);
@@ -469,12 +478,13 @@ namespace indice.Edi
         /// Writes a <see cref="Uri"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Uri"/> value to write.</param>
-        public override void WriteValue(Uri value) {
+        /// <param name="picture"> The <see cref="PictureKind"/> to use</param>
+        public override void WriteValue(Uri value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
                 InternalWriteValue(EdiToken.String);
-                WriteEscapedString(value.OriginalString);
+                WriteEscapedString(value.OriginalString, picture);
             }
         }
         #endregion

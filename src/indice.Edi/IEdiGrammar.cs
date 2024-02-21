@@ -87,6 +87,11 @@ namespace indice.Edi
         string InterchangeTrailerTag { get; }
 
         /// <summary>
+        /// Used to Strict follow the char limitation from Alphanumeric Picture Kind
+        /// </summary>
+        bool StrictAlphanumericCharLimit { get; }
+
+        /// <summary>
         /// Checks to see if a character is any of the known special characters.
         /// </summary>
         /// <param name="character"></param>
@@ -116,5 +121,12 @@ namespace indice.Edi
                        char? releaseCharacter,
                        char? reserved,
                        char? decimalMark);
+        
+        /// <summary>
+        /// Define the strict usage of Picture Kind for Alphanumeric Picture. <br/>
+        /// X(n) will limit the in n characters.
+        /// </summary>
+        /// <param name="strictAlphanumericCharLimit"></param>
+        void SetStrictAlphanumericCharLimit(bool strictAlphanumericCharLimit);
     }
 }

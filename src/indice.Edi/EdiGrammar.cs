@@ -53,6 +53,8 @@ namespace indice.Edi
             MessageTrailerTag = grammar.MessageTrailerTag;
             FunctionalGroupTrailerTag = grammar.FunctionalGroupTrailerTag;
             InterchangeTrailerTag = grammar.InterchangeTrailerTag;
+
+            StrictAlphanumericCharLimit = grammar.StrictAlphanumericCharLimit;
         }
 
 
@@ -149,6 +151,11 @@ namespace indice.Edi
         public string InterchangeTrailerTag { get; protected set; }
 
         /// <summary>
+        /// Used to Strict follow the char limitation from Alphanumeric Picture Kind
+        /// </summary>
+        public bool StrictAlphanumericCharLimit { get; protected set; }
+
+        /// <summary>
         /// Checks to see if a character is any of the known special characters.
         /// </summary>
         /// <param name="character"></param>
@@ -198,6 +205,15 @@ namespace indice.Edi
             DecimalMark = decimalMark;
             SegmentTerminator = segmentTerminator;
             _separators = null;
+        }
+
+        /// <summary>
+        /// Define the strict usage of Picture Kind for Alphanumeric Picture. <br/>
+        /// X(n) will limit the in n characters.
+        /// </summary>
+        /// <param name="strictAlphanumericCharLimit"></param>
+        public void SetStrictAlphanumericCharLimit(bool strictAlphanumericCharLimit) {
+            StrictAlphanumericCharLimit = strictAlphanumericCharLimit;
         }
 
         /// <summary>

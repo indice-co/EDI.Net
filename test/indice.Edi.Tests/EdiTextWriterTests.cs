@@ -123,5 +123,26 @@ namespace indice.Edi.Tests
             }
             Assert.Equal(expected.ToString(), output.ToString());
         }
+        
+        [Theory, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#198")]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void WriterLimits_Maxium_When_Alphanumeric(bool escapeDecimalMarkInText, bool strictAlphanumericCharLimit) {
+            var grammar = EdiGrammar.NewEdiFact();
+            grammar.SetStrictAlphanumericCharLimit(strictAlphanumericCharLimit);
+            grammar.SetAdvice('+', '+', ':', '\'', '?', null, ',');
+            var escapeChar = escapeDecimalMarkInText ? "?" : "";
+            var extraChars = strictAlphanumericCharLimit ? "" : "11111";
+            var expected = new StringBuilder().Append($"AAA+STRING{escapeChar},LIMITED{extraChars}'{Environment.NewLine}");
+            var output = new StringBuilder();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar) { EscapeDecimalMarkInText = escapeDecimalMarkInText }) {
+                writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);
+                writer.WriteValue("STRING,LIMITED11111", (Picture)"X(14)"); Assert.Equal("AAA[0][0]", writer.Path);
+            }
+            Assert.Equal(expected.ToString(), output.ToString());
+        }
+
     }
 }

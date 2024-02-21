@@ -986,7 +986,7 @@ namespace indice.Edi
         /// Writes a <see cref="Uri"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Uri"/> value to write.</param>
-        public virtual void WriteValue(Uri value) {
+        public virtual void WriteValue(Uri value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {
