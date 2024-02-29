@@ -116,12 +116,6 @@ namespace indice.Edi
                        char? releaseCharacter,
                        char? reserved,
                        char? decimalMark);
-        
-        /// <summary>
-        /// Define the strict usage of Picture Kind for Alphanumeric Picture. <br/>
-        /// X(n) will limit the in n characters.
-        /// </summary>
-        /// <param name="strictAlphanumericCharLimit"></param>
-        void SetStrictAlphanumericCharLimit(bool strictAlphanumericCharLimit);
+
     }
 }
