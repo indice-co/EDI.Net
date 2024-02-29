@@ -87,11 +87,6 @@ namespace indice.Edi
         string InterchangeTrailerTag { get; }
 
         /// <summary>
-        /// Used to Strict follow the char limitation from Alphanumeric Picture Kind
-        /// </summary>
-        bool StrictAlphanumericCharLimit { get; }
-
-        /// <summary>
         /// Checks to see if a character is any of the known special characters.
         /// </summary>
         /// <param name="character"></param>
