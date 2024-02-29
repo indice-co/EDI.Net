@@ -227,6 +227,13 @@ namespace indice.Edi
         /// </summary>
         public virtual bool EscapeDecimalMarkInText { get; set; }
 
+        /// <summary>
+        /// Used to Strict follow the char limitation from Alphanumeric Picture Kind
+        /// Define the strict usage of Picture Kind for Alphanumeric Picture. <br/>
+        /// X(n) will limit the in n characters.
+        /// </summary>
+        public virtual bool StrictAlphanumericCharLimit { get; set; }
+
         internal bool LastWriteNull { get; set; }
         internal int UnwrittenComponents { get; set; }
         internal int UnwrittenElements { get; set; }
@@ -986,7 +993,7 @@ namespace indice.Edi
         /// Writes a <see cref="Uri"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Uri"/> value to write.</param>
-        public virtual void WriteValue(Uri value) {
+        public virtual void WriteValue(Uri value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
             } else {

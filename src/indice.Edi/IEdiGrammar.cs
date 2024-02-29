@@ -116,5 +116,6 @@ namespace indice.Edi
                        char? releaseCharacter,
                        char? reserved,
                        char? decimalMark);
+
     }
 }
