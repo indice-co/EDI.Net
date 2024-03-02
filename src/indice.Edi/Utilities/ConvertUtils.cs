@@ -82,7 +82,8 @@ namespace indice.Edi.Utilities
         Uri = 38,
         String = 39,
         Bytes = 40,
-        DBNull = 41
+        DBNull = 41,
+        Enum = 42
     }
 
     internal class TypeInformation
@@ -190,7 +191,7 @@ namespace indice.Edi.Utilities
 
             if (t.IsEnum()) {
                 isEnum = true;
-                return GetTypeCode(Enum.GetUnderlyingType(t));
+                return PrimitiveTypeCode.Enum;
             }
 
             // performance?
