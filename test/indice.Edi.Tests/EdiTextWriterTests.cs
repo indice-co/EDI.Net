@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using indice.Edi.Tests.Models;
 using Xunit;
 
 namespace indice.Edi.Tests
@@ -144,5 +145,39 @@ namespace indice.Edi.Tests
             Assert.Equal(expected.ToString(), output.ToString());
         }
 
+        
+        [Theory, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#198")]
+        [InlineData(TestEnumWriter.AAA, 1)]
+        [InlineData(TestEnumWriter.AAA, 2)]
+        [InlineData(TestEnumWriter.AAA, 3)]
+        public void WriterEnumsAsString_And_Limits_Its_value_When_Alphanumeric_Picture_StrictAlphanumericCharLimited(TestEnumWriter enumratorWrite, int pictureScale) {
+            var grammar = EdiGrammar.NewEdiFact();
+            grammar.SetAdvice('+', '+', ':', '\'', '?', null, ',');
+            var expected = new StringBuilder().Append($"AAA+{Enum.GetName(enumratorWrite).Substring(0, pictureScale)}'{Environment.NewLine}");
+            var output = new StringBuilder();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar) {
+                StrictAlphanumericCharLimit = true
+            }) {
+                writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);
+                writer.WriteValue(enumratorWrite, (Picture)$"X({pictureScale})", null); Assert.Equal("AAA[0][0]", writer.Path);
+            }
+            Assert.Equal(expected.ToString(), output.ToString());
+        }
+
+        [Theory, Trait(Traits.Tag, "Writer"), Trait(Traits.Issue, "#198")]
+        [InlineData(TestEnumWriter.AAA)]
+        public void WriterEnumsAsString_When_Alphanumeric_Picture(TestEnumWriter enumratorWrite) {
+            var grammar = EdiGrammar.NewEdiFact();
+            grammar.SetAdvice('+', '+', ':', '\'', '?', null, ',');
+            var expected = new StringBuilder().Append($"AAA+{Enum.GetName(enumratorWrite)}'{Environment.NewLine}");
+            var output = new StringBuilder();
+            using (var writer = new EdiTextWriter(new StringWriter(output), grammar) {
+                StrictAlphanumericCharLimit = false
+            }) {
+                writer.WriteToken(EdiToken.SegmentName, "AAA"); Assert.Equal("AAA", writer.Path);
+                writer.WriteValue(enumratorWrite, (Picture)$"X(5)", null); Assert.Equal("AAA[0][0]", writer.Path);
+            }
+            Assert.Equal(expected.ToString(), output.ToString());
+        }
     }
 }

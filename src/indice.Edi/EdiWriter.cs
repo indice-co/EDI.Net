@@ -993,6 +993,7 @@ namespace indice.Edi
         /// Writes a <see cref="Uri"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Uri"/> value to write.</param>
+        /// <param name="picture"></param>
         public virtual void WriteValue(Uri value, Picture? picture = null) {
             if (value == null) {
                 WriteNull();
@@ -1172,6 +1173,13 @@ namespace indice.Edi
                     break;
                 case PrimitiveTypeCode.Bytes:
                     writer.WriteValue((byte[])value);
+                    break;
+                case PrimitiveTypeCode.Enum:
+                    if (picture.HasValue && picture.Value.IsValid && picture.Value.Kind == PictureKind.Alphanumeric) {
+                        writer.WriteValue(Enum.GetName(value.GetType(), value), picture);
+                    } else {
+                        writer.WriteValue((int)value, picture);
+                    }
                     break;
 #if !(PORTABLE || NETSTANDARD10)
                 case PrimitiveTypeCode.DBNull:
