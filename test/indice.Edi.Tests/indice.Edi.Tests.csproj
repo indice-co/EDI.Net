@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Samples\**\*.edi" />
+    <EmbeddedResource Include="Samples\**\*.xml" />
     <None Update="SamplesBig\**\*.edi">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

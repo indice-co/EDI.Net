@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using indice.Edi.Tests.Models;
 using Xunit;
 
@@ -441,6 +443,28 @@ namespace indice.Edi.Tests
                 new EdiSerializer().Serialize(writer, grammar, data);
                 return writer.ToString();
             }
+        }
+
+        [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#235")]
+        public void Serialize_Should_not_create_double_UNB_Segment_Issue235() {
+            var source = default(EDIFACT_APPERAK_issue235);
+            using (var stream = Helpers.GetResourceStream("Aperak_issue235.xml")) {
+                var serializer = new XmlSerializer(typeof(EDIFACT_APPERAK_issue235));
+                source = (EDIFACT_APPERAK_issue235)serializer.Deserialize(stream);
+            }
+            Assert.NotNull(source);
+
+            
+            string Serialize<T>(T data) {
+                var grammar = EdiGrammar.NewEdiFact();
+                using var writer = new StringWriter();
+                new EdiSerializer().Serialize(writer, grammar, data);
+                return writer.ToString();
+            }
+
+            var output = Serialize(source);
+            Regex unbRegex = new Regex("UNB");
+            Assert.Single(unbRegex.Matches(output));
         }
     }
 }
