@@ -6,7 +6,7 @@
     <VersionPrefix>1.11.0</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <Authors>c.leftheris</Authors>
-    <TargetFrameworks>net451;netstandard1.0;netstandard1.3;netstandard2.0;net60;net8.0</TargetFrameworks>
+    <TargetFrameworks>net451;netstandard1.0;netstandard1.3;netstandard2.0;net60</TargetFrameworks>
     <AssemblyName>indice.Edi</AssemblyName>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
