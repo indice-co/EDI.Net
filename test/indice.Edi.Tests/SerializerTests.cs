@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using indice.Edi.Tests.Models;
 using Xunit;
+using static indice.Edi.Tests.Models.Interchange_Issue263.GIN;
 
 namespace indice.Edi.Tests;
 
@@ -463,5 +464,30 @@ public class SerializerTests
         var output = Serialize(source);
         Regex unbRegex = new Regex("UNB");
         Assert.Single(unbRegex.Matches(output));
+    }
+
+    [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#263")]
+    public void Serialize_Should_Write_List_Of_Repeating_Elements_Issue235() {
+        var source = new Interchange_Issue263.GIN { 
+            Qualifier = "AW",
+            IdentityNumbers = [
+                new () {  Text = "9998219" },
+                new () {  Text = "9998218" },
+                new () {  Text = "9998217" },
+                new () {  Text = "9998216" },
+                new () {  Text = "9998215" },
+            ]
+        };
+       
+        string Serialize<T>(T data) {
+            var grammar = EdiGrammar.NewEdiFact();
+            
+            using var writer = new StringWriter();
+            new EdiSerializer().Serialize(writer, grammar, data);
+            return writer.ToString();
+        }
+        var expected = $"UNA:+.? '{Environment.NewLine}GIN+AW+9998219+9998218+9998217+9998216+9998215'{Environment.NewLine}";
+        var output = Serialize(source);
+        Assert.Equal(expected, output);
     }
 }
