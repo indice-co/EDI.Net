@@ -18,7 +18,7 @@ public class Interchange_Issue263
         [EdiElement]
         public class IdentityNumber
         {
-            [EdiValue("X(35)", Path = "GIN/*/0")]
+            [EdiValue("X(35)", Path = "*/*/0")]
             public string Text { get; set; }
 
         }
