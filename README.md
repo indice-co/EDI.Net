@@ -199,7 +199,8 @@ Ensure the PR description clearly describes the problem and solution. Include th
 As of v1.0.7 the solution was adapted to support the dotnet core project system. Then it was adapted again since the dotnet core tooling was officialy relased (_March 7th 2017 at the launch of Visual studio 2017_).
 In order to build and test the source code you will need either one of the following.
 
-- Visual studio 2017 + the dotnet core workload (for `v1.1.3` onwards)
+- Visual studio 2019 + the dotnet sdk 8.0 (for `v2.0.0` onwards)
+- Visual studio 2017 + the dotnet core workload (for versions `v1.1.3` - `v1.x.x`)
 - Visual studio 2015 Update 3 & .NET Core 1.0.0 - VS 2015 Tooling (for versions `v1.0.7` - `v1.1.2`)
 - [VS Code + .NET Core SDK](https://code.visualstudio.com/docs/runtimes/dotnet) 
 
