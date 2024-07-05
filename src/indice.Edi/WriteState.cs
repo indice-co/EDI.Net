@@ -23,45 +23,42 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System;
+namespace indice.Edi;
 
-namespace indice.Edi
+/// <summary>
+/// Specifies the state of the <see cref="EdiWriter"/>.
+/// </summary>
+public enum WriteState
 {
     /// <summary>
-    /// Specifies the state of the <see cref="EdiWriter"/>.
+    /// An exception has been thrown, which has left the <see cref="EdiWriter"/> in an invalid state.
+    /// You may call the <see cref="EdiWriter.Close"/> method to put the <see cref="EdiWriter"/> in the <c>Closed</c> state.
+    /// Any other <see cref="EdiWriter"/> method calls results in an <see cref="InvalidOperationException"/> being thrown. 
     /// </summary>
-    public enum WriteState
-    {
-        /// <summary>
-        /// An exception has been thrown, which has left the <see cref="EdiWriter"/> in an invalid state.
-        /// You may call the <see cref="EdiWriter.Close"/> method to put the <see cref="EdiWriter"/> in the <c>Closed</c> state.
-        /// Any other <see cref="EdiWriter"/> method calls results in an <see cref="InvalidOperationException"/> being thrown. 
-        /// </summary>
-        Error = 0,
+    Error = 0,
 
-        /// <summary>
-        /// The <see cref="EdiWriter.Close"/> method has been called. 
-        /// </summary>
-        Closed = 1,
+    /// <summary>
+    /// The <see cref="EdiWriter.Close"/> method has been called. 
+    /// </summary>
+    Closed = 1,
 
-        /// <summary>
-        /// A Segment is being written. 
-        /// </summary>
-        Segment = 2,
+    /// <summary>
+    /// A Segment is being written. 
+    /// </summary>
+    Segment = 2,
 
-        /// <summary>
-        /// An Element is being written.
-        /// </summary>
-        Element = 3,
+    /// <summary>
+    /// An Element is being written.
+    /// </summary>
+    Element = 3,
 
-        /// <summary>
-        /// A Component is being written.
-        /// </summary>
-        Component = 4,
-        
-        /// <summary>
-        /// A write method has not been called.
-        /// </summary>
-        Start = 5
-    }
+    /// <summary>
+    /// A Component is being written.
+    /// </summary>
+    Component = 4,
+    
+    /// <summary>
+    /// A write method has not been called.
+    /// </summary>
+    Start = 5
 }

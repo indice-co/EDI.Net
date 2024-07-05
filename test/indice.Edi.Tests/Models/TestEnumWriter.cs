@@ -1,7 +1,6 @@
-﻿namespace indice.Edi.Tests.Models
+﻿namespace indice.Edi.Tests.Models;
+
+public enum TestEnumWriter
 {
-    public enum TestEnumWriter
-    {
-        AAA = 1, BBB = 2
-    }
+    AAA = 1, BBB = 2
 }

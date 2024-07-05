@@ -1,6 +1,6 @@
-version: 1.12.0.{build}
+version: 2.0.0.{build}
 
-image: Visual Studio 2019
+image: Visual Studio 2022
 
 install:
   - ps: Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
@@ -11,7 +11,7 @@ init:
 - git config --global core.autocrlf true
 
 environment:
-  DOTNET_VERSION: "6.0.100"
+  DOTNET_VERSION: "8.0.300"
 
 build_script:
 - ps: dotnet pack -c Release -o artifacts

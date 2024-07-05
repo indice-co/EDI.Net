@@ -1,679 +1,648 @@
 ﻿using indice.Edi.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace indice.Edi
+namespace indice.Edi;
+
+/// <summary>
+/// Represents a reader that provides a fast, non-cached, forward-only way of reading EDI data from a <see cref="TextReader"/>.
+/// </summary>
+public class EdiTextReader : EdiReader, IEdiLineInfo
 {
+    private const char UnicodeReplacementChar = '\uFFFD';
+    private readonly TextReader _reader;
+    private char[] _chars;
+    private int _charsUsed;
+    private int _charPos;
+    private int _lineStartPos;
+    private int _lineNumber;
+    private bool _isEndOfFile;
+    private StringBuffer _buffer;
+    private StringReference _stringReference;
+
     /// <summary>
-    /// Represents a reader that provides a fast, non-cached, forward-only way of reading EDI data from a <see cref="TextReader"/>.
+    /// Constructs an <see cref="EdiTextReader"/> using the <seealso cref="IEdiGrammar"/> of choice and a <seealso cref="TextReader"/>
     /// </summary>
-    public class EdiTextReader : EdiReader, IEdiLineInfo
-    {
-        private const char UnicodeReplacementChar = '\uFFFD';
-        private readonly TextReader _reader;
-        private char[] _chars;
-        private int _charsUsed;
-        private int _charPos;
-        private int _lineStartPos;
-        private int _lineNumber;
-        private bool _isEndOfFile;
-        private StringBuffer _buffer;
-        private StringReference _stringReference;
-        internal NameTable NameTable;
+    /// <param name="reader">The <see cref="TextReader"/></param>
+    /// <param name="grammar">The <see cref="IEdiGrammar"/></param>
+    public EdiTextReader(TextReader reader, IEdiGrammar grammar)
+        : base(grammar) {
+        if (null == reader)
+            throw new ArgumentNullException(nameof(reader));
+        _reader = reader;
+        _lineNumber = 1;
+        _chars = new char[1025];
+    }
+    /// <summary>
+    /// Reads the next EDI token from the stream.
+    /// </summary>
+    /// <returns>
+    /// true if the next token was read successfully; false if there are no more tokens to read.
+    /// </returns>
+    [DebuggerStepThrough]
+    public override bool Read() {
+        if (!ReadInternal()) {
+            SetToken(EdiToken.None);
+            return false;
+        }
+        return true;
+    }
 
-        /// <summary>
-        /// Constructs an <see cref="EdiTextReader"/> using the <seealso cref="IEdiGrammar"/> of choice and a <seealso cref="TextReader"/>
-        /// </summary>
-        /// <param name="reader">The <see cref="TextReader"/></param>
-        /// <param name="grammar">The <see cref="IEdiGrammar"/></param>
-        public EdiTextReader(TextReader reader, IEdiGrammar grammar)
-            : base(grammar) {
-            if (null == reader)
-                throw new ArgumentNullException(nameof(reader));
-            _reader = reader;
-            _lineNumber = 1;
-            _chars = new char[1025];
-        }
-        /// <summary>
-        /// Reads the next EDI token from the stream.
-        /// </summary>
-        /// <returns>
-        /// true if the next token was read successfully; false if there are no more tokens to read.
-        /// </returns>
-        [DebuggerStepThrough]
-        public override bool Read() {
-            if (!ReadInternal()) {
-                SetToken(EdiToken.None);
-                return false;
-            }
-            return true;
-        }
-        
-        /// <summary>
-        /// Reads the next EDI token from the stream as a <see cref="Nullable{Decimal}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override decimal? ReadAsDecimal(Picture? picture = null) {
-            return ReadAsDecimalInternal(picture);
-        }
+    /// <summary>
+    /// Reads the next EDI token from the stream as a <see cref="Nullable{Decimal}"/>.
+    /// </summary>
+    /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
+    public override decimal? ReadAsDecimal(Picture? picture = null) => ReadAsDecimalInternal(picture);
 
-        /// <summary>
-        /// Reads the next EDI token from the stream as a <see cref="Nullable{Int32}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Nullable{Int32}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override int? ReadAsInt32() {
-            return ReadAsInt32Internal();
-        }
+    /// <summary>
+    /// Reads the next EDI token from the stream as a <see cref="Nullable{Int32}"/>.
+    /// </summary>
+    /// <returns>A <see cref="Nullable{Int32}"/>. This method will return <c>null</c> at the end of an array.</returns>
+    public override int? ReadAsInt32() => ReadAsInt32Internal();
 
-        /// <summary>
-        /// Reads the next EDI token from the stream as a <see cref="Nullable{Int64}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Nullable{Int64}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override long? ReadAsInt64() {
-            return ReadAsInt64Internal();
-        }
+    /// <summary>
+    /// Reads the next EDI token from the stream as a <see cref="Nullable{Int64}"/>.
+    /// </summary>
+    /// <returns>A <see cref="Nullable{Int64}"/>. This method will return <c>null</c> at the end of an array.</returns>
+    public override long? ReadAsInt64() => ReadAsInt64Internal();
 
-        /// <summary>
-        /// Reads the next EDI token from the stream as a <see cref="String"/>.
-        /// </summary>
-        /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override string ReadAsString() {
-            return ReadAsStringInternal();
-        }
+    /// <summary>
+    /// Reads the next EDI token from the stream as a <see cref="String"/>.
+    /// </summary>
+    /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>
+    public override string ReadAsString() => ReadAsStringInternal();
 
-        /// <summary>
-        /// Reads the next EDI token from the stream as a <see cref="Nullable{DateTime}"/>.
-        /// </summary>
-        /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override DateTime? ReadAsDateTime() {
-            return ReadAsDateTimeInternal();
-        }
-        
-        internal override bool ReadInternal() {
-            while (true) {
-                switch (_currentState) {
-                    case State.Start:
-                        return ParseServiceStringAdvice();
-                    case State.Segment:
-                    case State.SegmentStart:
-                        return ParseSegment();
-                    case State.Element:
-                    case State.ElementStart:
-                    case State.Component:
-                    case State.ComponentStart:
-                        return ParseValue();
-                    case State.SegmentName:
-                    case State.PostValue:
-                        // returns true if it hits
-                        // end of object or array
-                        if (ParsePostValue())
-                            return true;
-                        break;
-                    case State.Finished:
-                        if (EnsureChars(0, false)) {
-                            EatWhitespace(false);
-                            if (_isEndOfFile) {
-                                return false;
-                            }
-                            throw EdiReaderException.Create(this, "Additional text encountered after finished reading EDI content: {0}.".FormatWith(CultureInfo.InvariantCulture, _chars[_charPos]));
+    /// <summary>
+    /// Reads the next EDI token from the stream as a <see cref="Nullable{DateTime}"/>.
+    /// </summary>
+    /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>
+    public override DateTime? ReadAsDateTime() => ReadAsDateTimeInternal();
+
+    internal override bool ReadInternal() {
+        while (true) {
+            switch (_currentState) {
+                case State.Start:
+                    return ParseServiceStringAdvice();
+                case State.Segment:
+                case State.SegmentStart:
+                    return ParseSegment();
+                case State.Element:
+                case State.ElementStart:
+                case State.Component:
+                case State.ComponentStart:
+                    return ParseValue();
+                case State.SegmentName:
+                case State.PostValue:
+                    // returns true if it hits
+                    // end of object or array
+                    if (ParsePostValue())
+                        return true;
+                    break;
+                case State.Finished:
+                    if (EnsureChars(0, false)) {
+                        EatWhitespace(false);
+                        if (_isEndOfFile) {
+                            return false;
                         }
-                        return false;
-                    default:
-                        throw EdiReaderException.Create(this, "Unexpected state: {0}.".FormatWith(CultureInfo.InvariantCulture, CurrentState));
-                }
+                        throw EdiReaderException.Create(this, "Additional text encountered after finished reading EDI content: {0}.".FormatWith(CultureInfo.InvariantCulture, _chars[_charPos]));
+                    }
+                    return false;
+                default:
+                    throw EdiReaderException.Create(this, "Unexpected state: {0}.".FormatWith(CultureInfo.InvariantCulture, CurrentState));
             }
         }
+    }
 
-        #region Parse
+    #region Parse
 
-        private bool ParsePostValue() {
-            while (true) {
-                char currentChar = _chars[_charPos];
+    private bool ParsePostValue() {
+        while (true) {
+            char currentChar = _chars[_charPos];
 
-                switch (currentChar) {
-                    case ' ':
-                    case StringUtils.Tab:
+            switch (currentChar) {
+                case ' ':
+                case StringUtils.Tab:
+                    // eat
+                    _charPos++;
+                    break;
+                case StringUtils.CarriageReturn:
+                    if (Grammar.SegmentTerminator == currentChar) {
+                        SetToken(EdiToken.SegmentStart);
+                        ProcessCarriageReturn(false);
+                        return true;
+                    }
+                    ProcessCarriageReturn(false);
+                    break;
+                case StringUtils.LineFeed:
+                    if (Grammar.SegmentTerminator == currentChar) {
+                        SetToken(EdiToken.SegmentStart);
+                        ProcessLineFeed();
+                        return true;
+                    }
+                    ProcessLineFeed();
+                    break;
+                default:
+                    if (char.IsWhiteSpace(currentChar)) {
                         // eat
                         _charPos++;
                         break;
-                    case StringUtils.CarriageReturn:
-                        if (Grammar.SegmentTerminator == currentChar) {
-                            SetToken(EdiToken.SegmentStart);
-                            ProcessCarriageReturn(false);
-                            return true;
-                        }
-                        ProcessCarriageReturn(false);
-                        break;
-                    case StringUtils.LineFeed:
-                        if (Grammar.SegmentTerminator == currentChar) {
-                            SetToken(EdiToken.SegmentStart);
-                            ProcessLineFeed();
-                            return true;
-                        }
-                        ProcessLineFeed();
-                        break;
-                    default:
-                        if (char.IsWhiteSpace(currentChar)) {
-                            // eat
+                    }
+                    if (Grammar.IsSpecial(currentChar)) {
+                        if (Grammar.ComponentDataElementSeparator == currentChar) {
                             _charPos++;
-                            break;
-                        }
-                        if (Grammar.IsSpecial(currentChar)) {
-                            if (Grammar.ComponentDataElementSeparator == currentChar) {
-                                _charPos++;
-                                // finished parsing
-                                SetToken(EdiToken.ComponentStart);
-                                return true;
-                            } else if (Grammar.DataElementSeparator == currentChar || Grammar.SegmentNameDelimiter == currentChar) {
-                                _charPos++;
-                                SetToken(EdiToken.ElementStart);
-                                return true;
-                            } else if (Grammar.SegmentTerminator == currentChar) {
-                                _charPos++;
-                                SetToken(EdiToken.SegmentStart);
-                                return true;
-                            } else {
-                                throw EdiReaderException.Create(this, "After parsing a value an unexpected character was encountered: {0}.".FormatWith(CultureInfo.InvariantCulture, currentChar));
-                            }
+                            // finished parsing
+                            SetToken(EdiToken.ComponentStart);
+                            return true;
+                        } else if (Grammar.DataElementSeparator == currentChar || Grammar.SegmentNameDelimiter == currentChar) {
+                            _charPos++;
+                            SetToken(EdiToken.ElementStart);
+                            return true;
+                        } else if (Grammar.SegmentTerminator == currentChar) {
+                            _charPos++;
+                            SetToken(EdiToken.SegmentStart);
+                            return true;
                         } else {
                             throw EdiReaderException.Create(this, "After parsing a value an unexpected character was encountered: {0}.".FormatWith(CultureInfo.InvariantCulture, currentChar));
                         }
-                }
+                    } else {
+                        throw EdiReaderException.Create(this, "After parsing a value an unexpected character was encountered: {0}.".FormatWith(CultureInfo.InvariantCulture, currentChar));
+                    }
             }
         }
+    }
 
-        private bool ParseServiceStringAdvice() {
-            if (!string.IsNullOrEmpty(Grammar.ServiceStringAdviceTag) && 
-                '\0' == _chars[_charPos]) {
-                if (ReadData(false, 9) == 0)
-                    return false;
+    private bool ParseServiceStringAdvice() {
+        if (!string.IsNullOrEmpty(Grammar.ServiceStringAdviceTag) && 
+            '\0' == _chars[_charPos]) {
+            if (ReadData(false, 9) == 0)
+                return false;
 
-                var segmentName = new char[3];
-                Array.Copy(_chars, _charPos, segmentName, 0, 3);
-                if (new string(segmentName) == Grammar.ServiceStringAdviceTag) {
-                    var stringAdvice = new char[6];
-                    Array.Copy(_chars, _charPos + 3, stringAdvice, 0, 6);
-                    Grammar.SetAdvice(stringAdvice);
-                    _charPos = _charPos + 3 + 6;
-                }
+            var segmentName = new char[3];
+            Array.Copy(_chars, _charPos, segmentName, 0, 3);
+            if (new string(segmentName) == Grammar.ServiceStringAdviceTag) {
+                var stringAdvice = new char[6];
+                Array.Copy(_chars, _charPos + 3, stringAdvice, 0, 6);
+                Grammar.SetAdvice(stringAdvice);
+                _charPos = _charPos + 3 + 6;
             }
-            SetToken(EdiToken.SegmentStart);
-            return true;
         }
+        SetToken(EdiToken.SegmentStart);
+        return true;
+    }
 
-        private bool ParseSegment() {
-            while (true) {
-                char currentChar = _chars[_charPos];
+    private bool ParseSegment() {
+        while (true) {
+            char currentChar = _chars[_charPos];
 
-                switch (currentChar) {
-                    case '\0':
-                        if (_charsUsed == _charPos) {
-                            if (ReadData(false) == 0)
-                                return false;
-                        } else {
-                            _charPos++;
-                        }
-                        break;
-                    case ' ':
-                    case StringUtils.Tab:
+            switch (currentChar) {
+                case '\0':
+                    if (_charsUsed == _charPos) {
+                        if (ReadData(false) == 0)
+                            return false;
+                    } else {
+                        _charPos++;
+                    }
+                    break;
+                case ' ':
+                case StringUtils.Tab:
+                    // eat
+                    _charPos++;
+                    break;
+                case StringUtils.CarriageReturn:
+                    if (Grammar.SegmentTerminator == currentChar) {
+                        SetToken(EdiToken.SegmentStart);
+                        ProcessCarriageReturn(false);
+                        return true;
+                    }
+                    ProcessCarriageReturn(false);
+                    break;
+                case StringUtils.LineFeed:
+                    if (Grammar.SegmentTerminator == currentChar) {
+                        SetToken(EdiToken.SegmentStart);
+                        ProcessLineFeed();
+                        return true;
+                    }
+                    ProcessLineFeed();
+                    break;
+                default:
+                    if (Grammar.SegmentTerminator == currentChar) {
+                        SetToken(EdiToken.SegmentStart);
+                        _charPos++;
+                        return true;
+                    } else if (char.IsWhiteSpace(currentChar)) {
                         // eat
                         _charPos++;
-                        break;
-                    case StringUtils.CarriageReturn:
-                        if (Grammar.SegmentTerminator == currentChar) {
-                            SetToken(EdiToken.SegmentStart);
-                            ProcessCarriageReturn(false);
-                            return true;
-                        }
-                        ProcessCarriageReturn(false);
-                        break;
-                    case StringUtils.LineFeed:
-                        if (Grammar.SegmentTerminator == currentChar) {
-                            SetToken(EdiToken.SegmentStart);
-                            ProcessLineFeed();
-                            return true;
-                        }
-                        ProcessLineFeed();
-                        break;
-                    default:
-                        if (Grammar.SegmentTerminator == currentChar) {
-                            SetToken(EdiToken.SegmentStart);
-                            _charPos++;
-                            return true;
-                        } else if (char.IsWhiteSpace(currentChar)) {
-                            // eat
-                            _charPos++;
-                        } else if (_currentState == State.Start) {
-                            SetToken(EdiToken.SegmentStart);
-                            return true;
-                        } else {
-                            return ParseSegmentName();
-                        }
-                        break;
-                }
-            }
-        }
-        private bool ParseSegmentName() {
-            char firstChar = _chars[_charPos];
-            ShiftBufferIfNeeded();
-            ReadStringIntoBuffer();
-
-            string segmentName;
-            if (NameTable != null) {
-                segmentName = NameTable.Get(_stringReference.Chars, _stringReference.StartIndex, _stringReference.Length);
-                // no match in name table
-                if (segmentName == null)
-                    segmentName = _stringReference.ToString();
-            } else {
-                segmentName = _stringReference.ToString();
-            }
-            EatWhitespace(false);
-
-            if (Grammar.SegmentNameDelimiter != _chars[_charPos] && Grammar.SegmentTerminator != _chars[_charPos])
-                throw EdiReaderException.Create(this, "Invalid character after parsing segment name. Expected '{1}' but got: {0}.".FormatWith(CultureInfo.InvariantCulture, _chars[_charPos], string.Join("', '", Grammar.DataElementSeparator)));
-            
-            SetToken(EdiToken.SegmentName, segmentName);
-
-            ClearRecentString();
-            return true;
-        }
-
-        private bool ParseValue() {
-            while (true) {
-                char currentChar = _chars[_charPos];
-
-                switch (currentChar) {
-                    case '\0':
-                        if (_charsUsed == _charPos) {
-                            if (ReadData(false) == 0)
-                                return false;
-                        } else {
-                            _charPos++;
-                        }
-                        break;
-                    case StringUtils.CarriageReturn:
-                        if (Grammar.IsSpecial(currentChar)) {
-                            ParseString(true);
-                            ProcessCarriageReturn(false, forwardPosition: false);
-                            return true;
-                        }
-                        ProcessCarriageReturn(false);
-                        break;
-                    case StringUtils.LineFeed:
-                        if (Grammar.IsSpecial(currentChar)) {
-                            ParseString(true);
-                            ProcessLineFeed(forwardPosition: false);
-                            return true;
-                        }
-                        ProcessLineFeed();
-                        break;
-                    default:
-                        if (_currentState == State.ElementStart) {
-                            SetToken(EdiToken.ComponentStart);
-                            return true;
-                        } else if (Grammar.IsSpecial(currentChar)) {
-                            ParseString(true);
-                            return true;
-                        }
-                        ParseString();
+                    } else if (_currentState == State.Start) {
+                        SetToken(EdiToken.SegmentStart);
                         return true;
-                }
+                    } else {
+                        return ParseSegmentName();
+                    }
+                    break;
             }
         }
-        #endregion
+    }
+    private bool ParseSegmentName() {
+        char firstChar = _chars[_charPos];
+        ShiftBufferIfNeeded();
+        ReadStringIntoBuffer();
 
-        #region LineInfo
-        /// <summary>
-        /// Gets a value indicating whether the class can return line information.
-        /// </summary>
-        /// <returns>
-        /// 	<c>true</c> if LineNumber and LinePosition can be provided; otherwise, <c>false</c>.
-        /// </returns>
-        public bool HasLineInfo() {
-            return true;
-        }
+        string segmentName = _stringReference.ToString();
 
-        /// <summary>
-        /// Gets the current line number.
-        /// </summary>
-        /// <value>
-        /// The current line number or 0 if no line information is available (for example, HasLineInfo returns false).
-        /// </value>
-        public int LineNumber {
-            get {
-                if (CurrentState == State.Start && LinePosition == 0)
-                    return 0;
+        EatWhitespace(false);
 
-                return _lineNumber;
+        if (Grammar.SegmentNameDelimiter != _chars[_charPos] && Grammar.SegmentTerminator != _chars[_charPos])
+            throw EdiReaderException.Create(this, "Invalid character after parsing segment name. Expected '{1}' but got: {0}.".FormatWith(CultureInfo.InvariantCulture, _chars[_charPos], string.Join("', '", Grammar.DataElementSeparator)));
+        
+        SetToken(EdiToken.SegmentName, segmentName);
+
+        ClearRecentString();
+        return true;
+    }
+
+    private bool ParseValue() {
+        while (true) {
+            char currentChar = _chars[_charPos];
+
+            switch (currentChar) {
+                case '\0':
+                    if (_charsUsed == _charPos) {
+                        if (ReadData(false) == 0)
+                            return false;
+                    } else {
+                        _charPos++;
+                    }
+                    break;
+                case StringUtils.CarriageReturn:
+                    if (Grammar.IsSpecial(currentChar)) {
+                        ParseString(true);
+                        ProcessCarriageReturn(false, forwardPosition: false);
+                        return true;
+                    }
+                    ProcessCarriageReturn(false);
+                    break;
+                case StringUtils.LineFeed:
+                    if (Grammar.IsSpecial(currentChar)) {
+                        ParseString(true);
+                        ProcessLineFeed(forwardPosition: false);
+                        return true;
+                    }
+                    ProcessLineFeed();
+                    break;
+                default:
+                    if (_currentState == State.ElementStart) {
+                        SetToken(EdiToken.ComponentStart);
+                        return true;
+                    } else if (Grammar.IsSpecial(currentChar)) {
+                        ParseString(true);
+                        return true;
+                    }
+                    ParseString();
+                    return true;
             }
         }
+    }
+    #endregion
 
-        /// <summary>
-        /// Gets the current line position.
-        /// </summary>
-        /// <value>
-        /// The current line position or 0 if no line information is available (for example, HasLineInfo returns false).
-        /// </value>
-        public int LinePosition {
-            get { return _charPos - _lineStartPos; }
+    #region LineInfo
+    /// <summary>
+    /// Gets a value indicating whether the class can return line information.
+    /// </summary>
+    /// <returns>
+    /// 	<c>true</c> if LineNumber and LinePosition can be provided; otherwise, <c>false</c>.
+    /// </returns>
+    public bool HasLineInfo() => true;
+
+    /// <summary>
+    /// Gets the current line number.
+    /// </summary>
+    /// <value>
+    /// The current line number or 0 if no line information is available (for example, HasLineInfo returns false).
+    /// </value>
+    public int LineNumber {
+        get {
+            if (CurrentState == State.Start && LinePosition == 0)
+                return 0;
+
+            return _lineNumber;
         }
-        #endregion
+    }
+
+    /// <summary>
+    /// Gets the current line position.
+    /// </summary>
+    /// <value>
+    /// The current line position or 0 if no line information is available (for example, HasLineInfo returns false).
+    /// </value>
+    public int LinePosition {
+        get { return _charPos - _lineStartPos; }
+    }
+    #endregion
 
 
 #if DEBUG
-        internal void SetCharBuffer(char[] chars) {
-            _chars = chars;
-        }
+    internal void SetCharBuffer(char[] chars) => _chars = chars;
 #endif
 
-        private void ClearRecentString() {
-            if (_buffer != null)
-                _buffer.Position = 0;
+    private void ClearRecentString() {
+        if (_buffer != null)
+            _buffer.Position = 0;
 
-            _stringReference = new StringReference();
+        _stringReference = new StringReference();
+    }
+
+    private StringBuffer GetBuffer() {
+        if (_buffer == null) {
+            _buffer = new StringBuffer(1025);
+        } else {
+            _buffer.Position = 0;
         }
 
-        private StringBuffer GetBuffer() {
-            if (_buffer == null) {
-                _buffer = new StringBuffer(1025);
+        return _buffer;
+    }
+
+    private void OnNewLine(int pos) {
+        _lineNumber++;
+        _lineStartPos = pos - 1;
+    }
+
+    private void ParseString(bool forceNull = false) {
+        ShiftBufferIfNeeded();
+        ReadStringIntoBuffer();
+        SetPostValueState();
+
+        string text = _stringReference.ToString();
+        SetToken(forceNull ? EdiToken.Null : EdiToken.String, forceNull ? null : text, false);
+
+        ClearRecentString();
+    }
+    #region Helpers
+
+    private static void BlockCopyChars(char[] src, int srcOffset, char[] dst, int dstOffset, int count) {
+        const int charByteCount = 2;
+
+        Buffer.BlockCopy(src, srcOffset * charByteCount, dst, dstOffset * charByteCount, count * charByteCount);
+    }
+
+    private void ShiftBufferIfNeeded() {
+        // once in the last 10% of the buffer shift the remaining content to the start to avoid
+        // unnessesarly increasing the buffer size when reading numbers/strings
+        int length = _chars.Length;
+        if (length - _charPos <= length * 0.1) {
+            int count = _charsUsed - _charPos;
+            if (count > 0)
+                BlockCopyChars(_chars, _charPos, _chars, 0, count);
+
+            _lineStartPos -= _charPos;
+            _charPos = 0;
+            _charsUsed = count;
+            _chars[_charsUsed] = '\0';
+        }
+    }
+
+    private int ReadData(bool append) => ReadData(append, 0);
+
+    private int ReadData(bool append, int charsRequired) {
+        if (_isEndOfFile)
+            return 0;
+
+        // char buffer is full
+        if (_charsUsed + charsRequired >= _chars.Length - 1) {
+            if (append) {
+                // copy to new array either double the size of the current or big enough to fit required content
+                int newArrayLength = Math.Max(_chars.Length * 2, _charsUsed + charsRequired + 1);
+
+                // increase the size of the buffer
+                char[] dst = new char[newArrayLength];
+
+                BlockCopyChars(_chars, 0, dst, 0, _chars.Length);
+
+                _chars = dst;
             } else {
-                _buffer.Position = 0;
-            }
+                int remainingCharCount = _charsUsed - _charPos;
 
-            return _buffer;
-        }
+                if (remainingCharCount + charsRequired + 1 >= _chars.Length) {
+                    // the remaining count plus the required is bigger than the current buffer size
+                    char[] dst = new char[remainingCharCount + charsRequired + 1];
 
-        private void OnNewLine(int pos) {
-            _lineNumber++;
-            _lineStartPos = pos - 1;
-        }
-
-        private void ParseString(bool forceNull = false) {
-            ShiftBufferIfNeeded();
-            ReadStringIntoBuffer();
-            SetPostValueState();
-
-            string text = _stringReference.ToString();
-            SetToken(forceNull ? EdiToken.Null : EdiToken.String, forceNull ? null : text, false);
-
-            ClearRecentString();
-        }
-        #region Helpers
-
-        private static void BlockCopyChars(char[] src, int srcOffset, char[] dst, int dstOffset, int count) {
-            const int charByteCount = 2;
-
-            Buffer.BlockCopy(src, srcOffset * charByteCount, dst, dstOffset * charByteCount, count * charByteCount);
-        }
-
-        private void ShiftBufferIfNeeded() {
-            // once in the last 10% of the buffer shift the remaining content to the start to avoid
-            // unnessesarly increasing the buffer size when reading numbers/strings
-            int length = _chars.Length;
-            if (length - _charPos <= length * 0.1) {
-                int count = _charsUsed - _charPos;
-                if (count > 0)
-                    BlockCopyChars(_chars, _charPos, _chars, 0, count);
-
-                _lineStartPos -= _charPos;
-                _charPos = 0;
-                _charsUsed = count;
-                _chars[_charsUsed] = '\0';
-            }
-        }
-
-        private int ReadData(bool append) {
-            return ReadData(append, 0);
-        }
-
-        private int ReadData(bool append, int charsRequired) {
-            if (_isEndOfFile)
-                return 0;
-
-            // char buffer is full
-            if (_charsUsed + charsRequired >= _chars.Length - 1) {
-                if (append) {
-                    // copy to new array either double the size of the current or big enough to fit required content
-                    int newArrayLength = Math.Max(_chars.Length * 2, _charsUsed + charsRequired + 1);
-
-                    // increase the size of the buffer
-                    char[] dst = new char[newArrayLength];
-
-                    BlockCopyChars(_chars, 0, dst, 0, _chars.Length);
+                    if (remainingCharCount > 0)
+                        BlockCopyChars(_chars, _charPos, dst, 0, remainingCharCount);
 
                     _chars = dst;
                 } else {
-                    int remainingCharCount = _charsUsed - _charPos;
-
-                    if (remainingCharCount + charsRequired + 1 >= _chars.Length) {
-                        // the remaining count plus the required is bigger than the current buffer size
-                        char[] dst = new char[remainingCharCount + charsRequired + 1];
-
-                        if (remainingCharCount > 0)
-                            BlockCopyChars(_chars, _charPos, dst, 0, remainingCharCount);
-
-                        _chars = dst;
-                    } else {
-                        // copy any remaining data to the beginning of the buffer if needed and reset positions
-                        if (remainingCharCount > 0)
-                            BlockCopyChars(_chars, _charPos, _chars, 0, remainingCharCount);
-                    }
-
-                    _lineStartPos -= _charPos;
-                    _charPos = 0;
-                    _charsUsed = remainingCharCount;
+                    // copy any remaining data to the beginning of the buffer if needed and reset positions
+                    if (remainingCharCount > 0)
+                        BlockCopyChars(_chars, _charPos, _chars, 0, remainingCharCount);
                 }
+
+                _lineStartPos -= _charPos;
+                _charPos = 0;
+                _charsUsed = remainingCharCount;
             }
+        }
 
-            int attemptCharReadCount = _chars.Length - _charsUsed - 1;
+        int attemptCharReadCount = _chars.Length - _charsUsed - 1;
 
-            int charsRead = _reader.Read(_chars, _charsUsed, attemptCharReadCount);
+        int charsRead = _reader.Read(_chars, _charsUsed, attemptCharReadCount);
 
-            _charsUsed += charsRead;
+        _charsUsed += charsRead;
 
+        if (charsRead == 0)
+            _isEndOfFile = true;
+
+        _chars[_charsUsed] = '\0';
+        return charsRead;
+    }
+
+    private bool EnsureChars(int relativePosition, bool append) {
+        if (_charPos + relativePosition >= _charsUsed)
+            return ReadChars(relativePosition, append);
+
+        return true;
+    }
+
+    private bool ReadChars(int relativePosition, bool append) {
+        if (_isEndOfFile)
+            return false;
+
+        int charsRequired = _charPos + relativePosition - _charsUsed + 1;
+
+        int totalCharsRead = 0;
+
+        // it is possible that the TextReader doesn't return all data at once
+        // repeat read until the required text is returned or the reader is out of content
+        do {
+            int charsRead = ReadData(append, charsRequired - totalCharsRead);
+
+            // no more content
             if (charsRead == 0)
-                _isEndOfFile = true;
+                break;
 
-            _chars[_charsUsed] = '\0';
-            return charsRead;
-        }
+            totalCharsRead += charsRead;
+        } while (totalCharsRead < charsRequired);
 
-        private bool EnsureChars(int relativePosition, bool append) {
-            if (_charPos + relativePosition >= _charsUsed)
-                return ReadChars(relativePosition, append);
+        if (totalCharsRead < charsRequired)
+            return false;
+        return true;
+    }
 
-            return true;
-        }
+    private void ReadStringIntoBuffer() {
+        int charPos = _charPos;
+        int initialPosition = _charPos;
+        int lastWritePosition = _charPos;
+        StringBuffer buffer = null;
+        while (true) {
+            var charAt = _chars[charPos++];
+            if ('\0' == charAt) {
+                if (_charsUsed == charPos - 1) {
+                    charPos--;
 
-        private bool ReadChars(int relativePosition, bool append) {
-            if (_isEndOfFile)
-                return false;
-
-            int charsRequired = _charPos + relativePosition - _charsUsed + 1;
-
-            int totalCharsRead = 0;
-
-            // it is possible that the TextReader doesn't return all data at once
-            // repeat read until the required text is returned or the reader is out of content
-            do {
-                int charsRead = ReadData(append, charsRequired - totalCharsRead);
-
-                // no more content
-                if (charsRead == 0)
-                    break;
-
-                totalCharsRead += charsRead;
-            } while (totalCharsRead < charsRequired);
-
-            if (totalCharsRead < charsRequired)
-                return false;
-            return true;
-        }
-
-        private void ReadStringIntoBuffer() {
-            int charPos = _charPos;
-            int initialPosition = _charPos;
-            int lastWritePosition = _charPos;
-            StringBuffer buffer = null;
-            while (true) {
-                var charAt = _chars[charPos++];
-                if ('\0' == charAt) {
-                    if (_charsUsed == charPos - 1) {
-                        charPos--;
-
-                        if (ReadData(true) == 0) {
-                            _charPos = charPos;
-                            throw EdiReaderException.Create(this, "Unterminated string. Expected delimiter.");
-                        }
-                    }
-                }
-                // Make use of the release character. Identify escape sequence
-                else if (Grammar.ReleaseCharacter == charAt) {
-                    _charPos = charPos;
-                    if (!EnsureChars(0, true)) {
+                    if (ReadData(true) == 0) {
                         _charPos = charPos;
                         throw EdiReaderException.Create(this, "Unterminated string. Expected delimiter.");
                     }
+                }
+            }
+            // Make use of the release character. Identify escape sequence
+            else if (Grammar.ReleaseCharacter == charAt) {
+                _charPos = charPos;
+                if (!EnsureChars(0, true)) {
+                    _charPos = charPos;
+                    throw EdiReaderException.Create(this, "Unterminated string. Expected delimiter.");
+                }
 
-                    // start of escape sequence
-                    int escapeStartPos = charPos - 1;
+                // start of escape sequence
+                int escapeStartPos = charPos - 1;
 
-                    char currentChar = _chars[charPos];
+                char currentChar = _chars[charPos];
 
-                    char writeChar;
+                char writeChar;
 
-                    if (Grammar.IsSpecial(currentChar) || Grammar.ReleaseCharacter == currentChar) {
-                        charPos++;
-                        writeChar = currentChar;
-                    } else {
-                        charPos++;
-                        _charPos = charPos; 
-                        writeChar = currentChar;
-                        if (!SuppressBadEscapeSequenceErrors)
-                            throw EdiReaderException.Create(this, "Bad EDI escape sequence: {0}{1}.".FormatWith(CultureInfo.InvariantCulture, Grammar.ReleaseCharacter, currentChar));
-                    }
-                    
+                if (Grammar.IsSpecial(currentChar) || Grammar.ReleaseCharacter == currentChar) {
+                    charPos++;
+                    writeChar = currentChar;
+                } else {
+                    charPos++;
+                    _charPos = charPos; 
+                    writeChar = currentChar;
+                    if (!SuppressBadEscapeSequenceErrors)
+                        throw EdiReaderException.Create(this, "Bad EDI escape sequence: {0}{1}.".FormatWith(CultureInfo.InvariantCulture, Grammar.ReleaseCharacter, currentChar));
+                }
+                
+                if (buffer == null)
+                    buffer = GetBuffer();
+
+                WriteCharToBuffer(buffer, writeChar, lastWritePosition, escapeStartPos);
+
+                lastWritePosition = charPos;
+            } else if (StringUtils.CarriageReturn == charAt && !Grammar.IsSpecial(charAt)) {
+                _charPos = charPos - 1;
+                ProcessCarriageReturn(true);
+                charPos = _charPos;
+            } else if (StringUtils.LineFeed == charAt && !Grammar.IsSpecial(charAt)) {
+                _charPos = charPos - 1;
+                ProcessLineFeed();
+                charPos = _charPos;
+            } else if (Grammar.IsSpecial(charAt)) {
+                if (StringUtils.LineFeed == charAt) {
+                    ProcessLineFeed(forwardPosition: false);
+                }
+                charPos--;
+                if (initialPosition == lastWritePosition) {
+                    _stringReference = new StringReference(_chars, initialPosition, charPos - initialPosition);
+                } else {
                     if (buffer == null)
                         buffer = GetBuffer();
 
-                    WriteCharToBuffer(buffer, writeChar, lastWritePosition, escapeStartPos);
+                    if (charPos > lastWritePosition)
+                        buffer.Append(_chars, lastWritePosition, charPos - lastWritePosition);
 
-                    lastWritePosition = charPos;
-                } else if (StringUtils.CarriageReturn == charAt && !Grammar.IsSpecial(charAt)) {
-                    _charPos = charPos - 1;
-                    ProcessCarriageReturn(true);
-                    charPos = _charPos;
-                } else if (StringUtils.LineFeed == charAt && !Grammar.IsSpecial(charAt)) {
-                    _charPos = charPos - 1;
-                    ProcessLineFeed();
-                    charPos = _charPos;
-                } else if (Grammar.IsSpecial(charAt)) {
-                    if (StringUtils.LineFeed == charAt) {
-                        ProcessLineFeed(forwardPosition: false);
-                    }
-                    charPos--;
-                    if (initialPosition == lastWritePosition) {
-                        _stringReference = new StringReference(_chars, initialPosition, charPos - initialPosition);
-                    } else {
-                        if (buffer == null)
-                            buffer = GetBuffer();
-
-                        if (charPos > lastWritePosition)
-                            buffer.Append(_chars, lastWritePosition, charPos - lastWritePosition);
-
-                        _stringReference = new StringReference(buffer.GetInternalBuffer(), 0, buffer.Position);
-                    }
-                    _charPos = charPos;
-                    return;
+                    _stringReference = new StringReference(buffer.GetInternalBuffer(), 0, buffer.Position);
                 }
-
-            }
-        }
-
-        private void WriteCharToBuffer(StringBuffer buffer, char writeChar, int lastWritePosition, int writeToPosition) {
-            if (writeToPosition > lastWritePosition) {
-                buffer.Append(_chars, lastWritePosition, writeToPosition - lastWritePosition);
+                _charPos = charPos;
+                return;
             }
 
-            buffer.Append(writeChar);
+        }
+    }
+
+    private void WriteCharToBuffer(StringBuffer buffer, char writeChar, int lastWritePosition, int writeToPosition) {
+        if (writeToPosition > lastWritePosition) {
+            buffer.Append(_chars, lastWritePosition, writeToPosition - lastWritePosition);
         }
 
-        private char ParseUnicode() {
-            char writeChar;
-            if (EnsureChars(4, true)) {
-                string hexValues = new string(_chars, _charPos, 4);
-                char hexChar = Convert.ToChar(int.Parse(hexValues, NumberStyles.HexNumber, NumberFormatInfo.InvariantInfo));
-                writeChar = hexChar;
+        buffer.Append(writeChar);
+    }
 
-                _charPos += 4;
-            } else {
-                throw EdiReaderException.Create(this, "Unexpected end while parsing unicode character.");
-            }
-            return writeChar;
+    private char ParseUnicode() {
+        char writeChar;
+        if (EnsureChars(4, true)) {
+            string hexValues = new string(_chars, _charPos, 4);
+            char hexChar = Convert.ToChar(int.Parse(hexValues, NumberStyles.HexNumber, NumberFormatInfo.InvariantInfo));
+            writeChar = hexChar;
+
+            _charPos += 4;
+        } else {
+            throw EdiReaderException.Create(this, "Unexpected end while parsing unicode character.");
         }
+        return writeChar;
+    }
 
-        private void ProcessLineFeed(bool forwardPosition = true) {
-            if (forwardPosition) { 
-                _charPos++;
-            }
-            OnNewLine(_charPos);
+    private void ProcessLineFeed(bool forwardPosition = true) {
+        if (forwardPosition) { 
+            _charPos++;
         }
+        OnNewLine(_charPos);
+    }
 
-        private void ProcessCarriageReturn(bool append, bool forwardPosition = true) {
-            if (!forwardPosition) { 
+    private void ProcessCarriageReturn(bool append, bool forwardPosition = true) {
+        if (!forwardPosition) { 
+            return;
+        }
+        _charPos++;
+        if (EnsureChars(1, append) && _chars[_charPos] == StringUtils.LineFeed) {
+            if (Grammar.IsSpecial(StringUtils.LineFeed)) {
                 return;
             }
             _charPos++;
-            if (EnsureChars(1, append) && _chars[_charPos] == StringUtils.LineFeed) {
-                if (Grammar.IsSpecial(StringUtils.LineFeed)) {
-                    return;
-                }
-                _charPos++;
-            }
-            OnNewLine(_charPos);
         }
-
-        private bool EatWhitespace(bool oneOrMore) {
-            bool finished = false;
-            bool ateWhitespace = false;
-            while (!finished) {
-                char currentChar = _chars[_charPos];
-
-                switch (currentChar) {
-                    case '\0':
-                        if (_charsUsed == _charPos) {
-                            if (ReadData(false) == 0)
-                                finished = true;
-                        } else {
-                            _charPos++;
-                        }
-                        break;
-                    case StringUtils.CarriageReturn:
-                        ProcessCarriageReturn(false);
-                        break;
-                    case StringUtils.LineFeed:
-                        ProcessLineFeed();
-                        break;
-                    default:
-                        if (currentChar == ' ' || char.IsWhiteSpace(currentChar)) {
-                            ateWhitespace = true;
-                            _charPos++;
-                        } else {
-                            finished = true;
-                        }
-                        break;
-                }
-            }
-
-            return (!oneOrMore || ateWhitespace);
-        }
-
-        #endregion
+        OnNewLine(_charPos);
     }
+
+    private bool EatWhitespace(bool oneOrMore) {
+        bool finished = false;
+        bool ateWhitespace = false;
+        while (!finished) {
+            char currentChar = _chars[_charPos];
+
+            switch (currentChar) {
+                case '\0':
+                    if (_charsUsed == _charPos) {
+                        if (ReadData(false) == 0)
+                            finished = true;
+                    } else {
+                        _charPos++;
+                    }
+                    break;
+                case StringUtils.CarriageReturn:
+                    ProcessCarriageReturn(false);
+                    break;
+                case StringUtils.LineFeed:
+                    ProcessLineFeed();
+                    break;
+                default:
+                    if (currentChar == ' ' || char.IsWhiteSpace(currentChar)) {
+                        ateWhitespace = true;
+                        _charPos++;
+                    } else {
+                        finished = true;
+                    }
+                    break;
+            }
+        }
+
+        return (!oneOrMore || ateWhitespace);
+    }
+
+    #endregion
 }

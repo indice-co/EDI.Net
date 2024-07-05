@@ -23,7 +23,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace indice.Edi.Utilities
-{
-    internal delegate TResult MethodCall<T, TResult>(T target, params object[] args);
-}
+namespace indice.Edi.Utilities;
+
+internal delegate TResult MethodCall<T, TResult>(T target, params object[] args);

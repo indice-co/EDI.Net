@@ -1,38 +1,37 @@
 ﻿using System.Collections.Generic;
 using indice.Edi.Serialization;
 
-namespace indice.Edi.Tests.Models
+namespace indice.Edi.Tests.Models;
+
+
+public class Interchange_Issue188
 {
+    public IList<IFTMINMessage> IftminMessages { get; } = new List<IFTMINMessage>();
 
-    public class Interchange_Issue188
+    public IList<INVOICMessage> InvoiceMessages { get; } = new List<INVOICMessage>();
+
+
+    [EdiCondition("IFTMIN", Path = "UNH/2/0")]
+    [EdiMessage]
+    public class IFTMINMessage
     {
-        public IList<IFTMINMessage> IftminMessages { get; } = new List<IFTMINMessage>();
+        public IList<DTM> DTMs { get; } = new List<DTM>();
+    }
 
-        public IList<INVOICMessage> InvoiceMessages { get; } = new List<INVOICMessage>();
+    [EdiCondition("INVOIC", Path = "UNH/2/0")]
+    [EdiMessage]
+    public class INVOICMessage
+    {
+        public IList<DTM> DTMs { get; } = new List<DTM>();
+    }
 
+    [EdiSegment, EdiPath("DTM")]
+    public class DTM
+    {
+        [EdiValue("9(3)", Path = "DTM/0/0")] public string Qualifier { get; set; }
 
-        [EdiCondition("IFTMIN", Path = "UNH/2/0")]
-        [EdiMessage]
-        public class IFTMINMessage
-        {
-            public IList<DTM> DTMs { get; } = new List<DTM>();
-        }
+        [EdiValue("X(35)", Path = "DTM/0/1")] public string Value { get; set; }
 
-        [EdiCondition("INVOIC", Path = "UNH/2/0")]
-        [EdiMessage]
-        public class INVOICMessage
-        {
-            public IList<DTM> DTMs { get; } = new List<DTM>();
-        }
-
-        [EdiSegment, EdiPath("DTM")]
-        public class DTM
-        {
-            [EdiValue("9(3)", Path = "DTM/0/0")] public string Qualifier { get; set; }
-
-            [EdiValue("X(35)", Path = "DTM/0/1")] public string Value { get; set; }
-
-            [EdiValue("9(3)", Path = "DTM/0/2")] public string FormatQualifier { get; set; }
-        }
+        [EdiValue("9(3)", Path = "DTM/0/2")] public string FormatQualifier { get; set; }
     }
 }

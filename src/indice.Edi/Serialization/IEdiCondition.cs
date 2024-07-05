@@ -1,15 +1,14 @@
-﻿namespace indice.Edi.Serialization
+﻿namespace indice.Edi.Serialization;
+
+/// <summary>
+/// An interface for conditions.
+/// </summary>
+public interface IEdiCondition
 {
     /// <summary>
-    /// An interface for conditions.
+    /// Returns try if the <see cref="IEdiCondition"/> is satisfied for the value passed.
     /// </summary>
-    public interface IEdiCondition
-    {
-        /// <summary>
-        /// Returns try if the <see cref="IEdiCondition"/> is satisfied for the value passed.
-        /// </summary>
-        /// <param name="value">The value to check against the condition.</param>
-        /// <returns></returns>
-        bool SatisfiedBy(string value);
-    }
+    /// <param name="value">The value to check against the condition.</param>
+    /// <returns></returns>
+    bool SatisfiedBy(string value);
 }

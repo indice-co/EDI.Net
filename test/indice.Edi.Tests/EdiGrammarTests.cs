@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
-namespace indice.Edi.Tests
+namespace indice.Edi.Tests;
+
+public class EdiGrammarTests
 {
-    public class EdiGrammarTests
-    {
-        [Fact]
-        [Trait(Traits.Tag, "Grammar")]
-        public void EdiGrammarSetAdvice_ChangesSpecialCharacters() {
+    [Fact]
+    [Trait(Traits.Tag, "Grammar")]
+    public void EdiGrammarSetAdvice_ChangesSpecialCharacters() {
 
-            var grammar = EdiGrammar.NewEdiFact();
-            Assert.True(grammar.IsSpecial('\''));
-            grammar.SetAdvice(new[] { ':', '+', '.', '?', ' ', '\r' });
-            Assert.True(grammar.IsSpecial('\r'));
-        }
+        var grammar = EdiGrammar.NewEdiFact();
+        Assert.True(grammar.IsSpecial('\''));
+        grammar.SetAdvice(new[] { ':', '+', '.', '?', ' ', '\r' });
+        Assert.True(grammar.IsSpecial('\r'));
     }
 }

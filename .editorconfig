@@ -76,3 +76,6 @@ csharp_new_line_before_catch = false
 csharp_new_line_before_finally = false
 csharp_new_line_before_members_in_object_initializers = false
 csharp_new_line_before_members_in_anonymous_types = false
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
