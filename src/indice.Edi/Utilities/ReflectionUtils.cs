@@ -157,9 +157,7 @@ internal static class ReflectionUtils
     }
 
     public static Type EnsureNotNullableType(Type t) {
-        return (IsNullableType(t))
-            ? Nullable.GetUnderlyingType(t)
-            : t;
+        return Nullable.GetUnderlyingType(t) ?? t;
     }
 
     public static bool IsGenericDefinition(Type type, Type genericInterfaceDefinition) {

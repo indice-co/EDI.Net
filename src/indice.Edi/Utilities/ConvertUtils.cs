@@ -164,34 +164,13 @@ internal static class ConvertUtils
     ];
 
     public static PrimitiveTypeCode GetTypeCode(Type t) {
-        bool isEnum;
-        return GetTypeCode(t, out isEnum);
-    }
-
-    public static PrimitiveTypeCode GetTypeCode(Type t, out bool isEnum) {
-        PrimitiveTypeCode typeCode;
-        if (TypeCodeMap.TryGetValue(t, out typeCode)) {
-            isEnum = false;
+        if (TypeCodeMap.TryGetValue(t, out PrimitiveTypeCode typeCode)) {
             return typeCode;
         }
 
-        if (t.IsEnum) {
-            isEnum = true;
-            return PrimitiveTypeCode.Enum;
-        }
-
-        // performance?
-        if (ReflectionUtils.IsNullableType(t)) {
-            Type nonNullable = Nullable.GetUnderlyingType(t);
-            if (nonNullable.IsEnum) {
-                Type nullableUnderlyingType = typeof(Nullable<>).MakeGenericType(Enum.GetUnderlyingType(nonNullable));
-                isEnum = true;
-                return GetTypeCode(nullableUnderlyingType);
-            }
-        }
-
-        isEnum = false;
-        return PrimitiveTypeCode.Object;
+        return ReflectionUtils.EnsureNotNullableType(t).IsEnum
+            ? PrimitiveTypeCode.Enum
+            : PrimitiveTypeCode.Object;
     }
 
     public static TypeInformation GetTypeInformation(IConvertible convertable)

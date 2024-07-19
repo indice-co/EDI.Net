@@ -110,7 +110,7 @@ public class EdiSerializer
                 if (reader.IsStartMessage) {
                     if (stack.Count == 0) {
                         stack.Push(new EdiStructure(EdiStructureType.Message, Activator.CreateInstance(objectType)));
-                    } else { 
+                    } else {
                         TryCreateContainer(reader, stack, EdiStructureType.Message);
                     }
                 } else if (reader.IsEndMessage) {
@@ -127,7 +127,7 @@ public class EdiSerializer
                         stack.Pop();
                     }
                     value = stack.Peek().Instance;
-                } 
+                }
                 if (reader.TokenType == EdiToken.SegmentName) {
                     while (true) {
                         if (TryCreateContainer(reader, stack, EdiStructureType.SegmentGroup)
@@ -150,8 +150,7 @@ public class EdiSerializer
 
                 if (reader.TokenType == EdiToken.ElementStart) {
                     TryCreateContainer(reader, stack, EdiStructureType.Element);
-                }
-                else if (stack.Count > 0 && stack.Peek().CachedReads.Count > 0) {
+                } else if (stack.Count > 0 && stack.Peek().CachedReads.Count > 0) {
                     var allCachedReads = stack.Peek().CachedReads;
                     while (allCachedReads.Count > 0 && TryCreateContainer(reader, stack, EdiStructureType.Element)) {
                         if (stack.Peek().CachedReads.Any(x => x.HasValue)) {
@@ -257,8 +256,22 @@ public class EdiSerializer
                         break;
                     case PrimitiveTypeCode.Bytes: break;
                     case PrimitiveTypeCode.DBNull: break;
+                    case PrimitiveTypeCode.Enum:
+                        PopulateEnumValue(reader, structure, descriptor, useTheReader);
+                        break;
                 }
             }
+        }
+    }
+
+    internal static void PopulateEnumValue(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
+        var cache = structure.CachedReads;
+        var valueInfo = descriptor.ValueInfo;
+
+        var enumValueString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
+                                                            read ? reader.ReadAsString() : (string)reader.Value;
+        if (!string.IsNullOrEmpty(enumValueString)) {
+            descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(enumValueString, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
         }
     }
 
@@ -313,36 +326,20 @@ public class EdiSerializer
     internal static void PopulateInt32Value(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
         var cache = structure.CachedReads;
         var valueInfo = descriptor.ValueInfo;
-        if (!descriptor.Info.PropertyType.IsEnum) {
-            var integer = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsInt32(valueInfo.Path, reader.Culture) :
-                                                        read ? reader.ReadAsInt32() : (int?)reader.Value;
-            if (integer.HasValue) {
-                descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
-            }
-        } else {
-            var enumValueString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
-                                                                read ? reader.ReadAsString() : (string)reader.Value;
-            if (!string.IsNullOrEmpty(enumValueString)) {
-                descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(enumValueString, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
-            }
+        var integer = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsInt32(valueInfo.Path, reader.Culture) :
+                                                    read ? reader.ReadAsInt32() : (int?)reader.Value;
+        if (integer.HasValue) {
+            descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
         }
     }
-    
+
     internal static void PopulateInt64Value(EdiReader reader, EdiStructure structure, EdiPropertyDescriptor descriptor, bool read) {
         var cache = structure.CachedReads;
         var valueInfo = descriptor.ValueInfo;
-        if (!descriptor.Info.PropertyType.IsEnum) {
-            var integer = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsInt64(valueInfo.Path, reader.Culture) :
-                                                        read ? reader.ReadAsInt64() : (int?)reader.Value;
-            if (integer.HasValue) {
-                descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
-            }
-        } else {
-            var enumValueString = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsString(valueInfo.Path) :
-                                                                read ? reader.ReadAsString() : (string)reader.Value;
-            if (!string.IsNullOrEmpty(enumValueString)) {
-                descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(enumValueString, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
-            }
+        var integer = cache.ContainsPath(valueInfo.Path) ? cache.ReadAsInt64(valueInfo.Path, reader.Culture) :
+                                                    read ? reader.ReadAsInt64() : (int?)reader.Value;
+        if (integer.HasValue) {
+            descriptor.Info.SetValue(structure.Instance, ConvertUtils.ConvertOrCast(integer.Value, CultureInfo.InvariantCulture, descriptor.Info.PropertyType));
         }
     }
 
@@ -418,7 +415,7 @@ public class EdiSerializer
                         var canAdvance = FindForCurrentSegment(reader, level, EdiStructureType.SegmentGroup) != null;
                         if (canAdvance) {
                             break;
-                        } 
+                        }
                         level.Close(); // Close this level
                         index = level.Index + 1;
                         continue;
