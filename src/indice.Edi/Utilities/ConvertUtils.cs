@@ -173,8 +173,7 @@ internal static class ConvertUtils
             : PrimitiveTypeCode.Object;
     }
 
-    public static TypeInformation GetTypeInformation(IConvertible convertable)
-    {
+    public static TypeInformation GetTypeInformation(IConvertible convertable) {
         TypeInformation typeInformation = PrimitiveTypeCodes[(int)convertable.GetTypeCode()];
         return typeInformation;
     }
@@ -233,81 +232,42 @@ internal static class ConvertUtils
         return o => call(null, o);
     }
 
-    internal static BigInteger ToBigInteger(object value)
-    {
-        if (value is BigInteger)
-        {
-            return (BigInteger)value;
-        }
-        if (value is string)
-        {
-            return BigInteger.Parse((string)value, CultureInfo.InvariantCulture);
-        }
-        if (value is float)
-        {
-            return new BigInteger((float)value);
-        }
-        if (value is double)
-        {
-            return new BigInteger((double)value);
-        }
-        if (value is decimal)
-        {
-            return new BigInteger((decimal)value);
-        }
-        if (value is int)
-        {
-            return new BigInteger((int)value);
-        }
-        if (value is long)
-        {
-            return new BigInteger((long)value);
-        }
-        if (value is uint)
-        {
-            return new BigInteger((uint)value);
-        }
-        if (value is ulong)
-        {
-            return new BigInteger((ulong)value);
-        }
-        if (value is byte[])
-        {
-            return new BigInteger((byte[])value);
-        }
-
-        throw new InvalidCastException("Cannot convert {0} to BigInteger.".FormatWith(CultureInfo.InvariantCulture, value.GetType()));
+    internal static BigInteger ToBigInteger(object value) {
+        return value switch {
+            BigInteger v => v,
+            string v => BigInteger.Parse(v, CultureInfo.InvariantCulture),
+            float v => new BigInteger(v),
+            double v => new BigInteger(v),
+            decimal v => new BigInteger(v),
+            int v => new BigInteger(v),
+            long v => new BigInteger(v),
+            uint v => new BigInteger(v),
+            ulong v => new BigInteger(v),
+            byte[] v => new BigInteger(v),
+            _ => throw new InvalidCastException("Cannot convert {0} to BigInteger.".FormatWith(CultureInfo.InvariantCulture, value.GetType()))
+        };
     }
 
-    public static object FromBigInteger(BigInteger i, Type targetType)
-    {
-        if (targetType == typeof(decimal))
-        {
+    public static object FromBigInteger(BigInteger i, Type targetType) {
+        if (targetType == typeof(decimal)) {
             return (decimal)i;
         }
-        if (targetType == typeof(double))
-        {
+        if (targetType == typeof(double)) {
             return (double)i;
         }
-        if (targetType == typeof(float))
-        {
+        if (targetType == typeof(float)) {
             return (float)i;
         }
-        if (targetType == typeof(ulong))
-        {
+        if (targetType == typeof(ulong)) {
             return (ulong)i;
         }
-        if (targetType == typeof(bool))
-        {
+        if (targetType == typeof(bool)) {
             return i != 0;
         }
 
-        try
-        {
+        try {
             return System.Convert.ChangeType((long)i, targetType, CultureInfo.InvariantCulture);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new InvalidOperationException("Can not convert from BigInteger to {0}.".FormatWith(CultureInfo.InvariantCulture, targetType), ex);
         }
     }
@@ -431,13 +391,11 @@ internal static class ConvertUtils
             }
         }
 
-        if (targetType == typeof(BigInteger))
-        {
+        if (targetType == typeof(BigInteger)) {
             value = ToBigInteger(initialValue);
             return ConvertResult.Success;
         }
-        if (initialValue is BigInteger)
-        {
+        if (initialValue is BigInteger) {
             value = FromBigInteger((BigInteger)initialValue, targetType);
             return ConvertResult.Success;
         }
@@ -445,25 +403,21 @@ internal static class ConvertUtils
         // see if source or target types have a TypeConverter that converts between the two
         TypeConverter toConverter = GetConverter(initialType);
 
-        if (toConverter != null && toConverter.CanConvertTo(targetType))
-        {
+        if (toConverter != null && toConverter.CanConvertTo(targetType)) {
             value = toConverter.ConvertTo(null, culture, initialValue, targetType);
             return ConvertResult.Success;
         }
 
         TypeConverter fromConverter = GetConverter(targetType);
 
-        if (fromConverter != null && fromConverter.CanConvertFrom(initialType))
-        {
+        if (fromConverter != null && fromConverter.CanConvertFrom(initialType)) {
             value = fromConverter.ConvertFrom(null, culture, initialValue);
             return ConvertResult.Success;
         }
 
         // handle DBNull and INullable
-        if (initialValue == DBNull.Value)
-        {
-            if (ReflectionUtils.IsNullable(targetType))
-            {
+        if (initialValue == DBNull.Value) {
+            if (ReflectionUtils.IsNullable(targetType)) {
                 value = EnsureTypeAssignable(null, initialType, targetType);
                 return ConvertResult.Success;
             }
@@ -472,8 +426,7 @@ internal static class ConvertUtils
             value = null;
             return ConvertResult.CannotConvertNull;
         }
-        if (initialValue is INullable)
-        {
+        if (initialValue is INullable) {
             value = EnsureTypeAssignable(ToValue((INullable)initialValue), initialType, targetType);
             return ConvertResult.Success;
         }
@@ -501,7 +454,6 @@ internal static class ConvertUtils
     /// is returned if assignable to the target type.
     /// </returns>
     public static object ConvertOrCast(object initialValue, CultureInfo culture, Type targetType) {
-        object convertedValue;
 
         if (targetType == typeof(object)) {
             return initialValue;
@@ -511,7 +463,7 @@ internal static class ConvertUtils
             return null;
         }
 
-        if (TryConvert(initialValue, culture, targetType, out convertedValue)) {
+        if (TryConvert(initialValue, culture, targetType, out var convertedValue)) {
             return convertedValue;
         }
 
@@ -520,7 +472,7 @@ internal static class ConvertUtils
     #endregion
 
     private static object EnsureTypeAssignable(object value, Type initialType, Type targetType) {
-        Type valueType = (value != null) ? value.GetType() : null;
+        Type valueType = value?.GetType();
 
         if (value != null) {
             if (targetType.IsAssignableFrom(valueType)) {
@@ -540,34 +492,16 @@ internal static class ConvertUtils
         throw new ArgumentException("Could not cast or convert from {0} to {1}.".FormatWith(CultureInfo.InvariantCulture, (initialType != null) ? initialType.ToString() : "{null}", targetType));
     }
 
-    public static object ToValue(INullable nullableValue)
-    {
-        if (nullableValue == null)
-        {
-            return null;
-        }
-        else if (nullableValue is SqlInt32)
-        {
-            return ToValue((SqlInt32)nullableValue);
-        }
-        else if (nullableValue is SqlInt64)
-        {
-            return ToValue((SqlInt64)nullableValue);
-        }
-        else if (nullableValue is SqlBoolean)
-        {
-            return ToValue((SqlBoolean)nullableValue);
-        }
-        else if (nullableValue is SqlString)
-        {
-            return ToValue((SqlString)nullableValue);
-        }
-        else if (nullableValue is SqlDateTime)
-        {
-            return ToValue((SqlDateTime)nullableValue);
-        }
-
-        throw new ArgumentException("Unsupported INullable type: {0}".FormatWith(CultureInfo.InvariantCulture, nullableValue.GetType()));
+    public static object ToValue(INullable nullableValue) {
+        return nullableValue switch {
+            null => null,
+            SqlInt32 v => ToValue(v),
+            SqlInt64 v => ToValue(v),
+            SqlBoolean v => ToValue(v),
+            SqlString v => ToValue(v),
+            SqlDateTime v => ToValue(v),
+            _ => throw new ArgumentException("Unsupported INullable type: {0}".FormatWith(CultureInfo.InvariantCulture, nullableValue.GetType())),
+        };
     }
 
     internal static TypeConverter GetConverter(Type t) => TypeDescriptor.GetConverter(t);
@@ -575,19 +509,17 @@ internal static class ConvertUtils
     public static bool VersionTryParse(string input, out Version result) => Version.TryParse(input, out result);
 
     public static bool IsInteger(object value) {
-        switch (GetTypeCode(value.GetType())) {
-            case PrimitiveTypeCode.SByte:
-            case PrimitiveTypeCode.Byte:
-            case PrimitiveTypeCode.Int16:
-            case PrimitiveTypeCode.UInt16:
-            case PrimitiveTypeCode.Int32:
-            case PrimitiveTypeCode.UInt32:
-            case PrimitiveTypeCode.Int64:
-            case PrimitiveTypeCode.UInt64:
-                return true;
-            default:
-                return false;
-        }
+        return GetTypeCode(value.GetType()) switch {
+            PrimitiveTypeCode.SByte 
+            or PrimitiveTypeCode.Byte 
+            or PrimitiveTypeCode.Int16 
+            or PrimitiveTypeCode.UInt16 
+            or PrimitiveTypeCode.Int32 
+            or PrimitiveTypeCode.UInt32 
+            or PrimitiveTypeCode.Int64 
+            or PrimitiveTypeCode.UInt64 => true,
+            _ => false,
+        };
     }
 
     public static ParseResult Int32TryParse(char[] chars, int start, int length, out int value) {
