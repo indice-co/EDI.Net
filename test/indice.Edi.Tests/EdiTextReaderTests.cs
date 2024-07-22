@@ -1112,4 +1112,21 @@ public class EdiTextReaderTests
         Assert.Equal("CN", interchange.Messages[0].Details[0].PartyQualifier);
     }
 
+    [Theory, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#264")]
+    [InlineData("IFT+1:3'", Interchange_Issue264.DocumentType.DebitNote)]
+    [InlineData("IFT+1:CreditNote'", Interchange_Issue264.DocumentType.CreditNote)]
+    public void EdiFact_Read_Enum(string input, Interchange_Issue264.DocumentType expectedEnum) {
+
+        var text = new StringBuilder("UNB+XXXX'")
+            .AppendLine("UNH+000001'")
+            .AppendLine(input)
+            .AppendLine("UNZ+1'");
+
+        var interchange = default(Interchange_Issue264);
+        using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(text.ToString()))) {
+            interchange = new EdiSerializer().Deserialize<Interchange_Issue264>(new StreamReader(stream), EdiGrammar.NewEdiFact());
+        }
+
+        Assert.Equal(expectedEnum, interchange.Msg.DocumentType);
+    } 
 }
