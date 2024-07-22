@@ -20,6 +20,7 @@
     <PackageReleaseNotes>
       - Dotnet 8.0 #259
       - Csharp modern features
+      - Fix for Enum deserialization #264
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
