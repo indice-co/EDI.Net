@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>indice.Edi.Tests Class Library</Description>
-    <TargetFrameworks>net60;net8.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <LangVersion>Latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
