@@ -488,7 +488,12 @@ public enum VatRateCategoryCode
     /// <summary>
     /// Edi Value Description : Exemption From Vat In Withdrawn Bill
     /// </summary>
-    U
+    U,
+
+    /// <summary>
+    /// Edi Value Description : Standard Rate (used in tradacoms as alternative)
+    /// </summary>
+    A,
 }
 public enum ReasonForLowerVatRateType
 {

@@ -7,7 +7,9 @@
 public class EdiGrammar : IEdiGrammar
 {
     char[] _separators;
-    
+
+    bool _canImplicitlyEscapeSegmentNameDelimiter = false;
+
     /// <summary>
     /// Constructs an <see cref="EdiGrammar"/> with the EdiFact defaults
     /// </summary>
@@ -59,6 +61,7 @@ public class EdiGrammar : IEdiGrammar
                     DataElementSeparator,
                     SegmentTerminator
                 }.Distinct().ToArray();
+                _canImplicitlyEscapeSegmentNameDelimiter = _separators.Length == 4; 
             }
             return _separators;
         }
@@ -145,9 +148,12 @@ public class EdiGrammar : IEdiGrammar
     /// <summary>
     /// Checks to see if a character is any of the known special characters.
     /// </summary>
-    /// <param name="character"></param>
+    /// <param name="character">The character to check</param>
+    /// <param name="tokenContext">The context in which the character is checked for its purpose. Defaults to null</param>
     /// <returns>True if the character is special. Otherwize false.</returns>
-    public bool IsSpecial(char character) => Separators.Contains(character);
+    public bool IsSpecial(char character, EdiToken? tokenContext = null) => 
+        Separators.Contains(character) && 
+        !(tokenContext == EdiToken.ComponentStart && _canImplicitlyEscapeSegmentNameDelimiter && SegmentNameDelimiter.Equals(character));
 
     /// <summary>
     /// Populates the Edi grammar delimiters using a eg UNA:+.? '

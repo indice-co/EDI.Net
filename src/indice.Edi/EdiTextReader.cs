@@ -493,6 +493,7 @@ public class EdiTextReader : EdiReader, IEdiLineInfo
         StringBuffer buffer = null;
         while (true) {
             var charAt = _chars[charPos++];
+            var isSpecial = Grammar.IsSpecial(charAt, TokenType);
             if ('\0' == charAt) {
                 if (_charsUsed == charPos - 1) {
                     charPos--;
@@ -535,15 +536,15 @@ public class EdiTextReader : EdiReader, IEdiLineInfo
                 WriteCharToBuffer(buffer, writeChar, lastWritePosition, escapeStartPos);
 
                 lastWritePosition = charPos;
-            } else if (StringUtils.CarriageReturn == charAt && !Grammar.IsSpecial(charAt)) {
+            } else if (StringUtils.CarriageReturn == charAt && !isSpecial) {
                 _charPos = charPos - 1;
                 ProcessCarriageReturn(true);
                 charPos = _charPos;
-            } else if (StringUtils.LineFeed == charAt && !Grammar.IsSpecial(charAt)) {
+            } else if (StringUtils.LineFeed == charAt && !isSpecial) {
                 _charPos = charPos - 1;
                 ProcessLineFeed();
                 charPos = _charPos;
-            } else if (Grammar.IsSpecial(charAt)) {
+            } else if (isSpecial) {
                 if (StringUtils.LineFeed == charAt) {
                     ProcessLineFeed(forwardPosition: false);
                 }

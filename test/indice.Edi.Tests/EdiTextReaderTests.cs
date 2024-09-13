@@ -40,11 +40,46 @@ public class EdiTextReaderTests
     [Trait(Traits.Tag, "Tradacoms")]
     public void EscapeCharactersTest() {
         var grammar = EdiGrammar.NewTradacoms();
+        grammar.SetAdvice(
+            segmentNameDelimiter: '=',
+            componentDataElementSeparator: ':',
+            dataElementSeparator: '+',
+            segmentTerminator: '\'',
+            releaseCharacter: '?',
+            reserved: ' ',
+            decimalMark: null);
         var interchange = default(Interchange);
         using (var stream = Helpers.GetResourceStream("tradacoms.utilitybill.escape.edi")) {
             interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
         }
         Assert.Equal("GEORGE'S FRIED CHIKEN + SONS. Could be the best chicken yet?", interchange.Head.ClientName);
+    }
+    [Fact]
+    [Trait(Traits.Tag, "Tradacoms")]
+    [Trait(Traits.Issue, "#268")]
+    public void EscapeCharactersTest_noescape() {
+        var grammar = EdiGrammar.NewTradacoms();
+        var interchange = default(Interchange);
+        using (var stream = Helpers.GetResourceStream("tradacoms.utilitybill.escape2.edi")) {
+            interchange = new EdiSerializer().Deserialize<Interchange>(new StreamReader(stream), grammar);
+        }
+        Assert.Equal("Additional Cyclic Re (Balance to be charged=20.26)", interchange.Invoices[0].Charges[3].TariffDescription);
+    }
+
+    [Fact]
+    [Trait(Traits.Tag, "Tradacoms")]
+    [Trait(Traits.Issue, "#268")]
+    public void TreatsegmentNameDelimiter_As_NormalCharacterWhen_Inside_A_Segment_Test() {
+        var grammar = EdiGrammar.NewTradacoms();
+        var inputSegmentLine = "CCD=13+4+:Additional Cyclic Re (Balance to be charged=20.26)+:::+++++++++++83000+1000:ZZ:+++83000+83:+A+S+20000+'";
+        using (var ediReader = new EdiTextReader(new StreamReader(Helpers.StreamFromString(inputSegmentLine)), grammar)) {
+            // fast forward into position.
+            var notFinished = true;
+            do { notFinished = ediReader.Read(); }
+            while (notFinished && ediReader.Path != "CCD[2][1]");
+            ediReader.Read(); // read string.
+            Assert.Equal("Additional Cyclic Re (Balance to be charged=20.26)", ediReader.Value);
+        }
     }
 
     [Fact]
@@ -1072,7 +1107,7 @@ public class EdiTextReaderTests
         // There is a misconfiguration made in order to trigger the bug that makes the SearchForward function to enter into an infinite loop.
         // The correct configuration to change the Path on the two EdiCondition attributes to UNH/1/0, and it works.
 
-        Assert.Equal(0, interchange.IftminMessages.Count);
+        Assert.Empty(interchange.IftminMessages);
     }
 
     [Fact]
@@ -1087,7 +1122,7 @@ public class EdiTextReaderTests
 
         Assert.NotNull(interchange.EDIFACT_INVOICS4);
         Assert.Equal(5, interchange.EDIFACT_INVOICS4.SG6.Count);
-        Assert.Equal(1, interchange.EDIFACT_INVOICS4.UNS.SG52.Count);
+        Assert.Single(interchange.EDIFACT_INVOICS4.UNS.SG52);
     }
 
     [Fact]

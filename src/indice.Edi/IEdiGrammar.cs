@@ -87,9 +87,10 @@ public interface IEdiGrammar
     /// <summary>
     /// Checks to see if a character is any of the known special characters.
     /// </summary>
-    /// <param name="character"></param>
+    /// <param name="character">The character to check</param>
+    /// <param name="tokenContext">The context in which the character is checked for its purpose. Defaults to null</param>
     /// <returns>True if the character is special. Otherwize false.</returns>
-    bool IsSpecial(char character);
+    bool IsSpecial(char character, EdiToken? tokenContext = null);
 
     /// <summary>
     /// Populates the Edi grammar delimiters using a eg UNA:+.? '
