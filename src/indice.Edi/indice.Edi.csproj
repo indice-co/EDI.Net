@@ -4,7 +4,7 @@
     <Copyright>Copyright (c) 2015 Indice</Copyright>
     <AssemblyTitle>Edi.Net</AssemblyTitle>
     <VersionPrefix>2.0.0</VersionPrefix>
-    <VersionSuffix>beta01</VersionSuffix>
+    <VersionSuffix>beta02</VersionSuffix>
     <Authors>c.leftheris</Authors>
     <TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <AssemblyName>indice.Edi</AssemblyName>
@@ -21,6 +21,7 @@
       - Dotnet 8.0 #259
       - Csharp modern features
       - Fix for Enum deserialization #264
+      - Implicit segment name delimiter escape when inside a component value #268
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
