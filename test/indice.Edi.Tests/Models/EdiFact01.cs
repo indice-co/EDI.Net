@@ -1,7 +1,5 @@
 ﻿using indice.Edi.Serialization;
 using indice.Edi.Utilities;
-using System;
-using System.Collections.Generic;
 
 namespace indice.Edi.Tests.Models.EdiFact01;
 

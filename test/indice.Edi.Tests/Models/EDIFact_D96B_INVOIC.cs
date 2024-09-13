@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using indice.Edi.Serialization;
 
 namespace indice.Edi.Tests.Models;

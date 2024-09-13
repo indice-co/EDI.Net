@@ -1,7 +1,4 @@
 ﻿using indice.Edi.Tests.Models;
-using System;
-using System.IO;
-using System.Linq;
 using System.Text;
 using Xunit;
 

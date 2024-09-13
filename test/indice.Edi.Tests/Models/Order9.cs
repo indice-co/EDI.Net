@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace indice.Edi.Tests.Models;
+﻿namespace indice.Edi.Tests.Models;
 
 public class Order9
 {

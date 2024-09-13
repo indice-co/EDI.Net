@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using indice.Edi.Serialization;
 
 namespace indice.Edi.Tests.Models;

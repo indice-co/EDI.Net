@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace indice.Edi.Tests.Models;
+﻿namespace indice.Edi.Tests.Models;
 
 public class EdiFact_Issue154_Transmission
 {

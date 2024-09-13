@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using indice.Edi.Tests.Models;
 using Xunit;
-using static indice.Edi.Tests.Models.Interchange_Issue263.GIN;
 
 namespace indice.Edi.Tests;
 

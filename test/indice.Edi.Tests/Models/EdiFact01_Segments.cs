@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using indice.Edi.Serialization;
+﻿using indice.Edi.Serialization;
 using indice.Edi.Tests.Models.EdiFact01;
 
 namespace indice.Edi.Tests.Models;

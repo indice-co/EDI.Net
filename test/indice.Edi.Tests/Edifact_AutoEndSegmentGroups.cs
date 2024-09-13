@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using indice.Edi.Tests.Models;
+﻿using indice.Edi.Tests.Models;
 using Xunit;
 
 namespace indice.Edi.Tests;

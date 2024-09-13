@@ -1,7 +1,5 @@
 ﻿#region Using
 
-using System.Collections.Generic;
-
 using indice.Edi.Serialization;
 
 #endregion

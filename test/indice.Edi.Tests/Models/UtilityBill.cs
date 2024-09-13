@@ -1,7 +1,4 @@
 ﻿using indice.Edi.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace indice.Edi.Tests.Models;
 
