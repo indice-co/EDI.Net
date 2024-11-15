@@ -486,4 +486,56 @@ public class SerializerTests
         var output = Serialize(source);
         Assert.Equal(expected, output);
     }
+
+    [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#272")]
+    public void Serialize_Multiple_Repeating_Elements_In_A_Single_Segment_Issue272() {
+        var source = new Interchange_Issue272() {
+            PFD = new PFD {
+                PFD_01A_SpecificSeat = "12C",
+                PFD_02A_NoSmokingIndicator = "N",
+                PFD_02B_CabinClassDesignator = "M",
+                PFD_02C_CabinClassNumber = "3",
+                PFD_02E_SegmentAirportOfDeparture = "FRA",
+                PFD_02F_SegmentAirportOfArrival = "MEX",
+                PFD_02G_EquipmentCode = "744",
+                PFD_02I_SeatCharacteristics = "Y",
+                PFD_02J_SeatCharacteristics = "Z",
+                PFD_07_PaxIdForBPPrint = "12",
+                PFD_10_PaxPriorityInformation = "M/M",
+                SeatDetails = new PFD_SeatDetail[] {
+                                            new PFD_SeatDetail {
+                                                PFD_11A_SpecificSeat = "01A",
+                                                PFD_11B_FreeSeatingReference = "E"
+                                            },
+                                            new PFD_SeatDetail {
+                                                PFD_11A_SpecificSeat = "01B",
+                                                PFD_11B_FreeSeatingReference = "F"
+                                            }
+                                        },
+                SeatDefinitions = new PFD_SeatDefinition[] {
+                                            new PFD_SeatDefinition {
+                                                PFD_12A_NoSmokingIndicator = "Y",
+                                                PFD_12E_SegmentAirportOfDeparture = "AAA",
+                                                PFD_12F_SegmentAirportOfArrival = "BBB"
+                                            },
+                                            new PFD_SeatDefinition {
+                                                PFD_12A_NoSmokingIndicator = "N",
+                                                PFD_12E_SegmentAirportOfDeparture = "AAA",
+                                                PFD_12F_SegmentAirportOfArrival = "BBB"
+                                            }
+                                        }
+            }
+        };
+
+        string Serialize<T>(T data) {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            using var writer = new StringWriter();
+            new EdiSerializer().Serialize(writer, grammar, data);
+            return writer.ToString();
+        }
+        var expected = $"UNA:+.? '{Environment.NewLine}PFD+12C+N:M:3::FRA:MEX:744::Y:Z+12+++M/M+++++++++Y::::AAA:BBB+N::::AAA:BBB'{Environment.NewLine}";
+        var output = Serialize(source);
+        Assert.Equal(expected, output);
+    }
 }
