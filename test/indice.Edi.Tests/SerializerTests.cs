@@ -487,7 +487,7 @@ public class SerializerTests
     }
 
     [Fact, Trait(Traits.Tag, "EDIFact")]
-    public void Serialize_Explicit_Indication_of_Nesting() {
+    public void Serialize_With_Explicit_Indication_of_Nesting() {
         var grammar = EdiGrammar.NewEdiFact();
         grammar.ExplicitIndicationOfNesting = true;
         var interchange = new EDIFACT_ExplicitNesting_issue227() {
@@ -517,13 +517,60 @@ public class SerializerTests
             }
         };
         var expected = new StringBuilder()
-    .AppendLine("UNA:+.? '")
-    .AppendLine("TIT+Title'")
-    .AppendLine("LE1:1+Name 1'")
-    .AppendLine("LE2:1:1+Sub 1 1'")
-    .AppendLine("LE2:1:2+Sub 1 2'")
-    .AppendLine("LE1:2+Name 2'")
-    .AppendLine("LE2:2:1+Sub 2 1'").ToString();
+            .AppendLine("UNA:+.? '")
+            .AppendLine("TIT+Title'")
+            .AppendLine("LE1:1+Name 1'")
+            .AppendLine("LE2:1:1+Sub 1 1'")
+            .AppendLine("LE2:1:2+Sub 1 2'")
+            .AppendLine("LE1:2+Name 2'")
+            .AppendLine("LE2:2:1+Sub 2 1'").ToString();
+        string output = null;
+        using (var writer = new StringWriter()) {
+            new EdiSerializer().Serialize(writer, grammar, interchange);
+            output = writer.ToString();
+        }
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact, Trait(Traits.Tag, "EDIFact")]
+    public void Serialize_Without_Explicit_Indication_of_Nesting() {
+        var grammar = EdiGrammar.NewEdiFact();
+        grammar.ExplicitIndicationOfNesting = false;
+        var interchange = new EDIFACT_ExplicitNesting_issue227() {
+            Msg = new() {
+                Title = "Title",
+                L1s = [
+                    new() {
+                        Name = "Name 1",
+                        L2s = [
+                            new() {
+                                SubName = "Sub 1 1"
+                            },
+                            new() {
+                                SubName = "Sub 1 2"
+                            }
+                        ]
+                    },
+                    new() {
+                        Name = "Name 2",
+                        L2s = [
+                            new() {
+                                SubName = "Sub 2 1"
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+        var expected = new StringBuilder()
+            .AppendLine("UNA:+.? '")
+            .AppendLine("TIT+Title'")
+            .AppendLine("LE1+Name 1'")
+            .AppendLine("LE2+Sub 1 1'")
+            .AppendLine("LE2+Sub 1 2'")
+            .AppendLine("LE1+Name 2'")
+            .AppendLine("LE2+Sub 2 1'").ToString();
         string output = null;
         using (var writer = new StringWriter()) {
             new EdiSerializer().Serialize(writer, grammar, interchange);
