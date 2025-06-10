@@ -293,7 +293,8 @@ public abstract class EdiWriter : IDisposable
     /// Writes the segmant name. And marks the beginning of a Segment.
     /// </summary>
     /// <param name="name">The name of the segment.</param>
-    public virtual void WriteSegmentName(string name) {
+    /// <param name="nesting">The current nesting level.</param>
+    public virtual void WriteSegmentName(string name, IList<int> nesting) {
         InternalWriteStart(EdiToken.SegmentName, EdiContainerType.Segment);
         InternalWriteSegmentName(name);
     }
@@ -339,7 +340,7 @@ public abstract class EdiWriter : IDisposable
             case EdiToken.SegmentName:
                 // read to next
                 ValidationUtils.ArgumentNotNull(value, nameof(value));
-                WriteSegmentName(value.ToString());
+                WriteSegmentName(value.ToString(), []);
                 break;
             case EdiToken.ElementStart:
                 InternalWriteStart(EdiToken.ElementStart, EdiContainerType.Element);

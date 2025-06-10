@@ -146,6 +146,11 @@ public class EdiGrammar : IEdiGrammar
     public string InterchangeTrailerTag { get; protected set; }
 
     /// <summary>
+    /// Whether to print explicit indication of nesting
+    /// </summary>
+    public bool ExplicitIndicationOfNesting { get; set; }
+
+    /// <summary>
     /// Checks to see if a character is any of the known special characters.
     /// </summary>
     /// <param name="character">The character to check</param>

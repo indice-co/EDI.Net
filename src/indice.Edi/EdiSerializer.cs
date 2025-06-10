@@ -733,7 +733,7 @@ public class EdiSerializer
             stack.Push(new EdiStructure(EdiStructureType.Interchange, value));
             if (writer.WriteState == WriteState.Start)
                 writer.WriteServiceStringAdvice();
-            SerializeStructure(writer, stack);
+            SerializeStructure(writer, stack, []);
         }
         // else if this is indeed a collection type this must be a collection of messages.
         else {
@@ -743,7 +743,7 @@ public class EdiSerializer
 
 
 
-    private static void SerializeStructure(EdiWriter writer, Stack<EdiStructure> stack, EdiPathComparer structuralComparer = null) {
+    private static void SerializeStructure(EdiWriter writer, Stack<EdiStructure> stack, List<int> nesting, EdiPathComparer structuralComparer = null) {
         structuralComparer = structuralComparer ?? new EdiPathComparer(writer.Grammar);
         var structure = stack.Peek();
         var properies = structure.GetOrderedProperties(structuralComparer);
@@ -763,7 +763,7 @@ public class EdiSerializer
                 }
                 if (path.Segment != propertyPath.Segment ||
                     structuralComparer.Compare(path, propertyPath) >= 0) {
-                    writer.WriteSegmentName(propertyPath.Segment);
+                    writer.WriteSegmentName(propertyPath.Segment, nesting);
                     path = (EdiPath)writer.Path;
                 }
                 // the following loop handles the write of unmapped preceding elements/components to the one being writen 
@@ -823,7 +823,7 @@ public class EdiSerializer
                             var previous = stack.Pop();
                         }
                         stack.Push(new EdiStructure(container, stack.Peek(), property, item, range_offset + i, null));
-                        SerializeStructure(writer, stack, structuralComparer);
+                        SerializeStructure(writer, stack, [.. nesting, 1 + i], structuralComparer);
                     }
                 } else {
                     // or a simple Container.
@@ -836,7 +836,7 @@ public class EdiSerializer
                     if (value == null)
                         continue;
                     stack.Push(new EdiStructure(container, stack.Peek(), property, value));
-                    SerializeStructure(writer, stack, structuralComparer);
+                    SerializeStructure(writer, stack, nesting, structuralComparer);
                 }
             }
         }
