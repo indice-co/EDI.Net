@@ -58,7 +58,7 @@ public class EdiTextWriter : EdiWriter
 
         _writer = textWriter;
         _charEscapeFlags = new bool[128];
-        if (Grammar.ReleaseCharacter.HasValue) { 
+        if (Grammar.ReleaseCharacter.HasValue) {
             _charEscapeFlags[Grammar.DataElementSeparator] =
             _charEscapeFlags[Grammar.ComponentDataElementSeparator] =
             _charEscapeFlags[Grammar.SegmentNameDelimiter] =
@@ -88,15 +88,22 @@ public class EdiTextWriter : EdiWriter
             _writer.Close();
         }
     }
-    
+
     /// <summary>
     /// Writes the segment name of a name/value pair on a Edi object.
     /// </summary>
     /// <param name="name">The name of the property.</param>
-    public override void WriteSegmentName(string name) {
+    /// <param name="nesting">The current nesting level.</param>
+    public override void WriteSegmentName(string name, IList<int> nesting) {
         InternalWriteStart(EdiToken.SegmentName, EdiContainerType.Segment);
         InternalWriteSegmentName(name);
         _writer.Write(name);
+        if (Grammar.ExplicitIndicationOfNesting) {
+            foreach (var nestLevel in nesting) {
+                WriteComponentDelimiter();
+                _writer.Write(nestLevel);
+            }
+        }
         WriteSegmentNameDelimiter();
     }
 
@@ -104,7 +111,7 @@ public class EdiTextWriter : EdiWriter
     /// Writes the end of a Edi <see cref="EdiContainerType.Segment"/>.
     /// </summary>
     public override void WriteSegmentTerminator() {
-         _writer.Write(Grammar.SegmentTerminator); 
+        _writer.Write(Grammar.SegmentTerminator);
         if (Formatting == Formatting.LinePerSegment) {
             WriteNewLine();
         }
@@ -152,8 +159,7 @@ public class EdiTextWriter : EdiWriter
             InternalWriteValue(EdiToken.Integer);
 
             _writer.Write(((BigInteger)value).ToString(CultureInfo.InvariantCulture));
-        } else
-        {
+        } else {
             base.WriteValue(value);
         }
     }
@@ -189,7 +195,7 @@ public class EdiTextWriter : EdiWriter
                     valueLength = picture.Value.Scale;
                 }
             }
-            
+
             for (int i = 0; i < valueLength; i++) {
                 var c = value[i];
 
@@ -200,7 +206,7 @@ public class EdiTextWriter : EdiWriter
                 string escapedValue = null;
 
                 if (c < _charEscapeFlags.Length) {
-                    escapedValue = $"{Grammar.ReleaseCharacter.Value}{c}"; 
+                    escapedValue = $"{Grammar.ReleaseCharacter.Value}{c}";
                 } else {
                     escapedValue = null;
                 }
@@ -215,7 +221,7 @@ public class EdiTextWriter : EdiWriter
 
                     if (_writeBuffer == null || _writeBuffer.Length < length) {
                         char[] newBuffer = BufferUtils.RentBuffer(bufferPool, length);
-                        
+
                         BufferUtils.ReturnBuffer(bufferPool, _writeBuffer);
 
                         _writeBuffer = newBuffer;
@@ -250,7 +256,7 @@ public class EdiTextWriter : EdiWriter
             WriteNull();
         }
     }
-    
+
     /// <summary>
     /// Writes a <see cref="Int32"/> value.
     /// </summary>

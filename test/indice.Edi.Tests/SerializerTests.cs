@@ -417,9 +417,8 @@ public class SerializerTests
     public void Serialize_RangeError_Issue190() {
         var grammar = EdiGrammar.NewEdiFact();
 
-        var ok = new EdiFact_Issue190.TIF
-        {
-            Names = new List<EdiFact_Issue190.GivenName> {"Hello", "World"}
+        var ok = new EdiFact_Issue190.TIF {
+            Names = new List<EdiFact_Issue190.GivenName> { "Hello", "World" }
         };
         var okResult = Serialize(ok);
         var okExpected = new StringBuilder().AppendLine("UNA:+.? '").AppendLine("TIF++Hello+World'").ToString();
@@ -427,12 +426,12 @@ public class SerializerTests
 
         var bad = new EdiFact_Issue190.BUGGEDTIF {
             Category = "ADT",
-            Names = new List<EdiFact_Issue190.GivenName> {"Hello", "World"}
+            Names = new List<EdiFact_Issue190.GivenName> { "Hello", "World" }
         };
         var badResult = Serialize(bad);
         var badExpected = new StringBuilder().AppendLine("UNA:+.? '").AppendLine("TIF+:ADT+Hello+World'").ToString();
         Assert.Equal(badExpected, badResult);
-        
+
         string Serialize<T>(T data) {
             using var writer = new StringWriter();
             new EdiSerializer().Serialize(writer, grammar, data);
@@ -449,7 +448,7 @@ public class SerializerTests
         }
         Assert.NotNull(source);
 
-        
+
         string Serialize<T>(T data) {
             var grammar = EdiGrammar.NewEdiFact();
             using var writer = new StringWriter();
@@ -464,7 +463,7 @@ public class SerializerTests
 
     [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#263")]
     public void Serialize_Should_Write_List_Of_Repeating_Elements_Issue235() {
-        var source = new Interchange_Issue263.GIN { 
+        var source = new Interchange_Issue263.GIN {
             Qualifier = "AW",
             IdentityNumbers = [
                 new () {  Text = "9998219" },
@@ -474,16 +473,110 @@ public class SerializerTests
                 new () {  Text = "9998215" },
             ]
         };
-       
+
         string Serialize<T>(T data) {
             var grammar = EdiGrammar.NewEdiFact();
-            
+
             using var writer = new StringWriter();
             new EdiSerializer().Serialize(writer, grammar, data);
             return writer.ToString();
         }
         var expected = $"UNA:+.? '{Environment.NewLine}GIN+AW+9998219+9998218+9998217+9998216+9998215'{Environment.NewLine}";
         var output = Serialize(source);
+        Assert.Equal(expected, output);
+    }
+
+    [Fact, Trait(Traits.Tag, "EDIFact")]
+    public void Serialize_With_Explicit_Indication_of_Nesting() {
+        var grammar = EdiGrammar.NewEdiFact();
+        grammar.ExplicitIndicationOfNesting = true;
+        var interchange = new EDIFACT_ExplicitNesting_issue227() {
+            Msg = new() {
+                Title = "Title",
+                L1s = [
+                    new() {
+                        Name = "Name 1",
+                        L2s = [
+                            new() {
+                                SubName = "Sub 1 1"
+                            },
+                            new() {
+                                SubName = "Sub 1 2"
+                            }
+                        ]
+                    },
+                    new() {
+                        Name = "Name 2",
+                        L2s = [
+                            new() {
+                                SubName = "Sub 2 1"
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+        var expected = new StringBuilder()
+            .AppendLine("UNA:+.? '")
+            .AppendLine("TIT+Title'")
+            .AppendLine("LE1:1+Name 1'")
+            .AppendLine("LE2:1:1+Sub 1 1'")
+            .AppendLine("LE2:1:2+Sub 1 2'")
+            .AppendLine("LE1:2+Name 2'")
+            .AppendLine("LE2:2:1+Sub 2 1'").ToString();
+        string output = null;
+        using (var writer = new StringWriter()) {
+            new EdiSerializer().Serialize(writer, grammar, interchange);
+            output = writer.ToString();
+        }
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact, Trait(Traits.Tag, "EDIFact")]
+    public void Serialize_Without_Explicit_Indication_of_Nesting() {
+        var grammar = EdiGrammar.NewEdiFact();
+        grammar.ExplicitIndicationOfNesting = false;
+        var interchange = new EDIFACT_ExplicitNesting_issue227() {
+            Msg = new() {
+                Title = "Title",
+                L1s = [
+                    new() {
+                        Name = "Name 1",
+                        L2s = [
+                            new() {
+                                SubName = "Sub 1 1"
+                            },
+                            new() {
+                                SubName = "Sub 1 2"
+                            }
+                        ]
+                    },
+                    new() {
+                        Name = "Name 2",
+                        L2s = [
+                            new() {
+                                SubName = "Sub 2 1"
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+        var expected = new StringBuilder()
+            .AppendLine("UNA:+.? '")
+            .AppendLine("TIT+Title'")
+            .AppendLine("LE1+Name 1'")
+            .AppendLine("LE2+Sub 1 1'")
+            .AppendLine("LE2+Sub 1 2'")
+            .AppendLine("LE1+Name 2'")
+            .AppendLine("LE2+Sub 2 1'").ToString();
+        string output = null;
+        using (var writer = new StringWriter()) {
+            new EdiSerializer().Serialize(writer, grammar, interchange);
+            output = writer.ToString();
+        }
+
         Assert.Equal(expected, output);
     }
 }

@@ -116,4 +116,8 @@ public interface IEdiGrammar
                    char? reserved,
                    char? decimalMark);
 
+    /// <summary>
+    /// Whether to print explicit indication of nesting
+    /// </summary>
+    bool ExplicitIndicationOfNesting { get; set; }
 }
