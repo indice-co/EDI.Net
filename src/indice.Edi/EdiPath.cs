@@ -8,8 +8,8 @@ namespace indice.Edi;
 public struct EdiPath : IComparable<EdiPath>, IEquatable<EdiPath>
 {
 
-    private const string PARSE_PATTERN = @"^([A-Z]{1}[A-Z0-9]{1,3}|\*)?([\[\/]{1}([\d\.\*]+)\]?)?([\[\/]{1}(\d+?|\*)\]?)?$"; // supports both "STX/2/1 and STX[2][1]"
-                                         
+    private const string PARSE_PATTERN = @"^([A-Z]{1}[A-Z0-9]{1,3}|\*)?([\[\/]{1}([\d\.\*]+)\]?)?([\[\/]{1}([\d\.\*]+)\]?)?$"; // supports both "STX/2/1 and STX[2][1]"
+
     private readonly EdiPathFragment _SegmentPart;
     private readonly EdiPathFragment _ElementPart;
     private readonly EdiPathFragment _ComponentPart;

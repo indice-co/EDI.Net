@@ -579,4 +579,41 @@ public class SerializerTests
 
         Assert.Equal(expected, output);
     }
+
+
+    [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#272")]
+    public void Serialize_Multiple_Repeating_Elements_In_A_Single_Segment_Issue272() {
+        var source = new Interchange_Issue272_ValueRange() {
+            PFD = new Interchange_Issue272_ValueRange.PFDSegment {
+                SeatDefinitions = [
+                                    new () {
+                                        PFD_NoSmokingIndicator = "Y",
+                                        PFD_CabinClassDesignator = "M",
+                                        PFD_CabinClassNumber = "3",
+                                        PFD_SegmentAirportOfDeparture = "AAA",
+                                        PFD_SegmentAirportOfArrival = "BBB",
+                                        PFD_EquipmentCode = "744",
+                                        PFD_SeatCharacteristics = ["Y"],
+                                    },
+                                    new () {
+                                        PFD_SegmentAirportOfDeparture = "FRA",
+                                        PFD_SegmentAirportOfArrival = "MEX",
+                                        PFD_NoSmokingIndicator = "N",
+                                        PFD_SeatCharacteristics = ["Z", "E", "R"],
+                                    }
+                                ]
+            }
+        };
+
+        string Serialize<T>(T data) {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            using var writer = new StringWriter();
+            new EdiSerializer().Serialize(writer, grammar, data);
+            return writer.ToString();
+        }
+        var expected = $"UNA:+.? '{Environment.NewLine}PFD+Y:M:3::AAA:BBB:744::Y+N::::FRA:MEX:::Z:E:R'{Environment.NewLine}";
+        var output = Serialize(source);
+        Assert.Equal(expected, output);
+    }
 }

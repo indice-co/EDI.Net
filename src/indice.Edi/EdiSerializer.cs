@@ -797,6 +797,25 @@ public class EdiSerializer
                             break;
                     }
                 }
+                if (property.PathInfo.PathInternal.Component.IsRange) {
+                    int range_offset = property.PathInfo.PathInternal.Component.Min;
+                    while (path.ComponentIndex < range_offset) {
+                        writer.WriteToken(EdiToken.Null);
+                    }
+                    if (property.Info.PropertyType.IsCollectionType()) {
+                        var collection = (value ?? new object[0]) as IList;
+                        if (collection == null) {
+                            throw new EdiException($"Property '{property.Info.Name}' is a collection but the value is not a collection type.");
+                        }
+                        for (var i = 0; i < collection.Count; i++) {
+                            var item = collection[i];
+                            writer.WriteValue(item, property.ValueInfo.Picture, property.ValueInfo.Format);
+                        }
+                    } else {
+                        writer.WriteValue(value, property.ValueInfo.Picture, property.ValueInfo.Format);
+                    }
+                    continue;
+                }
                 writer.WriteValue(value, property.ValueInfo.Picture, property.ValueInfo.Format);
             } else {
                 // this is somekind of structure. Group/Message/Segment/SegmentGroup/Element

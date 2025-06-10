@@ -59,6 +59,16 @@ public class EdiPathTests
         Assert.Equal("B10[1..*][0]", path.ToString());
     }
 
+    [Trait(Traits.Tag, "Parser")]
+    [InlineData("PFD[7][0..*]")]
+    [InlineData("PFD/7/0..*")]
+    [Theory]
+    public void ParseHandlesRangeStyleFragmentComponents(string text) {
+        var path = EdiPath.Parse(text);
+        Assert.True(path.Component.IsRange);
+        Assert.Equal("PFD[7][0..*]", path.ToString());
+    }
+
     [Trait(Traits.Tag, "Writer")]
     [Fact]
     public void OrderByStructureTest() {
