@@ -94,7 +94,7 @@ public class EdiSerializer
 
         var stack = new Stack<EdiStructure>();
         var structuralComparer = default(EdiPathComparer);
-        // If this is not a collection type asume this type is the interchange.
+        // If this is not a collection type assume this type is the interchange.
         if (!objectType.IsCollectionType()) {
 
             while (reader.Read()) {
