@@ -75,10 +75,10 @@ public class EdiSerializer
     #region Read internals
 
     internal virtual object DeserializeInternal(EdiReader reader, Type objectType) {
-        reader.SuppressBadEscapeSequenceErrors = SuppressBadEscapeSequenceErrors;
-
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
+
+        reader.SuppressBadEscapeSequenceErrors = SuppressBadEscapeSequenceErrors;
 
         var implicitSegments = new[] {
             reader.Grammar.FunctionalGroupHeaderTag,
