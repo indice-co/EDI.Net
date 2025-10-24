@@ -110,12 +110,22 @@ RFF+LI:02382812480014'
 RFF+Z09:P015673'
 NAD+FR+22222:160:SVK+++++++SE'
 NAD+DO+11111:160:SVK+++++++SE'
-UNT+0000000010+1'";
+UNT+0000000010+1'
+";
         var message = new Edifact_Issue280();
         using (var stream = Helpers.StreamFromString(edi)) {
             message = new EdiSerializer().Deserialize<Edifact_Issue280>(new StreamReader(stream), grammar);
         }
 
         Assert.NotNull(message.Parties);
+
+        string Serialize<T>(T data, IEdiGrammar grammar) {
+
+            using var writer = new StringWriter();
+            new EdiSerializer().Serialize(writer, grammar, data);
+            return writer.ToString();
+        }
+        var output = Serialize(message, grammar);
+        Assert.Equal(edi.Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
     }
 }

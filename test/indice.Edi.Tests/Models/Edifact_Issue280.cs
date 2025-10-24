@@ -6,6 +6,7 @@ namespace indice.Edi.Tests.Models;
 public class Edifact_Issue280
 {
     public UNH unh { get; set; }
+    public UNB unb { get; set; }
     public BGM bgm { get; set; }
     public IList<DTM> Dates { get; set; }
     public IList<FTX> ftx {  get; set; }
@@ -61,6 +62,57 @@ public class Edifact_Issue280
 
         [EdiValue("X(6)", Path = "UNH/1/5", Mandatory = false)]
         public string? CodeListDirectoryVersionNumber { get; set; }
+    }
+
+    [EdiSegment, EdiPath("UNB")]
+    public class UNB
+    {
+        [EdiValue("X(4)", Path = "UNB/0/0", Mandatory = true)]
+        public string SyntaxIdentifier { get; set; }
+        [EdiValue("X(1)", Path = "UNB/0/1", Mandatory = true)]
+        public string SyntaxVersionNumber { get; set; }
+
+
+        // S002 : EMETTEUR DE L'INTERCHANGE
+        [EdiValue("X(35)", Path = "UNB/1/0", Mandatory = true)]
+        public string SenderIdentification { get; set; }
+        [EdiValue("X(4)", Path = "UNB/1/1", Mandatory = false)]
+        public string SenderIdentificationCodeQualifier { get; set; }
+        [EdiValue("X(14)", Path = "UNB/1/2", Mandatory = false)]
+        public string AddressForReverseRouting { get; set; }
+
+
+        // S003 : RECEPTEUR DE L'INTERCHANGE
+        [EdiValue("X(35)", Path = "UNB/2/0", Mandatory = true)]
+        public string RecipientIdentification { get; set; }
+        [EdiValue("X(4)", Path = "UNB/2/1", Mandatory = false)]
+        public string RecipientIdentificationCodeQualifier { get; set; }
+        [EdiValue("X(14)", Path = "UNB/2/2", Mandatory = false)]
+        public string RoutingAddress { get; set; }
+
+
+        // S004 : DATE ET HEURE DE PREPARATION
+        [EdiValue("X(6)", Path = "UNB/3/0")]
+        public string DateOfPreparation { get; set; }
+        [EdiValue("X(4)", Path = "UNB/3/1")]
+        public string TimeOfPreparation { get; set; }
+
+
+        // S005 : REFERENCE DE CONTROLE DE L’INTERCHANGE
+        [EdiValue("X(14)", Path = "UNB/4/0", Mandatory = true)]
+        public string INTERCHANGECONTROLREFERENCE { get; set; }
+
+
+        // 0026 : APPLICATIONREFERENCE
+        [EdiValue("X(14)", Path = "UNB/6/0", Mandatory = true)]
+        public string APPLICATIONREFERENCE { get; set; }
+        // 0029 : PROCESSING PRIORITY CODE
+        [EdiValue("X(1)", Path = "UNB/7/0", Mandatory = false)]
+        public string PROCESSING_PRIORITY_CODE { get; set; }
+        // 0026 : APPLICATIONREFERENCE
+        [EdiValue("X(35)", Path = "UNB/8/0", Mandatory = false)]
+        public string COMMUNICATIONS_AGREEMENT { get; set; }
+
     }
 
     [EdiSegment, EdiPath("BGM")]

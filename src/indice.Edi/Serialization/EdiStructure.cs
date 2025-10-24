@@ -160,7 +160,27 @@ internal class EdiStructure {
 
     public IEnumerable<EdiPropertyDescriptor> GetOrderedProperties(IComparer<EdiPath> comparer) =>
         Descriptor.Properties.OrderBy(p => p.PathInfo?.PathInternal ?? default(EdiPath), comparer);
-    
+
+    /// <summary>
+    /// Determines whether the current group consists of a single segment.
+    /// </summary>
+    /// <remarks>A group is considered a single segment group if it has no child members of <see cref="EdiStructureType.Segment"/>, no sequence end,
+    /// exactly one group member, and the segment of the group member matches the segment of the group start.</remarks>
+    /// <returns><see langword="true"/> if the group contains exactly one segment and meets the required conditions; otherwise,
+    /// <see langword="false"/>.</returns>
+    public bool IsSingleSegmentGroup() {
+        if (!IsGroup) {
+            return false;
+        }
+        var segments = GetMatchingProperties(EdiStructureType.Segment);
+
+        return segments.Length == 0 &&
+                SequenceEnd == null &&
+                GroupMembers.Length == 1 &&
+                GroupMembers[0].Segment == GroupStart.Segment;
+    }
+
+
     public override string ToString() {
         var text = new System.Text.StringBuilder();
         text.Append($"{StructureType}");
