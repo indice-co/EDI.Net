@@ -93,4 +93,29 @@ IEA*1*000000001~
         Assert.Equal(long.Parse(longText), interchange.Msg.Long);
     }
 
+
+    [Fact]
+    [Trait(Traits.Issue, "#280")]
+    public void ParseWithSingleSegmentGroup() 
+    {
+        var grammar = EdiGrammar.NewEdiFact();
+        var edi = $@"UNA:+.? '
+UNB+:0+++020125:0304+++++0'
+UNH+1'
+BGM+'
+DTM+137:202506150701:203'
+DTM+ZZZ:1:805'
+RFF+Z05:SYL'
+RFF+LI:02382812480014'
+RFF+Z09:P015673'
+NAD+FR+22222:160:SVK+++++++SE'
+NAD+DO+11111:160:SVK+++++++SE'
+UNT+0000000010+1'";
+        var message = new Edifact_Issue280();
+        using (var stream = Helpers.StreamFromString(edi)) {
+            message = new EdiSerializer().Deserialize<Edifact_Issue280>(new StreamReader(stream), grammar);
+        }
+
+        Assert.NotNull(message.Parties);
+    }
 }
