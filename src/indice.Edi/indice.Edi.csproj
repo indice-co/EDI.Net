@@ -22,6 +22,7 @@
       - Csharp modern features
       - Fix for Enum deserialization #264
       - Implicit segment name delimiter escape when inside a component value #268
+      - EdiSegmentGroup with only one EdiSegment not deserializing properly. #280
     </PackageReleaseNotes>
     <PackageIcon>icon-256.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
