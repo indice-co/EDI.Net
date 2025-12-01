@@ -15,7 +15,8 @@ public class EDIFact_Issue288_D01B_INVOIC
     [EdiMessage]
     public class Msg
     {
-        //Message Header (UNH)
+
+        //HEADER SECTION
         public UNH MsgHeader { get; set; }
 
         //Other message fields
@@ -39,15 +40,23 @@ public class EDIFact_Issue288_D01B_INVOIC
         public List<SG6_TAX_MOA_LOC> SegmentGroup6 { get; set; } = [];
         public List<SG7_CUX_DTM> SegmentGroup7 { get; set; } = [];
         public List<SG8_PAT_DTM_PCD_MOA_PAI_FII> SegmentGroup8 { get; set; } = [];
-        public List<SG9_TDT_LOC_SG10> SegmentGroup9 { get; set; } = [];
-        public List<SG11_TOD_LOC> SegmentGroup11 { get; set; } = [];
-        public List<SG12_PAC_MEA_EQD_SG13_SG14> SegmentGroup12 { get; set; } = [];
-        public List<SG15_ALC_ALI_DTM_SG16_SG19_SG20_SG21> SegmentGroup15 { get; set; } = [];
-        public List<SG22_RCS_RFF_DTM_FTX> SegmentGroup22 { get; set; } = [];
+        public List<SG9_TDT_TSR_SG10_SG11> SegmentGroup9 { get; set; } = [];
+        public List<SG12_TOD_LOC> SegmentGroup12 { get; set; } = [];
+        public List<SG13_EQD_SEL> SegmentGroup13 { get; set; } = [];
+        public List<SG14_PAC_MEA_EQD_SG15> SegmentGroup14 { get; set; } = [];
+        public List<SG16_ALC_ALI_FTX_SG17_SG18_SG19_SG20_SG21_SG22> SegmentGroup16 { get; set; } = [];
+        public List<SG23_RCS_RFF_DTM_FTX> SegmentGroup23 { get; set; } = [];
+        public List<SG24_AJT_FTX> SegmentGroup24 { get; set; } = [];
+        public List<SG25_INP_FTX> SegmentGroup25 { get; set; } = [];
+
+        //DETAIL SECTION
+        public List<SG26_LIN_PIA_IMD_MEA_QTY_PCD_ALI_DTM_GIN_GIR_QVR_DOC_PAI_FTX> SegmentGroup26 { get; set; } = [];
+
+        //SUMMARY SECTION
+
         public UNS UNS { get; set; }
-        public List<SG25_LIN_PIA_IMD_MEA_QTY_PCD_ALI_DTM_GIN_GIR_QVR_DOC_PAI_FTX> SegmentGroup25 { get; set; } = [];
         public CNT CNT { get; set; }
-        public List<MOA> MOA { get; set; } = [];
+        public MOA MOA { get; set; }
         public UNT UNT { get; set; }
     }
 
@@ -145,11 +154,30 @@ public class EDIFact_Issue288_D01B_INVOIC
     /// <summary>
     /// Segment group 9:  TDT-LOC-SG10
     /// </summary>
-    [EdiSegmentGroup("TDT", "LOC", "TSR")]
-    public class SG9_TDT_LOC_SG10 : TDT
+    [EdiSegmentGroup("TDT", "TSR", "LOC", "RFF")]
+    public class SG9_TDT_TSR_SG10_SG11 : TDT
     {
-        public List<LOC> LOC { get; set; } = [];
-        public List<SG10_TSR_RFF_LOC_TPL_FTX> SG10 { get; set; } = [];
+        public TSR TSR { get; set; }
+        public SG10_LOC_DTM SG10 { get; set; }
+        public SG11_RFF_DTM SG11 { get; set; }
+    }
+
+    /// <summary>
+    /// Segment group 10:  LOC-DTM
+    /// </summary>
+    [EdiSegmentGroup("LOC", "DTM")]
+    public class SG10_LOC_DTM : LOC
+    {
+        public DTM DTM { get; set; }
+    }
+
+    /// <summary>
+    /// Segment group 11:  RFF-DTM
+    /// </summary>
+    [EdiSegmentGroup("RFF", "DTM")]
+    public class SG11_RFF_DTM : RFF
+    {
+        public List<DTM> DTM { get; set; } = [];
     }
 
     /// <summary>
@@ -165,31 +193,39 @@ public class EDIFact_Issue288_D01B_INVOIC
     }
 
     /// <summary>
-    /// Segment group 11:  TOD-LOC
+    /// Segment group 12:  TOD-LOC
     /// </summary>
     [EdiSegmentGroup("TOD", "LOC")]
-    public class SG11_TOD_LOC : TOD
+    public class SG12_TOD_LOC : TOD
     {
         public List<LOC> LOC { get; set; } = [];
     }
-
     /// <summary>
-    /// Segment group 12:  PAC-MEA-EQD-SG13-SG14
+    /// Segment group 13:  EQD-SEL
     /// </summary>
-    [EdiSegmentGroup("PAC", "MEA", "EQD", "PCI", "RFF")]
-    public class SG12_PAC_MEA_EQD_SG13_SG14 : PAC
+    [EdiSegmentGroup("EQD", "SEL")]
+    public class SG13_EQD_SEL : EQD
     {
-        public List<MEA> MEA { get; set; } = [];
-        public List<EQD> EQD { get; set; } = [];
-        public List<SG13_PCI_RFF_DTM_GIN> SG13 { get; set; } = [];
-        public List<SG14_RFF_DTM> SG14 { get; set; } = [];
+        public SEL SEL { get; set; }
     }
 
     /// <summary>
-    /// Segment group 13:  PCI-RFF-DTM-GIN
+    /// Segment group 14:  PAC-MEA-EQD-SG15
+    /// </summary>
+    [EdiSegmentGroup("PAC", "MEA", "EQD", "PCI")]
+    public class SG14_PAC_MEA_EQD_SG15 : PAC
+    {
+        public List<MEA> MEA { get; set; } = [];
+        public List<EQD> EQD { get; set; } = [];
+
+        public SG15_PCI_RFF_DTM_GIN SegmentGroup15 { get; set; }
+    }
+
+    /// <summary>
+    /// Segment group 15:  PCI-RFF-DTM-GIN
     /// </summary>
     [EdiSegmentGroup("PCI", "RFF", "DTM", "GIN")]
-    public class SG13_PCI_RFF_DTM_GIN : PCI
+    public class SG15_PCI_RFF_DTM_GIN : PCI
     {
         public RFF RFF { get; set; }
         public List<DTM> DTM { get; set; } = [];
@@ -197,38 +233,19 @@ public class EDIFact_Issue288_D01B_INVOIC
     }
 
     /// <summary>
-    /// Segment group 14:  RFF-DTM
+    /// Segment group 16:  ALC-ALI-DTM-SG16-SG19-SG20-SG21
     /// </summary>
-    [EdiSegmentGroup("RFF", "DTM")]
-    public class SG14_RFF_DTM : RFF
-    {
-        public List<DTM> DTM { get; set; } = [];
-    }
-
-    /// <summary>
-    /// Segment group 15:  ALC-ALI-DTM-SG16-SG19-SG20-SG21
-    /// </summary>
-    [EdiSegmentGroup("ALC", "ALI", "DTM", "FTX", "QTY", "PCD", "MOA", "RTE", "TAX")]
-    public class SG15_ALC_ALI_DTM_SG16_SG19_SG20_SG21 : ALC
+    [EdiSegmentGroup("ALC", "ALI", "FTX", "RFF", "QTY", "PCD", "MOA", "RTE", "TAX")]
+    public class SG16_ALC_ALI_FTX_SG17_SG18_SG19_SG20_SG21_SG22 : ALC
     {
         public ALI ALI { get; set; }
-        public List<DTM> DTM { get; set; } = [];
-        public List<SG16_FTX_SG17_SG18> SG16 { get; set; } = [];
-        public List<SG19_QTY_RNG> SG19 { get; set; } = [];
-        public List<SG20_PCD_RNG> SG20 { get; set; } = [];
-        public List<SG21_MOA_RNG_CUX_DTM> SG21 { get; set; } = [];
-        public RTE RTE { get; set; }
-        public List<TAX> TAX { get; set; } = [];
-    }
-
-    /// <summary>
-    /// Segment group 16:  FTX-SG17-SG18
-    /// </summary>
-    [EdiSegmentGroup("FTX", "RFF", "PCD")]
-    public class SG16_FTX_SG17_SG18 : FTX
-    {
-        public List<SG17_RFF_DTM> SG17 { get; set; } = [];
-        public List<SG18_PCD_RNG> SG18 { get; set; } = [];
+        public FTX FTX { get; set; }
+        public SG17_RFF_DTM SG17 { get; set; }
+        public SG18_QTY_RNG SG18 { get; set; }
+        public SG19_PCD_RNG SG19 { get; set; }
+        public SG20_MOA_RNG_CUX_DTM SG20 { get; set; }
+        public SG21_RTE_RNG SG21 { get; set; }
+        public SG22_TAX_MOA SG22 { get; set; }
     }
 
     /// <summary>
@@ -237,41 +254,32 @@ public class EDIFact_Issue288_D01B_INVOIC
     [EdiSegmentGroup("RFF", "DTM")]
     public class SG17_RFF_DTM : RFF
     {
-        public DTM DTM { get; set; }
+        public List<DTM> DTM { get; set; } = [];
     }
 
     /// <summary>
-    /// Segment group 18:  PCD-RNG
-    /// </summary>
-    [EdiSegmentGroup("PCD", "RNG")]
-    public class SG18_PCD_RNG : PCD
-    {
-        public RNG RNG { get; set; }
-    }
-
-    /// <summary>
-    /// Segment group 19:  QTY-RNG
+    /// Segment group 18:  QTY-RNG
     /// </summary>
     [EdiSegmentGroup("QTY", "RNG")]
-    public class SG19_QTY_RNG : QTY
+    public class SG18_QTY_RNG : QTY
     {
         public RNG RNG { get; set; }
     }
 
     /// <summary>
-    /// Segment group 20:  PCD-RNG
+    /// Segment group 19:  PCD-RNG
     /// </summary>
     [EdiSegmentGroup("PCD", "RNG")]
-    public class SG20_PCD_RNG : PCD
+    public class SG19_PCD_RNG : PCD
     {
         public RNG RNG { get; set; }
     }
 
     /// <summary>
-    /// Segment group 21:  MOA-RNG-CUX-DTM
+    /// Segment group 20:  MOA-RNG-CUX-DTM
     /// </summary>
     [EdiSegmentGroup("MOA", "RNG", "CUX", "DTM")]
-    public class SG21_MOA_RNG_CUX_DTM : MOA
+    public class SG20_MOA_RNG_CUX_DTM : MOA
     {
         public RNG RNG { get; set; }
         public CUX CUX { get; set; }
@@ -279,43 +287,70 @@ public class EDIFact_Issue288_D01B_INVOIC
     }
 
     /// <summary>
-    /// Segment group 22:  RCS-RFF-DTM-FTX
+    /// Segment group 21:  RTE-RNG
+    /// </summary>
+    [EdiSegmentGroup("RTE", "RNG")]
+    public class SG21_RTE_RNG : RTE
+    {
+        public RNG RNG { get; set; }
+    }
+
+    /// <summary>
+    /// Segment group 22:  TAX-MOA
+    /// </summary>
+    [EdiSegmentGroup("TAX", "MOA")]
+    public class SG22_TAX_MOA : TAX
+    {
+        public MOA MOA { get; set; }
+    }
+
+    /// <summary>
+    /// Segment group 23:  RCS-RFF-DTM-FTX
     /// </summary>
     [EdiSegmentGroup("RCS", "RFF", "DTM", "FTX")]
-    public class SG22_RCS_RFF_DTM_FTX : RCS
+    public class SG23_RCS_RFF_DTM_FTX : RCS
     {
         public List<RFF> RFF { get; set; } = [];
         public List<DTM> DTM { get; set; } = [];
         public List<FTX> FTX { get; set; } = [];
     }
+    /// <summary>
+    /// Segment group 24:  AJT-FTX
+    /// </summary>
+    [EdiSegmentGroup("AJT", "FTX")]
+    public class SG24_AJT_FTX : AJT
+    {
+        public FTX FTX { get; set; }
+    }
 
+    /// <summary>
+    /// Segment group 25:  INP-FTX
+    /// </summary>
+    [EdiSegmentGroup("INP", "FTX")]
+    public class SG25_INP_FTX : INP
+    {
+        public FTX FTX { get; set; }
+    }
     /// <summary>
     /// Segment group 25:  LIN-PIA-IMD-MEA-QTY-PCD-ALI-DTM-GIN-GIR-QVR-DOC-PAI-FTX-SG26-SG27-SG28-SG29-SG31-SG34-SG38-SG44-SG48-SG49-SG50
     /// </summary>
-    [EdiSegmentGroup("LIN", "PIA", "IMD", "MEA", "QTY", "PCD", "ALI", "DTM", "GIN", "GIR", "QVR", "DOC", "PAI", "FTX", "CCI", "PRI", "RFF", "PAC", "LOC", "TAX", "NAD", "ALC", "TDT", "TOD", "RCS")]
-    public class SG25_LIN_PIA_IMD_MEA_QTY_PCD_ALI_DTM_GIN_GIR_QVR_DOC_PAI_FTX : LIN
+    [EdiSegmentGroup("LIN", "PIA", "PGI", "IMD", "MEA", "QTY", "PCD", "ALI", "DTM", "GIN", "GIR", "QVR", "DOC", "PAI", "FTX", "CCI", "PRI", "RFF", "PAC", "LOC", "TAX", "NAD", "ALC", "TDT", "TOD", "RCS")]
+    public class SG26_LIN_PIA_IMD_MEA_QTY_PCD_ALI_DTM_GIN_GIR_QVR_DOC_PAI_FTX : LIN
     {
         public List<PIA> PIA { get; set; } = [];
+        //public List<PGI>  PGI { get; set; } = [];
         public List<IMD> IMD { get; set; } = [];
         public List<MEA> MEA { get; set; } = [];
-        public List<QTY> QTY { get; set; } = [];
+        public QTY QTY { get; set; }
         public List<PCD> PCD { get; set; } = [];
         public List<ALI> ALI { get; set; } = [];
         public List<DTM> DTM { get; set; } = [];
         public List<GIN> GIN { get; set; } = [];
         public List<GIR> GIR { get; set; } = [];
         public QVR QVR { get; set; }
-        public List<DOC> DOC { get; set; } = [];
-        public PAI PAI { get; set; }
+        public EQD EQD { get; set; }
         public List<FTX> FTX { get; set; } = [];
-    }
-
-    [EdiSegmentGroup("RFF", "DTM")]
-    public class RFF_ABKON : RFF
-    {
-
-        [EdiCondition("171", Path = "DTM/0/0")]
-        public DTM RefDate { get; set; }
+        public DGS DGS { get; set; }
     }
 
     [EdiSegment, EdiPath("PCD")]
@@ -499,6 +534,20 @@ public class EDIFact_Issue288_D01B_INVOIC
         [EdiValue("X(35)", Path = "PCI/1/4")]
         public string ShippingMarks5 { get; set; }
     }
+
+    [EdiSegment, EdiPath("GIN")]
+    public class INP
+    {
+        [EdiValue("X(35)", Path = "*/0/0")]
+        public string Enacting_party_identifier { get; set; }
+        [EdiValue("X(35)", Path = "*/0/1")]
+        public string Instruction_receiving_party_identifier { get; set; }
+        [EdiValue("X(3)", Path = "*/1/0")]
+        public string Instruction_type_code_qualifier { get; set; }
+        [EdiValue("X(3)", Path = "*/2/0")]
+        public string Status_description_code { get; set; }
+    }
+
 
     [EdiSegment, EdiPath("GIN")]
     public class GIN
@@ -1151,16 +1200,35 @@ public class EDIFact_Issue288_D01B_INVOIC
         }
     }
 
-    [EdiSegment, EdiPath("CUX")]
-    public class CUX
+    [EdiSegment, EdiPath("SEL")]
+    public class SEL
     {
-        [EdiValue("X(1)", Path = "*/*/0")]
-        public string Qualifier { get; set; }
-        [EdiValue("X(3)", Path = "*/*/1")]
-        public string CurrencyCode { get; set; }
-        [EdiValue("X(1)", Path = "*/*/2")]
-        public string Ext { get; set; }
+        [EdiValue("X(35)", Path = "SEL/0/0")]
+        public string TransportUnitSealIdentifier { get; set; }
+
+        [EdiValue("X(3)", Path = "SEL/1/0")]
+        public string SealingPartyNameCode { get; set; }
+
+        [EdiValue("X(17)", Path = "SEL/1/1")]
+        public string CodeListIdentificationCode { get; set; }
+
+        [EdiValue("X(3)", Path = "SEL/1/2")]
+        public string CodeListResponsibleAgencyCode { get; set; }
+
+        [EdiValue("X(35)", Path = "SEL/1/3")]
+        public string SealingPartyName { get; set; }
+
+        [EdiValue("X(3)", Path = "SEL/2/0")]
+        public string SealConditionCode { get; set; }
+
+        [EdiValue("X(35)", Path = "SEL/3/0")]
+        public string ObjectIdentifier1 { get; set; }
+
+        [EdiValue("X(35)", Path = "SEL/3/1")]
+        public string ObjectIdentifier2 { get; set; }
     }
+
+
 
     [EdiSegment, EdiPath("FTX")]
     public class FTX
@@ -1213,6 +1281,49 @@ public class EDIFact_Issue288_D01B_INVOIC
 
         [EdiValue("X(256)", Path = "*/1/1", Mandatory = false)]
         public string ContactName { get; set; }
+    }
+
+    [EdiSegment, EdiPath("AJT")]
+    public class AJT
+    {
+        [EdiValue("X(3)", Path = "*/0/0")]
+        public string Adjustment_reason_description_code { get; set; }
+        [EdiValue("X(6)", Path = "*/0/1")]
+        public string Line_item_identifier { get; set; }
+    }
+
+    [EdiSegment, EdiPath("CUX")]
+    public class CUX
+    {
+        [EdiValue("X(3)", Path = "CUX/0/0")]
+        public string CurrencyUsageCodeQualifier { get; set; }
+
+        [EdiValue("X(3)", Path = "CUX/0/1")]
+        public string CurrencyIdentificationCode { get; set; }
+
+        [EdiValue("X(3)", Path = "CUX/0/2")]
+        public string CurrencyTypeCodeQualifier { get; set; }
+
+        [EdiValue("9(4)", Path = "CUX/0/3")]
+        public decimal? CurrencyRate { get; set; }
+
+        [EdiValue("X(3)", Path = "CUX/1/0")]
+        public string CurrencyUsageCodeQualifier2 { get; set; }
+
+        [EdiValue("X(3)", Path = "CUX/1/1")]
+        public string CurrencyIdentificationCode2 { get; set; }
+
+        [EdiValue("X(3)", Path = "CUX/1/2")]
+        public string CurrencyTypeCodeQualifier2 { get; set; }
+
+        [EdiValue("9(4)", Path = "CUX/1/3")]
+        public decimal? CurrencyRate2 { get; set; }
+
+        [EdiValue("9(12)", Path = "CUX/2/0")]
+        public decimal? CurrencyExchangeRate { get; set; }
+
+        [EdiValue("X(3)", Path = "CUX/3/0")]
+        public string ExchangeRateCurrencyMarketIdentifier { get; set; }
     }
 
     [EdiSegment, EdiPath("UNB")]
