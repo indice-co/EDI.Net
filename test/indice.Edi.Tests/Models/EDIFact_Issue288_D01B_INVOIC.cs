@@ -50,14 +50,21 @@ public class EDIFact_Issue288_D01B_INVOIC
         public List<SG25_INP_FTX> SegmentGroup25 { get; set; } = [];
 
         //DETAIL SECTION
-        public List<SG26_LIN_PIA_IMD_MEA_QTY_PCD_ALI_DTM_GIN_GIR_QVR_DOC_PAI_FTX> SegmentGroup26 { get; set; } = [];
+        public List<SG26_LIN> SegmentGroup26 { get; set; } = [];
 
         //SUMMARY SECTION
+        public SummarySection SummarySection { get; set; }
 
-        public UNS UNS { get; set; }
-        public CNT CNT { get; set; }
-        public MOA MOA { get; set; }
         public UNT UNT { get; set; }
+    }
+
+    [EdiSegmentGroup("UNS", "CNT", "MOA", "TAX")]
+    public class SummarySection : UNS
+    {
+        public CNT CNT { get; set; }
+
+        public List<SG50_MOA_SG51> SegmentGroup50 { get; set; } = [];
+        public List<SG52_TAX_MOA> SegmentGroup52 { get; set; } = [];
     }
 
     [EdiSegmentGroup("RFF", "DTM","GIR","LOC","MEA","QTY","FTX","MOA","RTE")]
@@ -332,10 +339,10 @@ public class EDIFact_Issue288_D01B_INVOIC
         public FTX FTX { get; set; }
     }
     /// <summary>
-    /// Segment group 25:  LIN-PIA-IMD-MEA-QTY-PCD-ALI-DTM-GIN-GIR-QVR-DOC-PAI-FTX-SG26-SG27-SG28-SG29-SG31-SG34-SG38-SG44-SG48-SG49-SG50
+    /// Segment group 25:  LIN-PIA-PGI-IMD-MEA-QTY-PCD-ALI-DTM-GIN-GIR-QVR-EQD-FTX-DGS-SG27-SG28-SG29-SG30-SG31-SG33-SG34-SG35-SG39-SG45-SG47-SG48-SG49
     /// </summary>
-    [EdiSegmentGroup("LIN", "PIA", "PGI", "IMD", "MEA", "QTY", "PCD", "ALI", "DTM", "GIN", "GIR", "QVR", "DOC", "PAI", "FTX", "CCI", "PRI", "RFF", "PAC", "LOC", "TAX", "NAD", "ALC", "TDT", "TOD", "RCS")]
-    public class SG26_LIN_PIA_IMD_MEA_QTY_PCD_ALI_DTM_GIN_GIR_QVR_DOC_PAI_FTX : LIN
+    [EdiSegmentGroup("LIN", "PIA", "PGI", "IMD", "MEA", "QTY", "PCD", "ALI", "DTM", "GIN", "GIR", "QVR", "EQD", "FTX", "DGS", "MOA", "MOA", "PYT", "PRI", "RFF", "PAC", "LOC", "TAX", "NAD", "ALC", "ALC", "TDT", "TOD", "RCS", "GEI")]
+    public class SG26_LIN : LIN
     {
         public List<PIA> PIA { get; set; } = [];
         //public List<PGI>  PGI { get; set; } = [];
@@ -351,7 +358,47 @@ public class EDIFact_Issue288_D01B_INVOIC
         public EQD EQD { get; set; }
         public List<FTX> FTX { get; set; } = [];
         public DGS DGS { get; set; }
+        public SG34_TAX_MOA_LOC SG34 { get; set; }
     }
+
+    /// <summary>
+    /// Segment Group 34:  TAX-MOA-LOC
+    /// </summary>
+    [EdiSegmentGroup("TAX", "MOA", "LOC")]
+    public class SG34_TAX_MOA_LOC : TAX
+    {
+        public MOA MOA { get; set; }
+        public LOC LOC { get; set; }
+    }
+
+    /// <summary>
+    /// Segment Group 50:  MOA-SG51
+    /// </summary>
+    [EdiSegmentGroup("MOA", "RFF")]
+    public class SG50_MOA_SG51 : MOA
+    {
+        public MOA MOA { get; set; }
+        public SG51_RFF_DTM SG51 { get; set; }
+    }
+
+    /// <summary>
+    /// Segment Group 51:  RFF-DTM
+    /// </summary>
+    [EdiSegmentGroup("RFF", "DTM")]
+    public class SG51_RFF_DTM : RFF
+    {
+        public DTM DTM { get; set; }
+    }
+
+    /// <summary>
+    /// Segment Group 52:  TAX-MOA
+    /// </summary>
+    [EdiSegmentGroup("TAX", "MOA")]
+    public class SG52_TAX_MOA : TAX
+    {
+        public List<MOA> MOA { get; set; } = [];
+    }
+
 
     [EdiSegment, EdiPath("PCD")]
     public class PCD
