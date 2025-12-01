@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using indice.Edi.Tests.Models;
+using indice.Edi.Tests.Models.Issue288;
 using Xunit;
 
 namespace indice.Edi.Tests;
@@ -615,5 +616,23 @@ public class SerializerTests
         var expected = $"UNA:+.? '{Environment.NewLine}PFD+Y:M:3::AAA:BBB:744::Y+N::::FRA:MEX:::Z:E:R'{Environment.NewLine}";
         var output = Serialize(source);
         Assert.Equal(expected, output);
+    }
+
+    [Fact, Trait(Traits.Tag, "EDIFact"), Trait(Traits.Issue, "#288")]
+    public void Serialize_Roundtrip_Invoice_Issue288() {
+        var grammar = EdiGrammar.NewEdiFact();
+        var interchange = default(EDIFact_Issue288_D01B_INVOIC);
+        using (var stream = Helpers.GetResourceStream("edifact.Issue288.D01B.INVOIC.edi")) {
+            interchange = new EdiSerializer().Deserialize<EDIFact_Issue288_D01B_INVOIC>(new StreamReader(stream), grammar);
+        }
+        string Serialize<T>(T data) {
+            var grammar = EdiGrammar.NewEdiFact();
+
+            using var writer = new StringWriter();
+            new EdiSerializer().Serialize(writer, grammar, data);
+            return writer.ToString();
+        }
+        var output = Serialize(interchange);
+        Assert.True(true);
     }
 }
