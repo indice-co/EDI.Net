@@ -131,7 +131,7 @@ UNT+0000000010+1'
 
     [Fact]
     [Trait(Traits.Issue, "#287")]
-    public void FistSegmentGroupNull() 
+    public void SegmentGroupWithoutEdiSegmentAttribute()
     {
         var grammar = EdiGrammar.NewEdiFact();
         var edi = $@"UNA:+.? '
@@ -147,7 +147,8 @@ UNZ+1+1'
             message = new EdiSerializer().Deserialize<EdiFact_Issue287>(new StreamReader(stream), grammar);
         }
 
-        Assert.NotNull(message);
+        Assert.NotNull(message.body.bgm);
+        Assert.NotNull(message.footer.unt);
 
         string Serialize<T>(T data, IEdiGrammar grammar) {
 

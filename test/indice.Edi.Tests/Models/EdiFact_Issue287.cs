@@ -6,29 +6,28 @@ namespace indice.Edi.Tests.Models;
 
 public class EdiFact_Issue287 
 {
-    public UNB unb { get; set; } // Missing in issue code
+    public UNB unb { get; set; }
     public UNH unh { get; set; }
+    public Body body { get; set; }
+    public Footer footer { get; set; }
 
-    public body Body { get; set; }
 
-    public footer Footer { get; set; }
-    
-
-    [EdiElement, EdiSegmentGroup("BGM", SequenceEnd = "LIN", Mandatory = true)]
-    public class body
+    [EdiSegmentGroup("BGM", Mandatory = true)]
+    public class Body
     {
 
-        [EdiElement] // <- with this attribut, only first part is valorized (BGM[0][0]) in BGM object
-        public BGM BGM { get; set; }  // <- always null without modification (tried every possible attribute configuration on class, property, with or without initialization [ = new BGM();] etc.)
+        //[EdiElement] // <- with this attribut, only first part is valorized (BGM[0][0]) in BGM object
+        public BGM bgm { get; set; }  // <- always null without modification (tried every possible attribute configuration on class, property, with or without initialization [ = new BGM();] etc.)
 
-        public List<DTM> DTM { get; set; } = new List<DTM>();
-        public List<NAD> NAD { get; set; } = new List<NAD>();
-        public List<RFF> RFF { get; set; } = new List<RFF>();
-        public List<CUX> CUX { get; set; } = new List<CUX>();
+        public List<DTM> dtm { get; set; } = new List<DTM>();
+        public List<NAD> nad { get; set; } = new List<NAD>();
+        public List<RFF> rff { get; set; } = new List<RFF>();
+        public List<CUX> cux { get; set; } = new List<CUX>();
     }
 
-    public class footer {
-        public UNT UNT {get; set;}
+    [EdiSegmentGroup("UNT", Mandatory =true)]
+    public class Footer {
+        public UNT unt {get; set;}
     }
 
     #region EdiSegments
