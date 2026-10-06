@@ -128,4 +128,35 @@ UNT+0000000010+1'
         var output = Serialize(message, grammar);
         Assert.Equal(edi.Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
     }
+
+    [Fact]
+    [Trait(Traits.Issue, "#287")]
+    public void SegmentGroupWithoutEdiSegmentAttribute()
+    {
+        var grammar = EdiGrammar.NewEdiFact();
+        var edi = $@"UNA:+.? '
+UNB+UNOA:3+SENDER+RECEIVER+250101:1200+1'
+UNH+1+ORDERS:D:96A:UN'
+BGM+220+PO12345+9'
+DTM+137:20250101:102'
+UNT+4+1'
+UNZ+1+1'
+";
+        var message = new EdiFact_Issue287();
+        using (var stream = Helpers.StreamFromString(edi)) {
+            message = new EdiSerializer().Deserialize<EdiFact_Issue287>(new StreamReader(stream), grammar);
+        }
+
+        Assert.NotNull(message.body.bgm);
+        Assert.NotNull(message.footer.unt);
+
+        string Serialize<T>(T data, IEdiGrammar grammar) {
+
+            using var writer = new StringWriter();
+            new EdiSerializer().Serialize(writer, grammar, data);
+            return writer.ToString();
+        }
+        var output = Serialize(message, grammar);
+        Assert.Equal(edi.Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
+    }
 }
